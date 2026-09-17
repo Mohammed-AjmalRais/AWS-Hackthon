@@ -76,6 +76,44 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
   };
 
   const isTamilNadu = profile.state === "Tamil Nadu";
+  const isAndhraPradesh = profile.state === "Andhra Pradesh";
+
+  const handleResetToBlank = () => {
+    onProfileChange({
+      name: "",
+      category: "General",
+      tnCommunity: "None",
+      apCommunity: "None",
+      gender: "Female",
+      isMinority: false,
+      minorityCommunity: "None",
+      isPersonWithDisability: false,
+      disabilityPercentage: 0,
+      isOrphanOrSingleParent: false,
+      state: "Andhra Pradesh",
+      district: "",
+      residenceYearsInState: 10,
+      isStudyingInHomeState: true,
+      educationLevel: "UG",
+      courseType: "Regular Full-Time",
+      isTechnicalCourse: true,
+      admissionQuota: "Merit/Govt Counseling",
+      institutionType: "Government",
+      studiedInGovtSchool6To12: false,
+      isFirstGraduateInFamily: false,
+      marksPercentage: 75,
+      isHosteller: false,
+      annualFamilyIncome: 150000,
+      electricityUnitsPerYear: 1800,
+      numberOfSiblingsAvailingScholarship: 0,
+      agriculturalLandAcres: 0,
+      residentialFlatSqFt: 0,
+      hasPaternalCasteRecord: true,
+      hasValidAddressProof: true,
+      isAlreadyReceivingOtherScholarship: false,
+      heldDocuments: ["Aadhaar_Card", "Marksheet_10_12", "Bank_Passbook"],
+    });
+  };
 
   // Split results into Eligible vs Not Eligible
   const eligibleResults = evaluationResults.filter((r) => r.decision === "ALLOW");
@@ -219,14 +257,25 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
           </div>
 
           {/* Quick-Fill Verified Personas Bar */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                <Sparkles className="size-3.5 text-orange-500" />
-                Quick-Fill Verified Demo Personas
-              </span>
-              <span className="text-[11px] text-slate-400">Click to instantly populate full real-world parameters</span>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <Sparkles className="size-3.5 text-orange-500" />
+                  Select Demo Persona OR Enter Custom Client Details
+                </span>
+                <p className="text-[11px] text-slate-500 mt-0.5">Click a verified profile or start fresh to enter custom citizen parameters</p>
+              </div>
+
+              <button
+                onClick={handleResetToBlank}
+                className="flex items-center gap-1.5 rounded-xl border border-dashed border-orange-300 bg-orange-50/70 px-3 py-1.5 text-xs font-bold text-orange-800 hover:bg-orange-100 cursor-pointer shadow-2xs transition-all shrink-0"
+              >
+                <RotateCcw className="size-3 text-orange-600" />
+                <span>Clear Form / Custom Client Entry</span>
+              </button>
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 pt-1">
               {DEMO_PERSONAS.map((persona) => (
                 <button
@@ -271,8 +320,8 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                   type="text"
                   value={profile.name || ""}
                   onChange={(e) => onProfileChange({ ...profile, name: e.target.value })}
-                  placeholder="e.g. Kavitha Selvam"
-                  className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
+                  placeholder="e.g. Sravani Reddy / Kavitha Selvam"
+                  className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden font-medium"
                 />
               </div>
 
@@ -285,6 +334,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                     onChange={(e) => onProfileChange({ ...profile, state: e.target.value })}
                     className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold text-orange-700 focus:border-orange-500 focus:outline-hidden"
                   >
+                    <option value="Andhra Pradesh">Andhra Pradesh (11 State Schemes Active)</option>
                     <option value="Tamil Nadu">Tamil Nadu (11 State Schemes Active)</option>
                     <option value="Jharkhand">Jharkhand (Tribal Welfare Active)</option>
                     <option value="Maharashtra">Maharashtra</option>
@@ -305,8 +355,8 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                     }
                     className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
                   >
-                    <option value="Female">Female (Pudhumai Penn / Pragati Eligible)</option>
-                    <option value="Male">Male (Tamil Pudhalvan Eligible)</option>
+                    <option value="Female">Female (Pudhumai Penn / Pragati / Amma Vodi)</option>
+                    <option value="Male">Male (Tamil Pudhalvan / General)</option>
                     <option value="Other">Other / Transgender</option>
                   </select>
                 </div>
@@ -347,6 +397,44 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                   </select>
                   <p className="text-[10px] text-orange-800">
                     MBC/DNC students in 3-yr degree courses receive 100% free tuition with zero income limit under TN Govt orders.
+                  </p>
+                </div>
+              ) : isAndhraPradesh ? (
+                <div className="rounded-xl border border-teal-200 bg-teal-50/50 p-3 space-y-2">
+                  <label className="block text-xs font-bold text-teal-950">
+                    Andhra Pradesh Social Category (MeeSeva / Navasakam Quota)
+                  </label>
+                  <select
+                    value={profile.apCommunity || "BC-A"}
+                    onChange={(e) =>
+                      onProfileChange({
+                        ...profile,
+                        apCommunity: e.target.value as UserProfile["apCommunity"],
+                        category:
+                          e.target.value === "ST"
+                            ? "ST"
+                            : e.target.value === "SC"
+                            ? "SC"
+                            : ["BC-A", "BC-B", "BC-C", "BC-D", "BC-E", "Kapu", "EBC"].includes(e.target.value)
+                            ? "OBC"
+                            : "General",
+                      })
+                    }
+                    className="w-full rounded-lg border border-teal-300 bg-white p-2 text-xs font-bold text-slate-900 focus:border-orange-500 focus:outline-hidden"
+                  >
+                    <option value="BC-A">BC-A (Aboriginal Tribes & Nomadic Groups - 100% RTF)</option>
+                    <option value="BC-B">BC-B (Occupational / Artisan Groups - 100% RTF)</option>
+                    <option value="BC-C">BC-C (Scheduled Caste Converts to Christianity - 100% RTF)</option>
+                    <option value="BC-D">BC-D (Other Backward Classes - 100% RTF)</option>
+                    <option value="BC-E">BC-E (Socially & Educationally Backward Muslims - 100% RTF)</option>
+                    <option value="SC">SC (Scheduled Caste - 100% RTF + Vasathi Deevena)</option>
+                    <option value="ST">ST (Scheduled Tribe - 100% RTF + Vasathi Deevena)</option>
+                    <option value="Kapu">Kapu / Telaga / Balija (Kapu Nestham & Jnanabhumi)</option>
+                    <option value="EBC">EBC (Economically Backward Classes)</option>
+                    <option value="OC">OC (Open Category / General)</option>
+                  </select>
+                  <p className="text-[10px] text-teal-800">
+                    Eligible for Jagananna Vidya Deevena (100% Fee Reimbursement) and Vasathi Deevena (₹20,000 MTF) under AP Navasakam guidelines.
                   </p>
                 </div>
               ) : (
@@ -950,7 +1038,15 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                         </button>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={onNavigateToDocuments}
+                          className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
+                        >
+                          <FileCheck className="size-3.5 text-blue-600" />
+                          <span>Upload & Audit Docs</span>
+                        </button>
+
                         {/* Primary Button: Open Scheme Cockpit */}
                         <button
                           onClick={() => setSelectedCockpitResult(result)}

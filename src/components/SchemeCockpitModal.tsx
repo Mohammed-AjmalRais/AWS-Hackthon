@@ -369,31 +369,69 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {defaultMilestones.map((m) => {
                 const isDone = !!checkedMilestones[m.id];
                 return (
-                  <label
+                  <div
                     key={m.id}
-                    className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all ${
+                    className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-3.5 transition-all ${
                       isDone
                         ? "border-emerald-300 bg-emerald-50/50"
                         : "border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300"
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isDone}
-                      onChange={() => toggleMilestone(m.id)}
-                      className="size-4.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 mt-0.5 cursor-pointer"
-                    />
-                    <div className="flex-1 text-xs">
-                      <p className={`font-bold ${isDone ? "text-emerald-950 line-through" : "text-slate-900"}`}>
-                        {m.label}
-                      </p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{m.detail}</p>
+                    <label className="flex items-start gap-3 cursor-pointer flex-1">
+                      <input
+                        type="checkbox"
+                        checked={isDone}
+                        onChange={() => toggleMilestone(m.id)}
+                        className="size-4.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 mt-0.5 cursor-pointer"
+                      />
+                      <div className="text-xs">
+                        <p className={`font-bold ${isDone ? "text-emerald-950 line-through" : "text-slate-900"}`}>
+                          {m.label}
+                        </p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">{m.detail}</p>
+                      </div>
+                    </label>
+
+                    {/* Contextual Action Button based on Milestone */}
+                    <div className="sm:shrink-0 pl-7 sm:pl-0">
+                      {m.id === "m2" && missingPrerequisites.length > 0 && (
+                        <button
+                          onClick={() => onOpenCertificateGuide(missingPrerequisites[0].id)}
+                          className="flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white shadow-2xs hover:bg-amber-700 cursor-pointer"
+                        >
+                          <span>Resolve {missingPrerequisites[0].shortCode || "Cert"} ➔</span>
+                        </button>
+                      )}
+
+                      {m.id === "m3" && onNavigateToDocumentsTab && (
+                        <button
+                          onClick={() => {
+                            onClose();
+                            onNavigateToDocumentsTab();
+                          }}
+                          className="flex items-center gap-1 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-2xs hover:bg-orange-700 cursor-pointer"
+                        >
+                          <span>Upload & Audit Docs ➔</span>
+                        </button>
+                      )}
+
+                      {m.id === "m4" && (
+                        <a
+                          href={scheme.officialPortalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white shadow-2xs hover:bg-slate-800"
+                        >
+                          <span>Official Portal</span>
+                          <ExternalLink className="size-3" />
+                        </a>
+                      )}
                     </div>
-                  </label>
+                  </div>
                 );
               })}
             </div>

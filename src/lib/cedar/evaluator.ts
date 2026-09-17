@@ -5,6 +5,7 @@ export interface UserProfile {
   name?: string;
   category: "ST" | "SC" | "OBC" | "EWS" | "General";
   tnCommunity?: "OC" | "BC" | "BCM" | "MBC" | "DNC" | "SC" | "SCA" | "ST" | "None";
+  apCommunity?: "OC" | "BC-A" | "BC-B" | "BC-C" | "BC-D" | "BC-E" | "SC" | "ST" | "Kapu" | "EBC" | "None";
   gender: "Male" | "Female" | "Other";
   isMinority: boolean;
   minorityCommunity?: "Muslim" | "Christian" | "Sikh" | "Buddhist" | "Jain" | "Parsi" | "None";
@@ -62,6 +63,7 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
   name: "Candidate",
   category: "General",
   tnCommunity: "BC",
+  apCommunity: "BC-A",
   gender: "Male",
   isMinority: false,
   minorityCommunity: "None",
@@ -116,7 +118,10 @@ export function evaluateCedarPolicies(rawProfile: Partial<UserProfile>): CedarEv
 
     // 1. Social Category Matching
     const isTN = profile.state === "Tamil Nadu";
+    const isAP = profile.state === "Andhra Pradesh";
     const community = profile.tnCommunity || "BC";
+    const apComm = profile.apCommunity || "BC-A";
+
     const isTNCommunityMatch = isTN && (
       scheme.targetCategories.includes("All") ||
       (community === "ST" && scheme.targetCategories.includes("ST")) ||
@@ -129,10 +134,34 @@ export function evaluateCedarPolicies(rawProfile: Partial<UserProfile>): CedarEv
       ))
     );
 
-    if (scheme.targetCategories.includes("All") || scheme.targetCategories.includes(profile.category) || isTNCommunityMatch) {
-      passedClauses.push(`Category match: ${isTN ? `${community} (TN)` : profile.category} in [${scheme.targetCategories.join(", ")}]`);
+    const isAPCommunityMatch = isAP && (
+      scheme.targetCategories.includes("All") ||
+      (apComm === "ST" && scheme.targetCategories.includes("ST")) ||
+      (apComm === "SC" && scheme.targetCategories.includes("SC")) ||
+      (["BC-A", "BC-B", "BC-C", "BC-D", "BC-E"].includes(apComm) && (
+        scheme.targetCategories.includes("OBC") ||
+        scheme.targetCategories.includes("BC")
+      )) ||
+      (["Kapu", "EBC"].includes(apComm) && (
+        scheme.targetCategories.includes("Kapu") ||
+        scheme.targetCategories.includes("EBC") ||
+        scheme.targetCategories.includes("OBC")
+      ))
+    );
+
+    if (
+      scheme.targetCategories.includes("All") ||
+      scheme.targetCategories.includes(profile.category) ||
+      isTNCommunityMatch ||
+      isAPCommunityMatch
+    ) {
+      passedClauses.push(
+        `Category match: ${isTN ? `${community} (TN)` : isAP ? `${apComm} (AP)` : profile.category} in [${scheme.targetCategories.join(", ")}]`
+      );
     } else {
-      failedClauses.push(`Category mismatch: Candidate is ${isTN ? community : profile.category}, but scheme requires [${scheme.targetCategories.join(", ")}]`);
+      failedClauses.push(
+        `Category mismatch: Candidate is ${isTN ? community : isAP ? apComm : profile.category}, but scheme requires [${scheme.targetCategories.join(", ")}]`
+      );
       fitScore -= 45;
     }
 

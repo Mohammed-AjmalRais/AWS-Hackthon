@@ -1383,5 +1383,616 @@ when {
         a: "The statutory government service fee is ₹60 at any authorized e-Sevai counter."
       }
     ]
+  },
+
+  // =========================================================================
+  // ANDHRA PRADESH (AP) FLAGSHIP STATE SCHEMES
+  // =========================================================================
+
+  // 25. AP Jagananna Vidya Deevena (Reimbursement of Tuition Fee - RTF)
+  {
+    id: "AP_Jagananna_Vidya_Deevena",
+    title: "Jagananna Vidya Deevena (Full Fee Reimbursement - RTF)",
+    shortCode: "AP-JVD-RTF",
+    type: "scholarship",
+    ministry: "Social Welfare / Higher Education Department, Government of Andhra Pradesh",
+    sponsoringBody: "State Government of Andhra Pradesh (100% State Funded)",
+    level: "State",
+    targetCategories: ["All", "BC", "SC", "ST", "Kapu", "EBC", "Minority"],
+    maxIncome: 250000,
+    educationStages: ["UG", "PG", "Diploma", "Professional"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    managementQuotaAllowed: false,
+    applicableStates: ["Andhra Pradesh"],
+    maxElectricityUnitsPerYear: 3600,
+    benefitAmount: "100% Full Tuition Fee Reimbursement (Direct Credit to Mother's Bank Account)",
+    benefitDescription: "Provides 100% complete tuition fee reimbursement for students pursuing ITI, Polytechnic, Degree, B.Tech, MBA, MCA, Pharmacy, and B.Ed courses in recognized government, aided, and private colleges under convenor merit quota.",
+    officialPortalUrl: "https://jnanabhumi.ap.gov.in",
+    portalName: "Jnanabhumi / Navasakam Portal",
+    portalSchemeCode: "AP-JVD-2026",
+    deadline: "October 31, 2026",
+    daysRemaining: 44,
+    prerequisites: ["Income_Certificate", "Caste_Certificate", "Ration_Card"],
+    mandatoryDocuments: [
+      "Integrated Community, Nativity & Date of Birth Certificate (MeeSeva Code REV-01)",
+      "Current Financial Year Income Certificate (< ₹2,50,000) or Rice Card / BPL Card",
+      "Aadhaar Number of Student and Mother (both actively linked for biometric authentication)",
+      "Aadhaar-Seeded NPCI Mapped Bank Account Passbook of the Mother",
+      "College Admission Allotment Order issued through Convenor Merit Counseling",
+      "Class 10 & Intermediate (12th) Marksheets"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam & College Principal Office",
+      counterName: "Welfare and Education Assistant (WEA) Desk",
+      officialStatutoryFee: "₹0 (Completely Free under Navasakam Guidelines)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Colleges and Sachivalayams cannot charge any fee for Jnanabhumi verification or authentication.",
+      statutoryDaysLimit: 21,
+      rtsaClause: "AP Right to Public Services Act & G.O. Ms No. 115"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_Jagananna_Vidya_Deevena")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 250000 &&
+    principal.admissionQuota == "Merit/Govt Counseling" &&
+    (principal.electricityUnitsPerYear == null || principal.electricityUnitsPerYear <= 3600) &&
+    (principal.educationLevel in ["UG", "PG", "Diploma", "Professional"])
+};`,
+    officialGazetteRef: "G.O. Ms. No. 115, Higher Education (EC) Department, Govt of AP",
+    faqs: [
+      {
+        q: "In whose bank account will the fee reimbursement be credited?",
+        a: "Under statutory guidelines, funds are directly deposited via DBT into the mother's Aadhaar-seeded bank account in four quarterly installments."
+      },
+      {
+        q: "What is the domestic electricity limit for eligibility?",
+        a: "The household electricity consumption must not exceed 300 units per month (3,600 units/year) across domestic connections."
+      }
+    ]
+  },
+
+  // 26. AP Jagananna Vasathi Deevena (Maintenance Fee - MTF)
+  {
+    id: "AP_Jagananna_Vasathi_Deevena",
+    title: "Jagananna Vasathi Deevena (Food & Hostel Maintenance Allowance - MTF)",
+    shortCode: "AP-JVD-MTF",
+    type: "scholarship",
+    ministry: "Social Welfare Department, Government of Andhra Pradesh",
+    sponsoringBody: "State Government of Andhra Pradesh",
+    level: "State",
+    targetCategories: ["All", "BC", "SC", "ST", "Kapu", "EBC", "Minority"],
+    maxIncome: 250000,
+    educationStages: ["UG", "PG", "Diploma", "Professional"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    managementQuotaAllowed: false,
+    applicableStates: ["Andhra Pradesh"],
+    maxElectricityUnitsPerYear: 3600,
+    benefitAmount: "₹20,000 / Year for Degree/Engineering; ₹15,000 for Polytechnic; ₹10,000 for ITI",
+    benefitDescription: "Provides annual financial assistance to meet food, hostel, and boarding expenses of post-matric students, deposited in two equal installments directly into the mother's bank account.",
+    officialPortalUrl: "https://jnanabhumi.ap.gov.in",
+    portalName: "Jnanabhumi / Navasakam Portal",
+    portalSchemeCode: "AP-JVD-VASATHI-2026",
+    deadline: "October 31, 2026",
+    daysRemaining: 44,
+    prerequisites: ["Income_Certificate", "Caste_Certificate", "Ration_Card"],
+    mandatoryDocuments: [
+      "Student & Mother Aadhaar Cards",
+      "Rice Card / Integrated Income Certificate issued by Tahsildar",
+      "Hostel Bonafide Certificate issued by College Principal / Warden",
+      "Mother's Aadhaar-Seeded Bank Account Passbook",
+      "Convenor Allotment Order"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam",
+      counterName: "Welfare and Education Assistant (WEA) Desk",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Government service is completely free at all Grama/Ward Sachivalayams.",
+      statutoryDaysLimit: 21,
+      rtsaClause: "G.O. Ms. No. 115 Social Welfare"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_Jagananna_Vasathi_Deevena")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 250000 &&
+    principal.admissionQuota == "Merit/Govt Counseling" &&
+    (principal.educationLevel in ["UG", "PG", "Diploma", "Professional"])
+};`,
+    officialGazetteRef: "G.O. Ms. No. 116 Social Welfare (EDN) Department",
+    faqs: [
+      {
+        q: "Can day scholars also receive Vasathi Deevena?",
+        a: "Yes. Both hostellers and day scholars pursuing eligible post-matric courses receive the allowance to cover boarding and learning material costs."
+      }
+    ]
+  },
+
+  // 27. Dr. YSR Aarogyasri Health Scheme
+  {
+    id: "AP_YSR_Aarogyasri",
+    title: "Dr. YSR Aarogyasri Comprehensive Health Scheme (₹25 Lakh Medical Coverage)",
+    shortCode: "AP-YSR-AAROGYASRI",
+    type: "healthcare",
+    ministry: "Health, Medical & Family Welfare Department, Government of Andhra Pradesh",
+    sponsoringBody: "Dr. YSR Aarogyasri Health Care Trust",
+    level: "State",
+    targetCategories: ["All"],
+    maxIncome: 500000,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    applicableStates: ["Andhra Pradesh"],
+    benefitAmount: "Up to ₹25,00,000 / Family / Year Cashless Treatment across 3,255 Inpatient Procedures",
+    benefitDescription: "Flagship health scheme providing end-to-end cashless secondary and tertiary medical treatments, surgical care, and follow-up medications in 1,800+ empaneled government and private super-specialty hospitals in AP, Hyderabad, Chennai, and Bengaluru.",
+    officialPortalUrl: "https://aarogyasri.ap.gov.in",
+    portalName: "Dr. YSR Aarogyasri Portal",
+    portalSchemeCode: "AP-AAROGYASRI-2026",
+    deadline: "Open All Year (Instant Kiosk Activation)",
+    daysRemaining: 365,
+    prerequisites: ["Ration_Card"],
+    mandatoryDocuments: [
+      "Dr. YSR Aarogyasri Health Card or BPL Rice Card / Food Security Card",
+      "Aadhaar Card of the Patient and Family Head",
+      "Doctor's Referral Prescription / Diagnostic Test Reports"
+    ],
+    offlineSubmission: {
+      centerName: "Aarogyamithra Helpdesk at any Empaneled Government/Private Hospital",
+      counterName: "Aarogyasri Kiosk Counter",
+      officialStatutoryFee: "₹0 (100% Free under Trust Guidelines)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Hospitals cannot charge any fees for registration, bed charges, tests, surgery, or medicines under Aarogyasri.",
+      statutoryDaysLimit: 1,
+      rtsaClause: "Dr. YSR Aarogyasri Health Care Trust Operational Guidelines"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"AvailHealthcare", resource == Scheme::"AP_YSR_Aarogyasri")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 500000
+};`,
+    officialGazetteRef: "G.O. Ms. No. 138 HM&FW Department, Govt of AP",
+    faqs: [
+      {
+        q: "What is the family income ceiling for Aarogyasri in Andhra Pradesh?",
+        a: "Families with an annual income up to ₹5,00,000, or possessing a state Rice Card, or owning less than 12 acres of wetland / 35 acres of dryland are covered."
+      },
+      {
+        q: "Are super-specialty hospitals in Hyderabad and Chennai covered?",
+        a: "Yes. 130+ super-specialty network hospitals in Hyderabad, Chennai, and Bengaluru are empaneled for high-end surgeries."
+      }
+    ]
+  },
+
+  // 28. YSR Cheyutha Scheme (Women Empowerment)
+  {
+    id: "AP_YSR_Cheyutha",
+    title: "YSR Cheyutha Scheme (₹75,000 Direct Financial Support for Women)",
+    shortCode: "AP-YSR-CHEYUTHA",
+    type: "scholarship",
+    ministry: "Panchayat Raj & Rural Development / SERP, Government of Andhra Pradesh",
+    sponsoringBody: "State Government of Andhra Pradesh",
+    level: "State",
+    targetCategories: ["SC", "ST", "BC", "Minority"],
+    maxIncome: 250000,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    genderRestriction: "Female",
+    managementQuotaAllowed: true,
+    applicableStates: ["Andhra Pradesh"],
+    maxElectricityUnitsPerYear: 3600,
+    benefitAmount: "₹18,750 / Year for 4 Years (Total ₹75,000 Direct Cash Transfer)",
+    benefitDescription: "Provides ₹18,750 per year for four consecutive years (totaling ₹75,000) to women belonging to SC, ST, BC, and Minority communities aged between 45 and 60 years to establish sustainable livelihoods and micro-enterprises.",
+    officialPortalUrl: "https://navasakam.ap.gov.in",
+    portalName: "AP Navasakam Beneficiary Management",
+    portalSchemeCode: "AP-CHEYUTHA-2026",
+    deadline: "December 15, 2026",
+    daysRemaining: 89,
+    prerequisites: ["Caste_Certificate", "Income_Certificate", "Ration_Card"],
+    mandatoryDocuments: [
+      "Aadhaar Card proving Age between 45 and 60 years",
+      "Integrated Caste Certificate (SC/ST/BC/Minority)",
+      "AP Rice Card / Household Income Certificate (< ₹2.5L)",
+      "Aadhaar-Seeded Single-Holder Bank Account Passbook"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam",
+      counterName: "Welfare & Education Assistant Counter",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Sachivalayam staff are prohibited from charging processing fees.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "SERP Operational Guidelines"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_YSR_Cheyutha")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.gender == "Female" &&
+    principal.annualFamilyIncome <= 250000 &&
+    (principal.category in ["SC", "ST", "OBC"])
+};`,
+    officialGazetteRef: "G.O. Ms. No. 59, Social Welfare (SW.OP) Department",
+    faqs: [
+      {
+        q: "What is the age requirement for YSR Cheyutha?",
+        a: "The woman applicant must be between 45 and 60 years of age as on the qualifying date of notification."
+      }
+    ]
+  },
+
+  // 29. Jagananna Amma Vodi / Thalliki Vandanam
+  {
+    id: "AP_Amma_Vodi",
+    title: "Jagananna Amma Vodi / Thalliki Vandanam (₹15,000 School Education DBT)",
+    shortCode: "AP-AMMA-VODI",
+    type: "scholarship",
+    ministry: "School Education Department, Government of Andhra Pradesh",
+    sponsoringBody: "State Government of Andhra Pradesh",
+    level: "State",
+    targetCategories: ["All"],
+    maxIncome: 250000,
+    educationStages: ["Class 9", "Class 10", "11th", "12th"],
+    courseTypesAllowed: ["Regular Full-Time"],
+    managementQuotaAllowed: true,
+    genderRestriction: "Female",
+    applicableStates: ["Andhra Pradesh"],
+    maxElectricityUnitsPerYear: 3600,
+    benefitAmount: "₹15,000 / Year Direct Benefit Transfer to Mother's Bank Account",
+    benefitDescription: "Provides annual financial assistance of ₹15,000 to eligible mothers sending their children to recognized government, aided, or private schools/junior colleges from Class 1 to 12, ensuring 75% minimum student attendance.",
+    officialPortalUrl: "https://jaganannaammavodi.ap.gov.in",
+    portalName: "Jagananna Amma Vodi Official Portal",
+    portalSchemeCode: "AP-AMMAVODI-2026",
+    deadline: "January 15, 2027",
+    daysRemaining: 120,
+    prerequisites: ["Ration_Card"],
+    mandatoryDocuments: [
+      "Mother's Aadhaar Card and Child's Aadhaar Card",
+      "White Ration Card / BPL Rice Card",
+      "School Bonafide Certificate with Child Info System (CIS) Student ID",
+      "Mother's Aadhaar-Seeded NPCI Bank Passbook",
+      "Minimum 75% Attendance Certification from School Headmaster"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam & School Headmaster Desk",
+      counterName: "Education Assistant Counter",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Completely free under AP School Education directives.",
+      statutoryDaysLimit: 15,
+      rtsaClause: "G.O. Ms. No. 79 School Education Dept"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_Amma_Vodi")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 250000 &&
+    (principal.electricityUnitsPerYear == null || principal.electricityUnitsPerYear <= 3600)
+};`,
+    officialGazetteRef: "G.O. Ms. No. 79, School Education (Prog.II) Department",
+    faqs: [
+      {
+        q: "Is 75% school attendance strictly mandatory for Amma Vodi?",
+        a: "Yes. The Child Info System (CIS) electronically checks that the student maintained at least 75% attendance throughout the academic year."
+      }
+    ]
+  },
+
+  // 30. YSR Kalyanamasthu & Shaadi Tohfa
+  {
+    id: "AP_YSR_Kalyanamasthu",
+    title: "YSR Kalyanamasthu & Shaadi Tohfa (Marriage Financial Assistance up to ₹1,50,000)",
+    shortCode: "AP-YSR-KALYANAMASTHU",
+    type: "scholarship",
+    ministry: "Social Welfare / Minorities Welfare Department, Government of Andhra Pradesh",
+    sponsoringBody: "State Government of Andhra Pradesh",
+    level: "State",
+    targetCategories: ["All", "SC", "ST", "BC", "Minority"],
+    maxIncome: 250000,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    applicableStates: ["Andhra Pradesh"],
+    maxElectricityUnitsPerYear: 3600,
+    benefitAmount: "₹1,00,000 (SC/ST), ₹50,000 (BC), ₹1,00,000 (Minorities), ₹1,50,000 (Differently Abled)",
+    benefitDescription: "Financial grant for newly married couples from economically weaker sections. To eliminate child marriages, both bride (18+) and groom (21+) must possess a minimum Class 10 SSC passing marksheet.",
+    officialPortalUrl: "https://navasakam2.apcfss.in",
+    portalName: "Navasakam Marriage Financial Assistance Portal",
+    portalSchemeCode: "AP-KALYANAMASTHU-2026",
+    deadline: "Within 60 Days of Marriage Registration",
+    daysRemaining: 60,
+    prerequisites: ["Caste_Certificate", "Income_Certificate"],
+    mandatoryDocuments: [
+      "Class 10 (SSC) Passing Certificate of both Bride and Groom",
+      "Marriage Registration Certificate issued by Sub-Registrar / Ward Secretariat",
+      "Aadhaar Cards of Bride and Groom",
+      "Community Certificate issued via MeeSeva",
+      "Bride's Aadhaar-Seeded Bank Account Passbook"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam",
+      counterName: "Welfare & Education Assistant Desk",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Verification at Sachivalayam is 100% free.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "G.O. Ms. No. 107 Social Welfare"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_YSR_Kalyanamasthu")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 250000
+};`,
+    officialGazetteRef: "G.O. Ms. No. 107, Social Welfare (SW.EDN.2) Department",
+    faqs: [
+      {
+        q: "Is Class 10 qualification strictly mandatory?",
+        a: "Yes. Both the bride and groom must have passed SSC (Class 10) to be eligible for Kalyanamasthu."
+      }
+    ]
+  },
+
+  // 31. YSR Aasara (SHG DWCRA Loan Waiver Reimbursement)
+  {
+    id: "AP_YSR_Aasara",
+    title: "YSR Aasara Scheme (100% SHG DWCRA Loan Waiver Reimbursement)",
+    shortCode: "AP-YSR-AASARA",
+    type: "scholarship",
+    ministry: "Society for Elimination of Rural Poverty (SERP) / MEPMA, Govt of AP",
+    sponsoringBody: "State Government of Andhra Pradesh",
+    level: "State",
+    targetCategories: ["All"],
+    maxIncome: 250000,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    genderRestriction: "Female",
+    managementQuotaAllowed: true,
+    applicableStates: ["Andhra Pradesh"],
+    benefitAmount: "100% Reimbursement of Outstanding DWCRA Bank Loans in Four Annual Installments",
+    benefitDescription: "Reimburses the entire outstanding bank loan liability of Self Help Group (SHG) women in four equal installments deposited directly into individual women's bank accounts.",
+    officialPortalUrl: "https://serp.ap.gov.in",
+    portalName: "AP SERP / Navasakam Portal",
+    portalSchemeCode: "AP-AASARA-2026",
+    deadline: "Open Annual Cycle",
+    daysRemaining: 150,
+    prerequisites: ["Ration_Card"],
+    mandatoryDocuments: [
+      "SHG DWCRA Group Member Savings Passbook",
+      "Bank Loan Account Sanction Letter & Statement",
+      "Aadhaar Card of the Woman SHG Member",
+      "Aadhaar-Seeded Bank Passbook"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam & Mandal Samakhya Office",
+      counterName: "Village Organization (VO) / SERP Counter",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "No intermediary charges allowed.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "SERP Guidelines"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_YSR_Aasara")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.gender == "Female" &&
+    principal.annualFamilyIncome <= 250000
+};`,
+    officialGazetteRef: "G.O. Ms. No. 44 SERP Guidelines, Govt of AP",
+    faqs: [
+      {
+        q: "Who is eligible for YSR Aasara?",
+        a: "Women members of recognized DWCRA Self Help Groups in rural and urban areas of Andhra Pradesh."
+      }
+    ]
+  },
+
+  // 32. YSR Vahana Mitra (Financial Allowance for Auto/Taxi Drivers)
+  {
+    id: "AP_YSR_Vahana_Mitra",
+    title: "YSR Vahana Mitra (₹10,000 Annual Allowance for Auto & Taxi Drivers)",
+    shortCode: "AP-YSR-VAHANAMITRA",
+    type: "scholarship",
+    ministry: "Transport, Roads and Buildings Department, Government of Andhra Pradesh",
+    sponsoringBody: "State Government of Andhra Pradesh",
+    level: "State",
+    targetCategories: ["All"],
+    maxIncome: 250000,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    applicableStates: ["Andhra Pradesh"],
+    benefitAmount: "₹10,000 / Year Recurring Allowance for Vehicle Insurance, Fitness & Repairs",
+    benefitDescription: "Provides ₹10,000 annual recurring financial allowance to self-employed auto, taxi, and maxi cab drivers to cover mandatory vehicle fitness certificates, motor insurance, and maintenance.",
+    officialPortalUrl: "https://aptransport.org",
+    portalName: "AP Transport Department Portal",
+    portalSchemeCode: "AP-VAHANAMITRA-2026",
+    deadline: "November 15, 2026",
+    daysRemaining: 59,
+    prerequisites: ["Ration_Card"],
+    mandatoryDocuments: [
+      "Valid Driving License (Light Motor Vehicle - Transport or Auto Rickshaw)",
+      "Vehicle Registration Certificate (RC) registered in driver's own name",
+      "Aadhaar Card and White Ration Card / Rice Card",
+      "Aadhaar-Seeded Bank Account Passbook"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam & Regional Transport Office (RTO)",
+      counterName: "Transport & Welfare Assistant Counter",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Completely free under AP Transport Department rules.",
+      statutoryDaysLimit: 15,
+      rtsaClause: "Transport Department G.O. Ms. No. 45"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_YSR_Vahana_Mitra")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 250000
+};`,
+    officialGazetteRef: "G.O. Ms. No. 45, Transport, Roads & Buildings (Tr.I) Department",
+    faqs: [
+      {
+        q: "Must the vehicle RC be in the driver's own name?",
+        a: "Yes. The applicant must be both the owner and driver of the auto rickshaw, taxi, or maxi cab."
+      }
+    ]
+  },
+
+  // 33. YSR Pension Kanuka (Social Security Pension)
+  {
+    id: "AP_YSR_Pension_Kanuka",
+    title: "YSR Pension Kanuka (₹3,000–₹4,000 / Month Social Security Pension)",
+    shortCode: "AP-YSR-PENSION",
+    type: "scholarship",
+    ministry: "Panchayat Raj and Rural Development Department, Government of Andhra Pradesh",
+    sponsoringBody: "State Government of Andhra Pradesh",
+    level: "State",
+    targetCategories: ["All"],
+    maxIncome: 120000,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    applicableStates: ["Andhra Pradesh"],
+    maxElectricityUnitsPerYear: 3600,
+    benefitAmount: "₹3,000–₹4,000 / Month Cash DBT (₹6,000 / Month for Severe Disability)",
+    benefitDescription: "Direct monthly pension delivered on the 1st of every month to senior citizens (60+), widows, single women, weavers, toddy tappers, and persons with disabilities.",
+    officialPortalUrl: "https://sspensions.ap.gov.in",
+    portalName: "YSR Pension Kanuka Portal",
+    portalSchemeCode: "AP-SSP-2026",
+    deadline: "Ongoing Monthly Doorstep Delivery",
+    daysRemaining: 365,
+    prerequisites: ["Ration_Card"],
+    mandatoryDocuments: [
+      "Aadhaar Card proving Age / Identity",
+      "BPL Rice Card / Household Assessment",
+      "SADAREM Disability Certificate (for PwD Pension)",
+      "Death Certificate of Spouse (for Widow Pension)",
+      "Aadhaar-Seeded Bank Passbook"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam",
+      counterName: "Welfare and Education Assistant (WEA)",
+      officialStatutoryFee: "₹0 (Free Doorstep Service)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Delivered free at doorstep by village/ward secretariat volunteers.",
+      statutoryDaysLimit: 21,
+      rtsaClause: "Panchayat Raj G.O. Ms. No. 103"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"AvailPension", resource == Scheme::"AP_YSR_Pension_Kanuka")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 120000
+};`,
+    officialGazetteRef: "G.O. Ms. No. 103, PR & RD (RD.II) Department, Govt of AP",
+    faqs: [
+      {
+        q: "How is the pension delivered?",
+        a: "Pensions are paid directly at the beneficiary's doorstep on the 1st of every month through biometric / iris / facial authentication."
+      }
+    ]
+  },
+
+  // 34. Jnanabhumi Post-Matric Scholarship for SC/ST/BC/Kapu/EBC
+  {
+    id: "AP_Jnanabhumi_PostMatric",
+    title: "Jnanabhumi Post-Matric Welfare Scholarship (SC, ST, BC, Kapu, EBC & Minorities)",
+    shortCode: "AP-JNANABHUMI-PMS",
+    type: "scholarship",
+    ministry: "Social Welfare / BC Welfare / Kapu Welfare / Minority Welfare, Govt of AP",
+    sponsoringBody: "Centrally Sponsored & State Shared Scheme (60:40)",
+    level: "State",
+    targetCategories: ["SC", "ST", "BC", "Kapu", "EBC", "Minority"],
+    maxIncome: 250000,
+    educationStages: ["11th", "12th", "UG", "PG", "PhD", "Diploma", "Professional"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    managementQuotaAllowed: false,
+    applicableStates: ["Andhra Pradesh"],
+    benefitAmount: "100% Tuition Waiver + Annual Academic & Living Maintenance Allowances",
+    benefitDescription: "Integrated state-managed post-matric scholarship platform processing central and state entitlements for students admitted through convenor merit counseling.",
+    officialPortalUrl: "https://jnanabhumi.ap.gov.in",
+    portalName: "Jnanabhumi Education Portal",
+    portalSchemeCode: "AP-PMS-2026",
+    deadline: "November 30, 2026",
+    daysRemaining: 74,
+    prerequisites: ["Income_Certificate", "Caste_Certificate", "Domicile_Certificate"],
+    mandatoryDocuments: [
+      "Integrated Community, Nativity and Date of Birth Certificate (REV-01)",
+      "Current Financial Year Income Certificate (< ₹2.5 Lakhs)",
+      "Student & Mother Aadhaar Cards (Biometric e-KYC on Jnanabhumi)",
+      "Aadhaar-Seeded Bank Passbook (NPCI Mapped)",
+      "SSC & Intermediate Marksheets",
+      "College Bonafide and Tuition Fee Structure"
+    ],
+    offlineSubmission: {
+      centerName: "College Principal Office & District Social Welfare Officer (DSWO)",
+      counterName: "College Jnanabhumi Nodal Desk",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "No application fee permitted.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "Jnanabhumi Operations Manual 2024"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AP_Jnanabhumi_PostMatric")
+when {
+    principal.state == "Andhra Pradesh" &&
+    principal.annualFamilyIncome <= 250000 &&
+    principal.admissionQuota != "Management/Direct"
+};`,
+    officialGazetteRef: "Social Welfare Dept OM 14013/AP/2024",
+    faqs: [
+      {
+        q: "Can students enrolled in deemed universities outside AP apply?",
+        a: "Students who have secured admission under merit counseling in recognized premier institutions across India are eligible through the external Jnanabhumi gateway."
+      }
+    ]
+  },
+
+  // 35. AP Integrated Community, Nativity & Date of Birth Certificate (MeeSeva Code REV-01)
+  {
+    id: "AP_Integrated_Community_Cert",
+    title: "Integrated Community, Nativity & Date of Birth Certificate (కుల, నివాస, జనన ధృవీకరణ పత్రం)",
+    shortCode: "AP-MEESEVA-REV01",
+    type: "certificate",
+    ministry: "Revenue Department, Government of Andhra Pradesh",
+    sponsoringBody: "Government of Andhra Pradesh (MeeSeva Services)",
+    level: "State",
+    targetCategories: ["All"],
+    maxIncome: 999999999,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    applicableStates: ["Andhra Pradesh"],
+    benefitAmount: "Official Statutory Certificate Required for Jnanabhumi, Vidya Deevena & Counseling",
+    benefitDescription: "Combined 3-in-1 statutory certificate issued by Tahsildar through MeeSeva certifying applicant's caste (SC/ST/BC/OC), permanent nativity, and date of birth in a single digital document.",
+    officialPortalUrl: "https://ap.meeseva.gov.in",
+    portalName: "AP MeeSeva / Grama Sachivalayam Portal",
+    portalSchemeCode: "REV-01-INTEGRATED",
+    deadline: "Apply before College Admission Counseling Document Verification",
+    daysRemaining: 30,
+    prerequisites: ["Ration_Card"],
+    mandatoryDocuments: [
+      "Applicant's Class 10th / School Leaving Certificate (TC) recording caste and date of birth",
+      "Parents' Community Proof (Father/Mother MeeSeva Caste Certificate)",
+      "AP Rice Card / Family Food Security Card",
+      "Aadhaar Card of Applicant and Parents",
+      "Application Form signed by applicant and parent"
+    ],
+    offlineSubmission: {
+      centerName: "Grama / Ward Sachivalayam & MeeSeva Citizen Service Centers",
+      counterName: "Digital Assistant / MeeSeva Operator Counter",
+      officialStatutoryFee: "₹45 (Statutory MeeSeva User Charge)",
+      maxAuthorizedFee: "₹45.00",
+      feeWarning: "Official government charge is strictly ₹45. Report overcharging to 1902 Spandana helpline.",
+      statutoryDaysLimit: 15,
+      rtsaClause: "Andhra Pradesh Right to Services Act & Revenue Dept G.O. Ms No. 58"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"IssueCertificate", resource == Certificate::"AP_Integrated_Community_Cert")
+when {
+    principal.state == "Andhra Pradesh"
+};`,
+    officialGazetteRef: "MeeSeva Citizen Services Standards Code REV-01",
+    faqs: [
+      {
+        q: "What is the validity of the Integrated Certificate in Andhra Pradesh?",
+        a: "Permanent validity for Community and Date of Birth; Nativity is valid for 5 years."
+      }
+    ]
   }
 ];
+

@@ -252,3 +252,56 @@ Received application for NPCI Aadhaar DBT Seeding for Account No: ${accountNumbe
 Date: _______________  Bank Official Seal & Signature: ____________________
   `.trim();
 }
+
+/**
+ * Generates official Notarized One-and-the-Same Person Affidavit text
+ * Used to resolve name and initial mismatches between Aadhaar and Marksheet
+ */
+export function generateNameAffidavitText(
+  nameOnAadhaar: string,
+  nameOnMarksheet: string,
+  fatherName?: string,
+  state?: string
+): string {
+  const applicant = nameOnAadhaar || "[Applicant Name]";
+  const marksheetName = nameOnMarksheet || "[Name on Marksheet]";
+  const parent = fatherName || "[Father / Guardian Name]";
+  const residentState = state || "India";
+
+  return `
+AFFIDAVIT FOR ONE AND THE SAME PERSON (NAME / INITIAL CLARIFICATION)
+(To be executed on Non-Judicial Stamp Paper of ₹20 / ₹50 value and attested by a Notary Public)
+
+I, ${applicant}, Son / Daughter of ${parent}, aged about ____ years, residing at __________________________________________________, permanent resident of ${residentState}, do hereby solemnly affirm and state on oath as under:
+
+1. That I am the deponent herein and am a citizen of India.
+
+2. That my name is correctly recorded as "${applicant}" in my Aadhaar Card issued by the Unique Identification Authority of India (UIDAI), bearing Aadhaar No. XXXX-XXXX-____.
+
+3. That in my Class 10th / 12th Board Examination Marksheet / Passing Certificate issued by the Board of Secondary Education, my name has been entered as "${marksheetName}".
+
+4. That I hereby solemnly declare, clarify, and affirm that both the names:
+   (a) "${applicant}" as appearing on my Aadhaar Card, AND
+   (b) "${marksheetName}" as appearing on my Class 10th / 12th Marksheet,
+   PERTAIN TO ONE AND THE SAME PERSON, THAT IS TO SAY, MYSELF, THE DEPONENT.
+
+5. That "${applicant}" and "${marksheetName}" are identical names of one single biological individual and there is no other person by this description in my family.
+
+6. That I am submitting this solemn affidavit to the Scholarship Sanctioning Authority / Educational Institution / State Welfare Department / National Scholarship Portal (NSP) / MeeSeva / e-Sevai for the purpose of availing government scholarships, welfare entitlements, and college admissions without rejection.
+
+7. That whatever is stated above is true and correct to the best of my personal knowledge, belief, and records, and nothing material has been concealed or falsely stated.
+
+DEPONENT
+(${applicant})
+
+VERIFICATION:
+Verified at ____________ on this _____ day of ____________ 2026, that the contents of paragraphs 1 to 7 above are true and correct.
+
+DEPONENT
+
+ATTESTATION BY NOTARY PUBLIC / EXECUTIVE MAGISTRATE
+Signed before me on this _____ day of ____________ 2026 at ________________.
+Seal & Signature of Notary Public: ___________________________
+`.trim();
+}
+
