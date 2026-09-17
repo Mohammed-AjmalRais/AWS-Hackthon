@@ -1,69 +1,236 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState, useMemo } from "react";
+import { Header } from "@/components/Header";
+import { AwsArchitectureModal } from "@/components/AwsArchitectureModal";
+import { EligibilityTab } from "@/components/EligibilityTab";
+import { DocumentAuditTab } from "@/components/DocumentAuditTab";
+import { PrerequisiteRoadmapTab } from "@/components/PrerequisiteRoadmapTab";
+import { OfflineNavigatorTab } from "@/components/OfflineNavigatorTab";
+import { AiCopilotTab } from "@/components/AiCopilotTab";
+import { ApplicationDossierTab } from "@/components/ApplicationDossierTab";
+import { DEMO_PERSONAS, DemoPersona } from "@/data/demoPersonas";
+import { evaluateCedarPolicies, UserProfile } from "@/lib/cedar/evaluator";
+import { auditCitizenDocuments, DocumentAuditInput } from "@/lib/audit/documentAuditor";
+import {
+  ShieldCheck,
+  FileCheck2,
+  GitFork,
+  Building,
+  Bot,
+  FileBadge,
+  Sparkles,
+  Award
+} from "lucide-react";
 
 export default function Home() {
+  const [currentLanguage, setCurrentLanguage] = useState<"en" | "hi">("en");
+  const [isArchitectureOpen, setIsArchitectureOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<
+    "eligibility" | "audit" | "roadmap" | "offline" | "copilot" | "dossier"
+  >("eligibility");
+
+  // Initial Profile: Default to Rajesh Kumar Munda (ST Tribal Student)
+  const [profile, setProfile] = useState<UserProfile>(DEMO_PERSONAS[0].profile);
+  const [auditInput, setAuditInput] = useState<DocumentAuditInput>(DEMO_PERSONAS[0].auditInput);
+
+  // Live Cedar policy evaluation
+  const evaluationResults = useMemo(() => {
+    return evaluateCedarPolicies(profile);
+  }, [profile]);
+
+  // Live document audit
+  const auditResult = useMemo(() => {
+    return auditCitizenDocuments(auditInput);
+  }, [auditInput]);
+
+  const eligibleCount = evaluationResults.filter((r) => r.decision === "ALLOW").length;
+
+  const handleSelectPersona = (persona: DemoPersona) => {
+    setProfile(persona.profile);
+    setAuditInput(persona.auditInput);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-slate-50/70 text-slate-900 flex flex-col font-sans">
+      {/* Header */}
+      <Header
+        currentLanguage={currentLanguage}
+        onLanguageChange={setCurrentLanguage}
+        onSelectPersona={handleSelectPersona}
+        onOpenArchitecture={() => setIsArchitectureOpen(true)}
+      />
+
+      {/* Main Container */}
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
+        {/* Navigation Tabs Bar */}
+        <div className="mb-6 overflow-x-auto scrollbar-none">
+          <div className="flex w-max min-w-full space-x-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xs">
+            <button
+              onClick={() => setActiveTab("eligibility")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "eligibility"
+                  ? "bg-orange-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <ShieldCheck className="size-4" />
+              <span>{currentLanguage === "hi" ? "1. योग्यता एवं नीतियां" : "1. Eligibility & Cedar Policies"}</span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                  activeTab === "eligibility"
+                    ? "bg-white/25 text-white"
+                    : "bg-orange-100 text-orange-800"
+                }`}
+              >
+                {eligibleCount}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("audit")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "audit"
+                  ? "bg-orange-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <FileCheck2 className="size-4" />
+              <span>{currentLanguage === "hi" ? "2. दस्तावेज़ व बैंक जांच" : "2. Document Audit & NPCI"}</span>
+              {auditResult.npciStatus !== "SEEDED" && (
+                <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-800">
+                  ⚠️ Risk
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab("roadmap")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "roadmap"
+                  ? "bg-orange-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+            >
+              <GitFork className="size-4" />
+              <span>{currentLanguage === "hi" ? "3. दस्तावेज़ श्रृंखला" : "3. Prerequisite Roadmap"}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("offline")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "offline"
+                  ? "bg-orange-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+            >
+              <Building className="size-4" />
+              <span>{currentLanguage === "hi" ? "4. ऑफलाइन केंद्र व फीस" : "4. Offline & Fee Guard"}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("copilot")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "copilot"
+                  ? "bg-orange-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+            >
+              <Bot className="size-4" />
+              <span>{currentLanguage === "hi" ? "5. आवाज व एआई साथी" : "5. Bedrock AI Copilot"}</span>
+              <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">
+                <Sparkles className="size-2.5" /> Voice
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("dossier")}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "dossier"
+                  ? "bg-orange-600 text-white shadow-xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+            >
+              <FileBadge className="size-4" />
+              <span>{currentLanguage === "hi" ? "6. आवेदन डॉसियर" : "6. Application Dossier"}</span>
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+
+        {/* Tab Views */}
+        <div>
+          {activeTab === "eligibility" && (
+            <EligibilityTab
+              profile={profile}
+              evaluationResults={evaluationResults}
+              currentLanguage={currentLanguage}
+              onProfileChange={setProfile}
+              onNavigateToDocuments={() => setActiveTab("audit")}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          )}
+
+          {activeTab === "audit" && (
+            <DocumentAuditTab
+              initialInput={auditInput}
+              currentLanguage={currentLanguage}
+            />
+          )}
+
+          {activeTab === "roadmap" && (
+            <PrerequisiteRoadmapTab currentLanguage={currentLanguage} />
+          )}
+
+          {activeTab === "offline" && (
+            <OfflineNavigatorTab
+              currentLanguage={currentLanguage}
+              userState={profile.state}
+            />
+          )}
+
+          {activeTab === "copilot" && (
+            <AiCopilotTab currentLanguage={currentLanguage} />
+          )}
+
+          {activeTab === "dossier" && (
+            <ApplicationDossierTab
+              profile={profile}
+              evaluationResults={evaluationResults}
+              auditResult={auditResult}
+              currentLanguage={currentLanguage}
+            />
+          )}
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="mt-12 border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-800">JanSetu AI</span>
+            <span>•</span>
+            <span>Built for WeMakeDevs × AWS Bharat Builds Tour</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              onClick={() => setIsArchitectureOpen(true)}
+              className="text-orange-600 hover:underline cursor-pointer"
+            >
+              Inspect AWS Stack
+            </button>
+            <span className="text-slate-300">|</span>
+            <span>Official Cedar Policies Open Source</span>
+            <span className="text-slate-300">|</span>
+            <span>SAM / LocalStack Ready</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* AWS Architecture Modal */}
+      <AwsArchitectureModal
+        isOpen={isArchitectureOpen}
+        onClose={() => setIsArchitectureOpen(false)}
+      />
     </div>
   );
 }
