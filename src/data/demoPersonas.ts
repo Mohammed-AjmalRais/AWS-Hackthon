@@ -12,6 +12,53 @@ export interface DemoPersona {
 
 export const DEMO_PERSONAS: DemoPersona[] = [
   {
+    id: "kavitha_tamilnadu_mbc",
+    name: "Kavitha Selvam",
+    tagline: "Tamil Nadu • 1st Year B.E. CSE • Chennai (Govt School Student)",
+    story: "Studied Class 6-12 in Chennai Corporation Govt Higher Secondary School. First Graduate in her family. MBC Category, Family income ₹1.6L. Admitted via TNEA Single Window Counseling. Highly eligible for Pudhumai Penn (₹1,000/mo), 7.5% Govt School 100% Fee Exemption, First Graduate Concession (₹25,000), and CMCHIS Health Insurance!",
+    profile: {
+      name: "Kavitha Selvam",
+      category: "OBC",
+      tnCommunity: "MBC",
+      gender: "Female",
+      isMinority: false,
+      isPersonWithDisability: false,
+      isOrphanOrSingleParent: false,
+      state: "Tamil Nadu",
+      district: "Chennai",
+      residenceYearsInState: 19,
+      isStudyingInHomeState: true,
+      educationLevel: "UG",
+      courseType: "Regular Full-Time",
+      isTechnicalCourse: true,
+      admissionQuota: "Merit/Govt Counseling",
+      institutionType: "Government",
+      studiedInGovtSchool6To12: true,
+      isFirstGraduateInFamily: true,
+      marksPercentage: 88,
+      isHosteller: false,
+      annualFamilyIncome: 160000,
+      electricityUnitsPerYear: 1950,
+      numberOfSiblingsAvailingScholarship: 0,
+      agriculturalLandAcres: 0,
+      residentialFlatSqFt: 550,
+      hasPaternalCasteRecord: true,
+      hasValidAddressProof: true,
+      isAlreadyReceivingOtherScholarship: false,
+      heldDocuments: ["Caste_Certificate", "Income_Certificate"]
+    },
+    auditInput: {
+      nameOnAadhaar: "Kavitha Selvam",
+      nameOnMarksheet: "Kavitha S",
+      dobOnAadhaar: "2006-05-12",
+      dobOnMarksheet: "2006-05-12",
+      incomeCertificateIssueDate: "2026-06-15",
+      isAadhaarLinkedToBank: true,
+      isNpciSeeded: true,
+      bankName: "Indian Overseas Bank (Anna Nagar Branch)"
+    }
+  },
+  {
     id: "rajesh_st_tribal",
     name: "Rajesh Kumar Munda",
     tagline: "ST Student • 1st Year B.Tech • Mayurbhanj, Odisha",

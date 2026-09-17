@@ -4,6 +4,7 @@ export interface UserProfile {
   // 1. Personal & Social Identity
   name?: string;
   category: "ST" | "SC" | "OBC" | "EWS" | "General";
+  tnCommunity?: "OC" | "BC" | "BCM" | "MBC" | "DNC" | "SC" | "SCA" | "ST" | "None";
   gender: "Male" | "Female" | "Other";
   isMinority: boolean;
   minorityCommunity?: "Muslim" | "Christian" | "Sikh" | "Buddhist" | "Jain" | "Parsi" | "None";
@@ -23,11 +24,14 @@ export interface UserProfile {
   isTechnicalCourse: boolean;
   admissionQuota: "Merit/Govt Counseling" | "Management/Direct" | "Sports/ECA";
   institutionType: "Government" | "Govt-Aided" | "Premier/Notified (IIT/NIT/AIIMS)" | "Private Recognized";
+  studiedInGovtSchool6To12?: boolean;
+  isFirstGraduateInFamily?: boolean;
   marksPercentage: number;
   isHosteller: boolean;
 
   // 4. Financial & Household Background
   annualFamilyIncome: number;
+  electricityUnitsPerYear?: number;
   numberOfSiblingsAvailingScholarship: number;
   agriculturalLandAcres: number;
   residentialFlatSqFt: number;
@@ -54,6 +58,7 @@ export interface CedarEvaluationResult {
 export const DEFAULT_USER_PROFILE: UserProfile = {
   name: "Candidate",
   category: "General",
+  tnCommunity: "BC",
   gender: "Male",
   isMinority: false,
   minorityCommunity: "None",
@@ -69,9 +74,12 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
   isTechnicalCourse: true,
   admissionQuota: "Merit/Govt Counseling",
   institutionType: "Government",
+  studiedInGovtSchool6To12: false,
+  isFirstGraduateInFamily: false,
   marksPercentage: 75,
   isHosteller: false,
   annualFamilyIncome: 200000,
+  electricityUnitsPerYear: 1800,
   numberOfSiblingsAvailingScholarship: 0,
   agriculturalLandAcres: 0,
   residentialFlatSqFt: 0,
@@ -96,10 +104,24 @@ export function evaluateCedarPolicies(rawProfile: Partial<UserProfile>): CedarEv
     let fitScore = 100;
 
     // 1. Social Category Matching
-    if (scheme.targetCategories.includes("All") || scheme.targetCategories.includes(profile.category)) {
-      passedClauses.push(`Category match: ${profile.category} in [${scheme.targetCategories.join(", ")}]`);
+    const isTN = profile.state === "Tamil Nadu";
+    const community = profile.tnCommunity || "BC";
+    const isTNCommunityMatch = isTN && (
+      scheme.targetCategories.includes("All") ||
+      (community === "ST" && scheme.targetCategories.includes("ST")) ||
+      (["SC", "SCA"].includes(community) && scheme.targetCategories.includes("SC")) ||
+      (["BC", "BCM", "MBC", "DNC"].includes(community) && (
+        scheme.targetCategories.includes("OBC") ||
+        scheme.targetCategories.includes("BC") ||
+        scheme.targetCategories.includes("MBC") ||
+        scheme.targetCategories.includes("DNC")
+      ))
+    );
+
+    if (scheme.targetCategories.includes("All") || scheme.targetCategories.includes(profile.category) || isTNCommunityMatch) {
+      passedClauses.push(`Category match: ${isTN ? `${community} (TN)` : profile.category} in [${scheme.targetCategories.join(", ")}]`);
     } else {
-      failedClauses.push(`Category mismatch: Candidate is ${profile.category}, but scheme requires [${scheme.targetCategories.join(", ")}]`);
+      failedClauses.push(`Category mismatch: Candidate is ${isTN ? community : profile.category}, but scheme requires [${scheme.targetCategories.join(", ")}]`);
       fitScore -= 45;
     }
 
@@ -237,7 +259,47 @@ export function evaluateCedarPolicies(rawProfile: Partial<UserProfile>): CedarEv
       fitScore -= 35;
     }
 
-    // 16. Missing Prerequisite Document Check
+    // 16. State-Specific Applicability
+    if (scheme.applicableStates && scheme.applicableStates.length > 0) {
+      if (scheme.applicableStates.includes(profile.state)) {
+        passedClauses.push(`State domicile verified: Resident of ${profile.state}`);
+      } else {
+        failedClauses.push(`State restriction: Scheme is exclusively for residents of [${scheme.applicableStates.join(", ")}] (Candidate is from ${profile.state})`);
+        fitScore -= 70;
+      }
+    }
+
+    // 17. Government Schooling Requirement (e.g. TN Pudhumai Penn, Tamil Pudhalvan, 7.5% Quota)
+    if (scheme.requiresGovtSchool6To12) {
+      if (profile.studiedInGovtSchool6To12) {
+        passedClauses.push("Govt schooling verified: Studied in Government Schools from Class 6 to 12 continuously");
+      } else {
+        failedClauses.push("Requires continuous schooling in Government Schools from Class 6 to 12 (Crucial State Guideline)");
+        fitScore -= 50;
+      }
+    }
+
+    // 18. First Graduate in Family Requirement (e.g. TN Mudhal Thalaimurai Pattadhari)
+    if (scheme.requiresFirstGraduate) {
+      if (profile.isFirstGraduateInFamily) {
+        passedClauses.push("First Graduate status verified: First member in family to pursue a degree");
+      } else {
+        failedClauses.push("Requires candidate to be the First Graduate in their immediate family (No graduate parents or elder siblings)");
+        fitScore -= 50;
+      }
+    }
+
+    // 19. Household Electricity Consumption Cap (e.g. TN KMUT)
+    if (scheme.maxElectricityUnitsPerYear && profile.electricityUnitsPerYear) {
+      if (profile.electricityUnitsPerYear <= scheme.maxElectricityUnitsPerYear) {
+        passedClauses.push(`Domestic electricity consumption verified: ${profile.electricityUnitsPerYear} <= ${scheme.maxElectricityUnitsPerYear} units/year`);
+      } else {
+        failedClauses.push(`Electricity consumption exceeds cap: ${profile.electricityUnitsPerYear} units/year > Max ${scheme.maxElectricityUnitsPerYear} units/year`);
+        fitScore -= 40;
+      }
+    }
+
+    // 20. Missing Prerequisite Document Check
     const missingPrereqs: SchemeOrService[] = [];
     for (const prereqId of scheme.prerequisites) {
       if (!heldDocs.has(prereqId)) {

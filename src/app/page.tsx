@@ -31,7 +31,7 @@ export default function Home() {
   // Initial Profile: Default to Rajesh Kumar Munda (ST Student)
   const [profile, setProfile] = useState<UserProfile>(DEMO_PERSONAS[0].profile);
   const [auditInput, setAuditInput] = useState<DocumentAuditInput>(DEMO_PERSONAS[0].auditInput);
-  const [targetRoadmapSchemeId, setTargetRoadmapSchemeId] = useState<string>("PostMatric_ST");
+  const [targetRoadmapSchemeId, setTargetRoadmapSchemeId] = useState<string>("TN_Pudhumai_Penn");
 
   // Live Cedar policy evaluation
   const evaluationResults = useMemo(() => {
