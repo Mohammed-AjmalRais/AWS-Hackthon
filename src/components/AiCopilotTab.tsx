@@ -98,54 +98,49 @@ export const AiCopilotTab: React.FC = () => {
       return;
     }
 
-    const cleanText = text.replace(/[*_#`]/g, "");
+    // Clean markdown stars from speech text
+    const cleanText = text.replace(/[*#_`]/g, "");
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = "en-IN";
     utterance.rate = 0.95;
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
 
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+    };
+
+    setIsSpeaking(true);
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleSendMessage = async (queryToSend?: string) => {
-    const query = queryToSend || inputQuery;
-    if (!query.trim() || isLoading) return;
+  const handleSendMessage = async (customText?: string) => {
+    const textToSend = customText || inputQuery;
+    if (!textToSend.trim() || isLoading) return;
 
-    const newMessages: ChatMessage[] = [...messages, { role: "user", content: query }];
-    setMessages(newMessages);
-    setInputQuery("");
+    const userMessage: ChatMessage = { role: "user", content: textToSend };
+    setMessages((prev) => [...prev, userMessage]);
+    if (!customText) setInputQuery("");
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query,
-          history: newMessages.slice(-5),
-          language: "en",
-        }),
-      });
+      const response = await askJanSetuCopilot(textToSend, messages, "en");
+      setModelSource(response.source === "AWS_BEDROCK_LIVE" ? response.modelUsed : "JanSetu-Civic-RAG (LocalStack/Zero-Fail)");
 
-      const data = await res.json();
-      if (data.success) {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: data.answer },
-        ]);
-        setModelSource(data.source === "AWS_BEDROCK_LIVE" ? "Amazon Bedrock (Claude 3.5)" : "Zero-Fail Civic RAG");
-      } else {
-        throw new Error(data.error);
-      }
+      const assistantMessage: ChatMessage = {
+        role: "assistant",
+        content: response.answer,
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
-      // Fallback
-      const fallbackResponse = await askJanSetuCopilot(query, newMessages, "en");
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: fallbackResponse.answer },
+        {
+          role: "assistant",
+          content: "Sorry, I encountered a network issue while consulting the knowledge base. Please try again.",
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -168,13 +163,13 @@ export const AiCopilotTab: React.FC = () => {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Info */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 p-6 text-white shadow-xs">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-[#142A6F] bg-gradient-to-r from-[#0B1B4F] via-[#0C1B4A] to-[#040B22] p-6 text-white shadow-luxury">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#F5E29F] font-display">
             <Sparkles className="size-4" />
             Amazon Bedrock Conversational Copilot
           </div>
-          <h3 className="mt-1 text-xl font-bold tracking-tight">
+          <h3 className="mt-1 text-xl font-bold tracking-tight font-serif">
             Voice & Text Enabled Civic Assistant
           </h3>
           <p className="mt-1 text-xs text-slate-300">
@@ -189,7 +184,7 @@ export const AiCopilotTab: React.FC = () => {
       </div>
 
       {/* Chat Messages Box */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs min-h-[480px] flex flex-col justify-between">
+      <div className="rounded-2xl border border-[#EDE6DD] bg-white p-4 sm:p-6 shadow-luxury min-h-[480px] flex flex-col justify-between">
         <div className="space-y-4 overflow-y-auto max-h-[500px] pr-2">
           {messages.map((m, idx) => (
             <div
@@ -199,7 +194,7 @@ export const AiCopilotTab: React.FC = () => {
               }`}
             >
               {m.role === "assistant" && (
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white shadow-xs">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-[#0B1B4F] to-[#152864] text-[#F5E29F] shadow-xs">
                   <Bot className="size-4" />
                 </div>
               )}
@@ -207,18 +202,18 @@ export const AiCopilotTab: React.FC = () => {
               <div
                 className={`rounded-2xl p-4 max-w-[85%] text-xs sm:text-sm leading-relaxed ${
                   m.role === "user"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-slate-50 text-slate-800 border border-slate-200/80"
+                    ? "bg-[#0B1B4F] text-white shadow-xs"
+                    : "bg-[#FAF7F2] text-slate-800 border border-[#EDE6DD]"
                 }`}
               >
                 <div className="whitespace-pre-line">{m.content}</div>
 
                 {m.role === "assistant" && (
-                  <div className="mt-3 flex items-center justify-between border-t border-slate-200/60 pt-2 text-[11px] text-slate-400">
-                    <span className="font-mono text-[10px]">JanSetu AWS Copilot</span>
+                  <div className="mt-3 flex items-center justify-between border-t border-[#EDE6DD] pt-2 text-[11px] text-slate-500">
+                    <span className="font-mono text-[10px] text-[#854D0E] font-bold">JanSetu AWS Copilot</span>
                     <button
                       onClick={() => handleSpeak(m.content)}
-                      className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium transition-colors cursor-pointer"
+                      className="flex items-center gap-1 text-[#0B1B4F] hover:text-[#854D0E] font-bold transition-colors cursor-pointer"
                       title="Read aloud"
                     >
                       {isSpeaking ? (
@@ -238,7 +233,7 @@ export const AiCopilotTab: React.FC = () => {
               </div>
 
               {m.role === "user" && (
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-white shadow-xs">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0B1B4F] text-[#F5E29F] shadow-xs">
                   <User className="size-4" />
                 </div>
               )}
@@ -247,12 +242,12 @@ export const AiCopilotTab: React.FC = () => {
 
           {isLoading && (
             <div className="flex gap-3 justify-start items-center text-xs text-slate-500">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white animate-pulse">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0B1B4F] text-[#F5E29F] animate-pulse">
                 <Bot className="size-4" />
               </div>
-              <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80 flex items-center gap-2">
-                <RefreshCw className="size-3.5 animate-spin text-indigo-600" />
-                <span>Consulting official gazette database & Cedar policies...</span>
+              <div className="rounded-2xl bg-[#FAF7F2] p-4 border border-[#EDE6DD] flex items-center gap-2">
+                <RefreshCw className="size-3.5 animate-spin text-[#854D0E]" />
+                <span className="font-medium text-slate-700">Consulting official gazette database & Cedar policies...</span>
               </div>
             </div>
           )}
@@ -261,14 +256,14 @@ export const AiCopilotTab: React.FC = () => {
         </div>
 
         {/* Bottom Input & Quick Prompts Area */}
-        <div className="mt-4 border-t border-slate-100 pt-4">
+        <div className="mt-4 border-t border-[#EDE6DD] pt-4">
           {/* Quick Prompt Pills */}
           <div className="mb-3 flex flex-wrap gap-1.5">
             {quickPrompts.map((prompt, i) => (
               <button
                 key={i}
                 onClick={() => handleSendMessage(prompt)}
-                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-800 transition-all text-left cursor-pointer"
+                className="rounded-full border border-[#EDE6DD] bg-[#FAF7F2] px-3 py-1 text-[11px] text-slate-700 hover:border-[#DFC8A5] hover:bg-[#F4ECE1] hover:text-[#0B1B4F] transition-all text-left cursor-pointer"
               >
                 {prompt}
               </button>
@@ -283,7 +278,7 @@ export const AiCopilotTab: React.FC = () => {
               className={`rounded-xl p-2.5 transition-all cursor-pointer ${
                 isListening
                   ? "bg-rose-600 text-white animate-pulse shadow-md shadow-rose-500/30"
-                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-indigo-600"
+                  : "border border-[#DACBB8] bg-[#FAF7F2] text-[#854D0E] hover:bg-[#F4ECE1]"
               }`}
               title={isListening ? "Listening... click to stop" : "Click to speak your question"}
             >
@@ -300,14 +295,14 @@ export const AiCopilotTab: React.FC = () => {
                   ? "Listening to your voice..."
                   : "Ask about scholarships, documents, or NPCI bank seeding..."
               }
-              className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-indigo-500 focus:outline-hidden"
+              className="flex-1 rounded-xl border border-[#EDE6DD] bg-white px-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-[#DFB738] focus:ring-2 focus:ring-[#DFB738]/20 focus:outline-hidden"
             />
 
             <button
               type="button"
               onClick={() => handleSendMessage()}
               disabled={isLoading || !inputQuery.trim()}
-              className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs hover:bg-indigo-700 disabled:opacity-50 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl bg-[#0B1B4F] px-5 py-2.5 text-xs sm:text-sm font-bold text-[#F5E29F] shadow-xs hover:bg-[#071233] disabled:opacity-50 transition-all cursor-pointer border border-[#142A6F]"
             >
               <span>Ask</span>
               <Send className="size-3.5" />

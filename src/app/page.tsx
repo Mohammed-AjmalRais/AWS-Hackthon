@@ -122,7 +122,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FAF7F2] text-slate-800 flex flex-col font-sans">
       {/* Official Gov Header */}
       <Header
         activeProfileName={profile.name}
@@ -133,16 +133,16 @@ export default function Home() {
 
       {/* Main Container */}
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
-        {/* Single-Tier Clean Navigation Tabs Bar */}
-        <div className="mb-6 overflow-x-auto scrollbar-none">
-          <div className="flex w-max min-w-full space-x-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xs">
+        {/* Regal Navy Navigation Ribbon */}
+        <div className="mb-6 overflow-x-auto no-scrollbar">
+          <div className="flex w-max min-w-full space-x-1 rounded-2xl bg-[#0B1B4F] p-1.5 shadow-luxury border border-[#142A6F]">
             {/* Tab 1: Citizen Master Profile */}
             <button
               onClick={() => setActiveTab("profile")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "profile"
-                  ? "bg-indigo-600 text-white shadow-xs font-bold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#152864] text-[#F5E29F] shadow-sm ring-1 ring-[#DFB738]/50 font-bold"
+                  : "text-slate-300 hover:bg-[#152864]/50 hover:text-white"
               }`}
             >
               <User className="size-4" />
@@ -150,8 +150,8 @@ export default function Home() {
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   activeTab === "profile"
-                    ? "bg-white/25 text-white"
-                    : "bg-slate-100 text-slate-700"
+                    ? "bg-[#DFB738]/20 text-[#F5E29F] border border-[#DFB738]/40"
+                    : "bg-white/10 text-slate-300"
                 }`}
               >
                 {profile.state.split(" ")[0]}
@@ -163,8 +163,8 @@ export default function Home() {
               onClick={() => setActiveTab("schemes")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "schemes"
-                  ? "bg-indigo-600 text-white shadow-xs font-bold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#152864] text-[#F5E29F] shadow-sm ring-1 ring-[#DFB738]/50 font-bold"
+                  : "text-slate-300 hover:bg-[#152864]/50 hover:text-white"
               }`}
             >
               <ShieldCheck className="size-4" />
@@ -172,8 +172,8 @@ export default function Home() {
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   activeTab === "schemes"
-                    ? "bg-white/25 text-white"
-                    : "bg-indigo-100 text-indigo-800"
+                    ? "bg-[#DFB738]/20 text-[#F5E29F] border border-[#DFB738]/40"
+                    : "bg-emerald-900/60 text-emerald-300 border border-emerald-700/50"
                 }`}
               >
                 {eligibleCount} Eligible
@@ -185,14 +185,14 @@ export default function Home() {
               onClick={() => setActiveTab("audit")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "audit"
-                  ? "bg-indigo-600 text-white shadow-xs font-bold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#152864] text-[#F5E29F] shadow-sm ring-1 ring-[#DFB738]/50 font-bold"
+                  : "text-slate-300 hover:bg-[#152864]/50 hover:text-white"
               }`}
             >
               <FileCheck2 className="size-4" />
               <span>3. Document Upload & Matcher</span>
               {auditResult.npciStatus !== "SEEDED" && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                <span className="rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 text-[10px] font-bold">
                   Attention
                 </span>
               )}
@@ -203,8 +203,8 @@ export default function Home() {
               onClick={() => setActiveTab("roadmap")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "roadmap"
-                  ? "bg-indigo-600 text-white shadow-xs font-bold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#152864] text-[#F5E29F] shadow-sm ring-1 ring-[#DFB738]/50 font-bold"
+                  : "text-slate-300 hover:bg-[#152864]/50 hover:text-white"
               }`}
             >
               <GitFork className="size-4" />
@@ -216,8 +216,8 @@ export default function Home() {
               onClick={() => setActiveTab("offline")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "offline"
-                  ? "bg-indigo-600 text-white shadow-xs font-bold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#152864] text-[#F5E29F] shadow-sm ring-1 ring-[#DFB738]/50 font-bold"
+                  : "text-slate-300 hover:bg-[#152864]/50 hover:text-white"
               }`}
             >
               <Building className="size-4" />
@@ -229,13 +229,13 @@ export default function Home() {
               onClick={() => setActiveTab("copilot")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "copilot"
-                  ? "bg-indigo-600 text-white shadow-xs font-bold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#152864] text-[#F5E29F] shadow-sm ring-1 ring-[#DFB738]/50 font-bold"
+                  : "text-slate-300 hover:bg-[#152864]/50 hover:text-white"
               }`}
             >
               <Bot className="size-4" />
               <span>6. AI Civic Assistant</span>
-              <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-200">
+              <span className="flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-300 border border-amber-500/30">
                 <Sparkles className="size-2.5" /> Voice
               </span>
             </button>
@@ -245,8 +245,8 @@ export default function Home() {
               onClick={() => setActiveTab("dossier")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "dossier"
-                  ? "bg-indigo-600 text-white shadow-xs font-bold"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-[#152864] text-[#F5E29F] shadow-sm ring-1 ring-[#DFB738]/50 font-bold"
+                  : "text-slate-300 hover:bg-[#152864]/50 hover:text-white"
               }`}
             >
               <FileBadge className="size-4" />
@@ -328,10 +328,10 @@ export default function Home() {
       </main>
 
       {/* Official Portal Footer */}
-      <footer className="mt-12 border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
+      <footer className="mt-12 border-t border-[#EAE2D5] bg-[#FDFBF7] py-6 text-xs text-slate-600">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800">JanSetu AI</span>
+            <span className="font-bold text-[#0B1B4F] font-serif">JanSetu AI</span>
             <span>•</span>
             <span>National Citizen Service Flight Deck • WeMakeDevs × AWS Hackathon 2026</span>
           </div>
@@ -339,7 +339,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-4">
             <button
               onClick={() => setIsArchitectureOpen(true)}
-              className="text-indigo-600 hover:underline cursor-pointer font-medium"
+              className="text-[#854D0E] hover:underline cursor-pointer font-bold"
             >
               Inspect AWS Stack
             </button>

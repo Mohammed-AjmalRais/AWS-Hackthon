@@ -442,30 +442,30 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
   return (
     <div className="space-y-6 font-sans">
       {/* Target Scheme Selector Banner */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+      <div className="luxury-card rounded-2xl p-6 sm:p-8 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">
-              <Layers className="size-4" />
+            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold uppercase tracking-wider mb-2">
+              <Layers className="size-3.5 text-amber-600" />
               <span>Scheme-Centric Pre-Flight Document Audit</span>
             </div>
-            <h2 className="text-xl font-black text-slate-900 sm:text-2xl">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#0B1B4F] font-serif tracking-tight">
               Audit Document Prerequisites for Specific Scheme
             </h2>
-            <p className="text-xs text-slate-500 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed mt-1">
               Document mandates differ per program. Select your target scheme below to evaluate statutory prerequisites, cross-document name consistency, and NPCI DBT readiness.
             </p>
           </div>
 
           {/* Scheme Dropdown Selector */}
           <div className="w-full md:w-80 shrink-0">
-            <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+            <label className="block text-[11px] font-bold text-[#0B1B4F] uppercase tracking-wider mb-1.5 font-serif">
               Target Scheme:
             </label>
             <select
               value={activeSchemeId}
               onChange={(e) => handleSchemeChange(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs font-bold text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
+              className="w-full rounded-xl border border-[#DFC8A5] bg-white px-3.5 py-2.5 text-xs font-bold text-[#0B1B4F] shadow-xs focus:border-[#DFB738] focus:ring-2 focus:ring-[#DFB738]/30 focus:outline-none"
             >
               {profile?.state === "Tamil Nadu" ? (
                 <>
@@ -521,21 +521,21 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
         </div>
 
         {/* Selected Scheme Detail Card */}
-        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
+        <div className="rounded-2xl border border-[#EDE6DD] bg-[#FAF7F2] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-indigo-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase">
+              <span className="rounded-md bg-[#0B1B4F] px-2.5 py-0.5 text-[10px] font-bold text-[#F5E29F] uppercase tracking-wider">
                 {currentScheme.level} Level
               </span>
-              <span className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-700">
+              <span className="rounded-md border border-[#DFC8A5] bg-white px-2.5 py-0.5 text-[10px] font-bold text-[#0B1B4F]">
                 {currentScheme.shortCode}
               </span>
-              <h3 className="text-sm font-bold text-slate-900">{currentScheme.title}</h3>
+              <h3 className="text-sm font-bold text-[#0B1B4F] font-serif">{currentScheme.title}</h3>
             </div>
-            <p className="text-xs text-slate-600">
-              <strong>Statutory Benefit:</strong> <span className="font-semibold text-indigo-900">{currentScheme.benefitAmount}</span> ({currentScheme.benefitDescription})
+            <p className="text-xs text-slate-700">
+              <strong>Statutory Benefit:</strong> <span className="font-bold text-[#0B1B4F]">{currentScheme.benefitAmount}</span> ({currentScheme.benefitDescription})
             </p>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-slate-600">
               Sponsoring Body: {currentScheme.sponsoringBody} • Official Portal: {currentScheme.portalName}
             </p>
           </div>
@@ -543,7 +543,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           {onNavigateToRoadmap && (
             <button
               onClick={() => onNavigateToRoadmap(currentScheme.id)}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700 transition-all cursor-pointer shrink-0 shadow-xs"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#0B1B4F] px-5 py-2.5 text-xs font-bold text-[#F5E29F] hover:bg-[#152864] transition-all cursor-pointer shrink-0 shadow-md border border-[#DFB738]/40"
             >
               <span>View Scheme Roadmap</span>
               <ArrowRight className="size-3.5" />
@@ -553,14 +553,14 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
       </div>
 
       {/* Scheme Required Documents Checklist */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-              <FileCheck2 className="size-4" />
+      <div className="luxury-card rounded-2xl p-6 sm:p-8 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#EDE6DD]">
+          <div className="flex items-center gap-3">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-2xs">
+              <FileCheck2 className="size-4.5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm sm:text-base font-bold text-[#0B1B4F] font-serif">
                 1. Statutory Documents Required for {currentScheme.shortCode}
               </h3>
               <p className="text-[11px] text-slate-500">
@@ -569,7 +569,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
             </div>
           </div>
 
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
+          <span className="rounded-full bg-[#FAF7F2] border border-[#DFC8A5] px-3 py-1 text-xs font-bold text-[#0B1B4F]">
             {schemeDocs.filter((d) => userHeld.includes(d)).length} of {schemeDocs.length} Verified
           </span>
         </div>
@@ -580,10 +580,10 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
             return (
               <div
                 key={docId}
-                className={`flex flex-col justify-between rounded-xl border p-3.5 transition-all ${
+                className={`flex flex-col justify-between rounded-xl border p-4 transition-all shadow-2xs ${
                   isHeld
-                    ? "border-emerald-200 bg-emerald-50/40 text-emerald-950"
-                    : "border-amber-200 bg-amber-50/50 text-amber-950"
+                    ? "border-emerald-200 bg-emerald-50/60 text-emerald-950"
+                    : "border-[#EBDDCB] bg-[#FAF7F2]/80 text-[#644616]"
                 }`}
               >
                 <div className="flex items-start gap-2.5">
@@ -591,13 +591,13 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                     className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md ${
                       isHeld
                         ? "bg-emerald-600 text-white"
-                        : "bg-amber-500 text-white"
+                        : "bg-amber-600 text-white"
                     }`}
                   >
                     {isHeld ? <Check className="size-3.5 stroke-[3]" /> : <AlertTriangle className="size-3" />}
                   </div>
                   <div>
-                    <p className="text-xs font-bold leading-tight">{getDocumentName(docId)}</p>
+                    <p className="text-xs font-bold leading-tight text-[#0B1B4F] font-serif">{getDocumentName(docId)}</p>
                     <p className="text-[10px] mt-0.5 text-slate-600">
                       {isHeld ? "✓ Uploaded & verified in profile" : "⚠️ Missing prerequisite certificate"}
                     </p>
@@ -605,11 +605,11 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                 </div>
 
                 {!isHeld && (
-                  <div className="mt-3 pt-2 border-t border-amber-200/60 flex items-center justify-between">
+                  <div className="mt-3 pt-2.5 border-t border-[#DFC8A5]/60 flex items-center justify-between">
                     <span className="text-[10px] font-semibold text-amber-800">Prerequisite Roadblock</span>
                     <button
                       onClick={() => setSelectedCertGuideId(docId)}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 hover:text-indigo-900 hover:underline cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B1B4F] hover:text-amber-800 hover:underline cursor-pointer"
                     >
                       <span>Resolve Guide</span>
                       <ChevronRight className="size-3" />
@@ -623,14 +623,14 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
       </div>
 
       {/* Interactive Document Upload Dropzones with Live OCR Preview */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 border-b border-slate-100 gap-2">
-          <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
-              <Upload className="size-4" />
+      <div className="luxury-card rounded-2xl p-6 sm:p-8 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 border-b border-[#EDE6DD] gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-amber-50 border border-amber-200 text-amber-800 shadow-2xs">
+              <Upload className="size-4.5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm sm:text-base font-bold text-[#0B1B4F] font-serif">
                 2. Live Document Upload & OCR Identity Parsing
               </h3>
               <p className="text-[11px] text-slate-500">
@@ -639,17 +639,17 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
             </div>
           </div>
 
-          <div className="text-[11px] font-medium text-slate-500 flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-indigo-600" />
+          <div className="text-[11px] font-semibold text-amber-800 flex items-center gap-1.5 bg-[#FAF7F2] px-2.5 py-1 rounded-full border border-[#DFC8A5]">
+            <Sparkles className="size-3.5 text-amber-600" />
             <span>Simulates AWS Textract / DigiLocker API OCR</span>
           </div>
         </div>
 
         {/* Quick Test Scenarios Bar */}
-        <div className="rounded-2xl bg-slate-50 border border-slate-200 p-3 space-y-2">
+        <div className="rounded-2xl bg-[#FAF7F2] border border-[#DFC8A5] p-4 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-              <Sparkles className="size-3.5 text-indigo-600" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#0B1B4F] flex items-center gap-1.5 font-serif">
+              <Sparkles className="size-3.5 text-amber-600" />
               <span>Quick Test Scenarios (1-Click Test):</span>
             </span>
             <span className="text-[10px] text-slate-500">Click any preset to instantly test name matching behavior</span>
@@ -658,13 +658,13 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => handleApplyPreset("sravani_ap")}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 hover:border-indigo-400 hover:bg-indigo-50/40 transition-all cursor-pointer shadow-2xs"
+              className="rounded-lg border border-[#DFC8A5] bg-white px-3 py-1.5 text-xs font-semibold text-[#0B1B4F] hover:border-[#DFB738] hover:bg-[#FAF7F2] transition-all cursor-pointer shadow-2xs"
             >
               🎯 <strong>AP: M. Sravani</strong> vs <strong>Madhira Sravani</strong>
             </button>
             <button
               onClick={() => handleApplyPreset("kavitha_tn")}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 hover:border-indigo-400 hover:bg-indigo-50/40 transition-all cursor-pointer shadow-2xs"
+              className="rounded-lg border border-[#DFC8A5] bg-white px-3 py-1.5 text-xs font-semibold text-[#0B1B4F] hover:border-[#DFB738] hover:bg-[#FAF7F2] transition-all cursor-pointer shadow-2xs"
             >
               🎯 <strong>TN: Kavitha S</strong> vs <strong>Kavitha Selvam</strong>
             </button>
@@ -682,7 +682,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
             </button>
             <button
               onClick={() => handleApplyPreset("clear")}
-              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all cursor-pointer ml-auto"
+              className="rounded-lg border border-[#EDE6DD] bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer ml-auto"
             >
               <RefreshCw className="size-3 inline mr-1" /> Reset
             </button>
@@ -692,28 +692,28 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
         {/* 3 Upload Dropzones */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Dropzone 1: Aadhaar Card */}
-          <div className="rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/20 p-4 flex flex-col justify-between hover:bg-indigo-50/40 transition-colors">
+          <div className="rounded-2xl border-2 border-dashed border-[#DFB738]/60 bg-[#FAF7F2]/40 p-4.5 flex flex-col justify-between hover:bg-[#FAF7F2]/70 transition-colors shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-amber-100/80 text-amber-800">
                     <FileBadge className="size-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">Aadhaar Card (UIDAI)</h4>
+                    <h4 className="text-xs font-bold text-[#0B1B4F] font-serif">Aadhaar Card (UIDAI)</h4>
                     <p className="text-[10px] text-slate-500">Master Legal Identity Anchor</p>
                   </div>
                 </div>
-                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[9px] font-bold text-indigo-800 uppercase">
+                <span className="rounded-full bg-[#0B1B4F] px-2 py-0.5 text-[9px] font-bold text-[#F5E29F] uppercase tracking-wider">
                   Anchor
                 </span>
               </div>
 
               {/* Upload Input Control */}
               <div className="mt-2">
-                <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-3 hover:bg-slate-50 cursor-pointer transition-all">
-                  <FileUp className="size-5 text-indigo-600 mb-1" />
-                  <span className="text-xs font-bold text-slate-800">
+                <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DFC8A5] bg-white p-3 hover:bg-[#FAF7F2] cursor-pointer transition-all">
+                  <FileUp className="size-5 text-[#0B1B4F] mb-1" />
+                  <span className="text-xs font-bold text-[#0B1B4F]">
                     {aadhaarFile ? "Replace Aadhaar File" : "Upload Aadhaar (PDF / JPG)"}
                   </span>
                   <span className="text-[10px] text-slate-400">Click to browse from device</span>
@@ -728,14 +728,14 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
               {/* File Info & OCR Output */}
               {aadhaarFile && (
-                <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3 space-y-2 text-xs">
+                <div className="mt-3 rounded-xl border border-[#EDE6DD] bg-white p-3 space-y-2 text-xs">
                   <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
                     <span className="font-bold text-slate-800 truncate max-w-[150px]">{aadhaarFile.name}</span>
                     <span className="text-[10px] text-slate-500 font-semibold">{aadhaarFile.size}</span>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-0.5">
+                    <label className="block text-[10px] font-bold text-[#0B1B4F] uppercase tracking-wider mb-0.5 font-serif">
                       Extracted Name on Aadhaar:
                     </label>
                     <div className="relative">
@@ -743,7 +743,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                         type="text"
                         value={auditInput.nameOnAadhaar || ""}
                         onChange={(e) => handleUpdateAadhaarName(e.target.value)}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
+                        className="w-full rounded-lg border border-[#DFC8A5] bg-[#FAF7F2]/50 px-2.5 py-1.5 text-xs font-bold text-[#0B1B4F] focus:border-[#DFB738] focus:bg-white focus:outline-hidden"
                         placeholder="e.g. Kavitha Selvam"
                       />
                       <Edit3 className="absolute right-2 top-2 size-3 text-slate-400 pointer-events-none" />
@@ -758,7 +758,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
               )}
             </div>
 
-            <div className="mt-3 flex items-center justify-between text-[10px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+            <div className="mt-3 flex items-center justify-between text-[10px] text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
               <span className="flex items-center gap-1 font-semibold">
                 <CheckCircle className="size-3" /> UIDAI Biometric Verified
               </span>
@@ -766,28 +766,28 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           </div>
 
           {/* Dropzone 2: 10th Marksheet */}
-          <div className="rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50/20 p-4 flex flex-col justify-between hover:bg-sky-50/40 transition-colors">
+          <div className="rounded-2xl border-2 border-dashed border-[#DFC8A5] bg-[#FAF7F2]/40 p-4.5 flex flex-col justify-between hover:bg-[#FAF7F2]/70 transition-colors shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-8 items-center justify-center rounded-lg bg-sky-100 text-sky-600">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-sky-100 text-sky-700">
                     <FileText className="size-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">10th Class Mark Memo</h4>
+                    <h4 className="text-xs font-bold text-[#0B1B4F] font-serif">10th Class Mark Memo</h4>
                     <p className="text-[10px] text-slate-500">Board / SSC Exam Record</p>
                   </div>
                 </div>
-                <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[9px] font-bold text-sky-800 uppercase">
+                <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[9px] font-bold text-sky-800 uppercase tracking-wider">
                   Education
                 </span>
               </div>
 
               {/* Upload Input Control */}
               <div className="mt-2">
-                <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-3 hover:bg-slate-50 cursor-pointer transition-all">
-                  <FileUp className="size-5 text-sky-600 mb-1" />
-                  <span className="text-xs font-bold text-slate-800">
+                <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DFC8A5] bg-white p-3 hover:bg-[#FAF7F2] cursor-pointer transition-all">
+                  <FileUp className="size-5 text-[#0B1B4F] mb-1" />
+                  <span className="text-xs font-bold text-[#0B1B4F]">
                     {marksheetFile ? "Replace Marksheet File" : "Upload Memo (PDF / JPG)"}
                   </span>
                   <span className="text-[10px] text-slate-400">Click to browse from device</span>
@@ -802,14 +802,14 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
               {/* File Info & OCR Output */}
               {marksheetFile && (
-                <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3 space-y-2 text-xs">
+                <div className="mt-3 rounded-xl border border-[#EDE6DD] bg-white p-3 space-y-2 text-xs">
                   <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
                     <span className="font-bold text-slate-800 truncate max-w-[150px]">{marksheetFile.name}</span>
                     <span className="text-[10px] text-slate-500 font-semibold">{marksheetFile.size}</span>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-0.5">
+                    <label className="block text-[10px] font-bold text-[#0B1B4F] uppercase tracking-wider mb-0.5 font-serif">
                       Extracted Name on Marksheet:
                     </label>
                     <div className="relative">
@@ -817,7 +817,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                         type="text"
                         value={auditInput.nameOnMarksheet || ""}
                         onChange={(e) => handleUpdateMarksheetName(e.target.value)}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:border-sky-500 focus:bg-white focus:outline-hidden"
+                        className="w-full rounded-lg border border-[#DFC8A5] bg-[#FAF7F2]/50 px-2.5 py-1.5 text-xs font-bold text-[#0B1B4F] focus:border-[#DFB738] focus:bg-white focus:outline-hidden"
                         placeholder="e.g. Kavitha S"
                       />
                       <Edit3 className="absolute right-2 top-2 size-3 text-slate-400 pointer-events-none" />
@@ -840,28 +840,28 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           </div>
 
           {/* Dropzone 3: Bank Passbook */}
-          <div className="rounded-2xl border-2 border-dashed border-purple-200 bg-purple-50/20 p-4 flex flex-col justify-between hover:bg-purple-50/40 transition-colors">
+          <div className="rounded-2xl border-2 border-dashed border-[#DFC8A5] bg-[#FAF7F2]/40 p-4.5 flex flex-col justify-between hover:bg-[#FAF7F2]/70 transition-colors shadow-2xs">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-8 items-center justify-center rounded-lg bg-purple-100 text-purple-600">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-amber-100 text-amber-800">
                     <Building className="size-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">Bank Passbook</h4>
+                    <h4 className="text-xs font-bold text-[#0B1B4F] font-serif">Bank Passbook</h4>
                     <p className="text-[10px] text-slate-500">NPCI / PFMS Direct Benefit Transfer</p>
                   </div>
                 </div>
-                <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[9px] font-bold text-purple-800 uppercase">
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-bold text-amber-800 uppercase tracking-wider">
                   DBT Passbook
                 </span>
               </div>
 
               {/* Upload Input Control */}
               <div className="mt-2">
-                <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-3 hover:bg-slate-50 cursor-pointer transition-all">
-                  <FileUp className="size-5 text-purple-600 mb-1" />
-                  <span className="text-xs font-bold text-slate-800">
+                <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#DFC8A5] bg-white p-3 hover:bg-[#FAF7F2] cursor-pointer transition-all">
+                  <FileUp className="size-5 text-[#0B1B4F] mb-1" />
+                  <span className="text-xs font-bold text-[#0B1B4F]">
                     {bankFile ? "Replace Passbook File" : "Upload Passbook (PDF / JPG)"}
                   </span>
                   <span className="text-[10px] text-slate-400">Click to browse from device</span>
@@ -876,14 +876,14 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
               {/* File Info & OCR Output */}
               {bankFile && (
-                <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3 space-y-2 text-xs">
+                <div className="mt-3 rounded-xl border border-[#EDE6DD] bg-white p-3 space-y-2 text-xs">
                   <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
                     <span className="font-bold text-slate-800 truncate max-w-[150px]">{bankFile.name}</span>
                     <span className="text-[10px] text-slate-500 font-semibold">{bankFile.size}</span>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-0.5">
+                    <label className="block text-[10px] font-bold text-[#0B1B4F] uppercase tracking-wider mb-0.5 font-serif">
                       Account Holder Name:
                     </label>
                     <div className="relative">
@@ -891,7 +891,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                         type="text"
                         value={bankFile.extractedName}
                         onChange={(e) => handleUpdateBankName(e.target.value)}
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:border-purple-500 focus:bg-white focus:outline-hidden"
+                        className="w-full rounded-lg border border-[#DFC8A5] bg-[#FAF7F2]/50 px-2.5 py-1.5 text-xs font-bold text-[#0B1B4F] focus:border-[#DFB738] focus:bg-white focus:outline-hidden"
                         placeholder="e.g. Kavitha Selvam"
                       />
                       <Edit3 className="absolute right-2 top-2 size-3 text-slate-400 pointer-events-none" />
@@ -900,13 +900,13 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
                     <span>A/C: <strong>38920192819</strong></span>
-                    <span>NPCI: <strong className={auditResult.npciStatus === "SEEDED" ? "text-emerald-600" : "text-amber-600"}>{auditResult.npciStatus}</strong></span>
+                    <span>NPCI: <strong className={auditResult.npciStatus === "SEEDED" ? "text-emerald-700" : "text-amber-700"}>{auditResult.npciStatus}</strong></span>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="mt-3 flex items-center justify-between text-[10px] text-purple-800 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
+            <div className="mt-3 flex items-center justify-between text-[10px] text-amber-900 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
               <span className="flex items-center gap-1 font-semibold">
                 <CheckCircle className="size-3" /> Core Banking Validated
               </span>
@@ -916,14 +916,14 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
       </div>
 
       {/* Visual Side-by-Side Name Comparison & Matching Engine */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 border-b border-slate-100 gap-2">
-          <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
-              <ShieldAlert className="size-4" />
+      <div className="luxury-card rounded-2xl p-6 sm:p-8 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 border-b border-[#EDE6DD] gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-amber-50 border border-amber-200 text-amber-800 shadow-2xs">
+              <ShieldAlert className="size-4.5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm sm:text-base font-bold text-[#0B1B4F] font-serif">
                 3. Cross-Document Name Matching Matrix & Resolution
               </h3>
               <p className="text-[11px] text-slate-500">
@@ -933,14 +933,14 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500">Matching Score:</span>
+            <span className="text-xs font-semibold text-slate-600">Matching Score:</span>
             <span
-              className={`rounded-full px-3 py-1 text-xs font-black ${
+              className={`rounded-full px-3 py-1 text-xs font-black font-serif ${
                 auditResult.nameMatchPercentage >= 95
-                  ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                  ? "bg-emerald-50 text-emerald-900 border border-emerald-300"
                   : auditResult.nameMatchPercentage >= 75
-                  ? "bg-amber-100 text-amber-900 border border-amber-300"
-                  : "bg-rose-100 text-rose-800 border border-rose-300"
+                  ? "bg-amber-50 text-amber-900 border border-amber-300"
+                  : "bg-rose-50 text-rose-900 border border-rose-300"
               }`}
             >
               {auditResult.nameMatchPercentage}% Confidence
@@ -949,18 +949,18 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
         </div>
 
         {/* Visual Token Comparison Breakdown */}
-        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-3">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center justify-between">
+        <div className="rounded-2xl border border-[#EDE6DD] bg-[#FAF7F2] p-4.5 space-y-3">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#0B1B4F] flex items-center justify-between font-serif">
             <span>Visual Token Comparison</span>
             <span className="text-[10px] text-slate-500 lowercase font-normal">character & word alignment</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Aadhaar Anchor Tokens */}
-            <div className="rounded-xl border border-indigo-200 bg-white p-3 space-y-1.5 shadow-2xs">
+            <div className="rounded-xl border border-[#DFC8A5] bg-white p-3.5 space-y-2 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-indigo-900">Aadhaar Card Name (Anchor)</span>
-                <span className="text-[10px] text-indigo-600 font-semibold">UIDAI Master</span>
+                <span className="text-xs font-bold text-[#0B1B4F] font-serif">Aadhaar Card Name (Anchor)</span>
+                <span className="text-[10px] text-amber-700 font-semibold">UIDAI Master</span>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 {aadhaarTokens.map((token, i) => {
@@ -975,8 +975,8 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                       key={i}
                       className={`rounded-md px-2.5 py-1 text-xs font-black ${
                         isPresentInMarksheet
-                          ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
-                          : "bg-amber-100 text-amber-900 border border-amber-300"
+                          ? "bg-emerald-50 text-emerald-900 border border-emerald-300"
+                          : "bg-amber-50 text-amber-900 border border-amber-300"
                       }`}
                     >
                       {token}
@@ -987,10 +987,10 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
             </div>
 
             {/* Marksheet Tokens */}
-            <div className="rounded-xl border border-sky-200 bg-white p-3 space-y-1.5 shadow-2xs">
+            <div className="rounded-xl border border-[#DFC8A5] bg-white p-3.5 space-y-2 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-sky-900">10th Marksheet Name</span>
-                <span className="text-[10px] text-sky-600 font-semibold">Academic Memo</span>
+                <span className="text-xs font-bold text-[#0B1B4F] font-serif">10th Marksheet Name</span>
+                <span className="text-[10px] text-sky-700 font-semibold">Academic Memo</span>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 {marksheetTokens.map((token, i) => {
@@ -1005,8 +1005,8 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                       key={i}
                       className={`rounded-md px-2.5 py-1 text-xs font-black ${
                         isPresentInAadhaar
-                          ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
-                          : "bg-amber-100 text-amber-900 border border-amber-300"
+                          ? "bg-emerald-50 text-emerald-900 border border-emerald-300"
+                          : "bg-amber-50 text-amber-900 border border-amber-300"
                       }`}
                     >
                       {token}
@@ -1020,21 +1020,21 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           {/* Verdict Banner */}
           <div className="pt-1">
             {auditResult.nameMatchPercentage === 100 ? (
-              <div className="flex items-center gap-2 rounded-xl bg-emerald-100/70 border border-emerald-300 p-2.5 text-xs text-emerald-950">
+              <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-300 p-3 text-xs text-emerald-950 shadow-2xs">
                 <CheckCircle2 className="size-4 text-emerald-700 shrink-0" />
                 <span>
                   <strong>100% Exact Name Match:</strong> Both Aadhaar and educational records are perfectly aligned. No affidavit or gazette correction required for PFMS DBT disbursement.
                 </span>
               </div>
             ) : auditResult.nameMatchPercentage >= 75 ? (
-              <div className="flex items-center gap-2 rounded-xl bg-amber-100/80 border border-amber-300 p-2.5 text-xs text-amber-950">
+              <div className="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-300 p-3 text-xs text-amber-950 shadow-2xs">
                 <AlertTriangle className="size-4 text-amber-700 shrink-0" />
                 <span>
                   <strong>Initial / Abbreviation Variation Detected:</strong> Marksheet has initial while Aadhaar has expanded surname. State verification portals flag this as a procedural objection. <strong>Solution 1 (Affidavit)</strong> or <strong>MeeSeva/e-Sevai Certificate</strong> provides instant legal clearance.
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 rounded-xl bg-rose-100/80 border border-rose-300 p-2.5 text-xs text-rose-950">
+              <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-300 p-3 text-xs text-rose-950 shadow-2xs">
                 <XCircle className="size-4 text-rose-700 shrink-0" />
                 <span>
                   <strong>Critical Name Discrepancy:</strong> High risk of automated rejection by PFMS / Welfare Department. Execute Notarized Affidavit or get an Aadhaar Name Update at your nearest CSC/ASK center.
@@ -1045,58 +1045,58 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
         </div>
 
         {/* Cross-Document Comparison Table */}
-        <div className="overflow-x-auto rounded-2xl border border-slate-200">
+        <div className="overflow-x-auto rounded-2xl border border-[#EDE6DD] shadow-2xs">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+            <thead className="bg-[#0B1B4F] text-[#F5E29F] uppercase text-[10px] font-bold tracking-wider font-serif">
               <tr>
-                <th className="px-4 py-3">Document Source</th>
-                <th className="px-4 py-3">Extracted Legal Name</th>
-                <th className="px-4 py-3">Date of Birth</th>
-                <th className="px-4 py-3">Discrepancy Status</th>
+                <th className="px-4 py-3.5">Document Source</th>
+                <th className="px-4 py-3.5">Extracted Legal Name</th>
+                <th className="px-4 py-3.5">Date of Birth</th>
+                <th className="px-4 py-3.5">Discrepancy Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
-              <tr className="hover:bg-slate-50/60">
-                <td className="px-4 py-3 font-bold text-slate-800 flex items-center gap-2">
-                  <FileBadge className="size-3.5 text-indigo-600" />
+            <tbody className="divide-y divide-[#EDE6DD] font-medium bg-white">
+              <tr className="hover:bg-[#FAF7F2]/60 transition-colors">
+                <td className="px-4 py-3 font-bold text-[#0B1B4F] flex items-center gap-2">
+                  <FileBadge className="size-3.5 text-amber-700" />
                   <span>Aadhaar Card (UIDAI)</span>
                 </td>
                 <td className="px-4 py-3 text-slate-900 font-bold">{auditInput.nameOnAadhaar || "—"}</td>
                 <td className="px-4 py-3 text-slate-700">{auditInput.dobOnAadhaar || "—"}</td>
                 <td className="px-4 py-3">
-                  <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-[10px] font-bold text-indigo-800">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[#FAF7F2] border border-[#DFC8A5] px-2.5 py-0.5 text-[10px] font-bold text-[#0B1B4F]">
                     <Check className="size-3" /> Master Legal Anchor
                   </span>
                 </td>
               </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="px-4 py-3 font-bold text-slate-800 flex items-center gap-2">
-                  <FileText className="size-3.5 text-sky-600" />
+              <tr className="hover:bg-[#FAF7F2]/60 transition-colors">
+                <td className="px-4 py-3 font-bold text-[#0B1B4F] flex items-center gap-2">
+                  <FileText className="size-3.5 text-sky-700" />
                   <span>10th Class Marksheet</span>
                 </td>
                 <td className="px-4 py-3 text-slate-900 font-bold">{auditInput.nameOnMarksheet || "—"}</td>
                 <td className="px-4 py-3 text-slate-700">{auditInput.dobOnMarksheet || "—"}</td>
                 <td className="px-4 py-3">
                   {auditInput.nameOnAadhaar === auditInput.nameOnMarksheet ? (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-300 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
                       <Check className="size-3" /> Exact Match
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 border border-amber-300 px-2.5 py-0.5 text-[10px] font-bold text-amber-900">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-300 px-2.5 py-0.5 text-[10px] font-bold text-amber-900">
                       <AlertTriangle className="size-3" /> Initial Discrepancy Flagged
                     </span>
                   )}
                 </td>
               </tr>
-              <tr className="hover:bg-slate-50/60">
-                <td className="px-4 py-3 font-bold text-slate-800 flex items-center gap-2">
-                  <Building className="size-3.5 text-purple-600" />
+              <tr className="hover:bg-[#FAF7F2]/60 transition-colors">
+                <td className="px-4 py-3 font-bold text-[#0B1B4F] flex items-center gap-2">
+                  <Building className="size-3.5 text-amber-700" />
                   <span>Bank Passbook Record</span>
                 </td>
                 <td className="px-4 py-3 text-slate-900 font-bold">{bankFile?.extractedName || auditInput.nameOnAadhaar || "—"}</td>
                 <td className="px-4 py-3 text-slate-700">{auditInput.dobOnAadhaar || "—"}</td>
                 <td className="px-4 py-3">
-                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-300 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
                     <Check className="size-3" /> KYC Seeded & Matched
                   </span>
                 </td>
@@ -1106,23 +1106,23 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
         </div>
 
         {/* Actionable Legal Solutions for Mismatch */}
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 space-y-3">
+        <div className="rounded-2xl border border-[#DFC8A5] bg-[#FAF7F2] p-5 space-y-3.5">
           <div className="flex items-center gap-2">
             <Sparkles className="size-4 text-amber-600" />
-            <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+            <h4 className="text-xs sm:text-sm font-bold text-[#0B1B4F] uppercase tracking-wider font-serif">
               Legal Remedies & Solutions for Name Discrepancy:
             </h4>
           </div>
-          <p className="text-xs text-amber-900 leading-relaxed">
+          <p className="text-xs text-slate-700 leading-relaxed">
             When educational records state <strong>"{auditInput.nameOnMarksheet || "Applicant S"}"</strong> while Aadhaar records <strong>"{auditInput.nameOnAadhaar || "Applicant Full Name"}"</strong>, welfare audit teams require legal corroboration. We generate two official, ready-to-use documents:
           </p>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-1">
             {/* Solution A: One-and-the-Same Person Affidavit */}
-            <div className="rounded-2xl border border-amber-300 bg-white p-4 space-y-2.5 shadow-2xs">
+            <div className="luxury-card rounded-2xl p-5 space-y-2.5 shadow-2xs border-[#DFC8A5]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900">Solution 1: Notarized Affidavit</span>
-                <span className="rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200">
+                <span className="text-xs font-bold text-[#0B1B4F] font-serif">Solution 1: Notarized Affidavit</span>
+                <span className="rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-900 border border-amber-200">
                   Ready in 24 hrs
                 </span>
               </div>
@@ -1132,21 +1132,21 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
                   onClick={() => setShowAffidavitModal(true)}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#DFC8A5] bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-[#FAF7F2] cursor-pointer"
                 >
                   <Eye className="size-3" />
                   <span>Preview Text</span>
                 </button>
                 <button
                   onClick={handleCopyAffidavit}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#DFC8A5] bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-[#FAF7F2] cursor-pointer"
                 >
                   <Copy className="size-3" />
                   <span>{copiedAffidavit ? "Copied!" : "Copy"}</span>
                 </button>
                 <button
                   onClick={handleDownloadAffidavit}
-                  className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-indigo-700 cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#0B1B4F] px-3.5 py-1 text-[11px] font-bold text-[#F5E29F] hover:bg-[#152864] cursor-pointer shadow-xs border border-[#DFB738]/40"
                 >
                   <Download className="size-3" />
                   <span>Download .txt</span>
@@ -1155,10 +1155,10 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
             </div>
 
             {/* Solution B: NPCI Seeding Mandate */}
-            <div className="rounded-2xl border border-sky-300 bg-white p-4 space-y-2.5 shadow-2xs">
+            <div className="luxury-card rounded-2xl p-5 space-y-2.5 shadow-2xs border-[#DFC8A5]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900">Solution 2: Bank NPCI Seeding Mandate</span>
-                <span className="rounded-md bg-sky-100 px-2 py-0.5 text-[10px] font-bold text-sky-800 border border-sky-200">
+                <span className="text-xs font-bold text-[#0B1B4F] font-serif">Solution 2: Bank NPCI Seeding Mandate</span>
+                <span className="rounded-md bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-800 border border-sky-200">
                   Bank Form
                 </span>
               </div>
@@ -1168,21 +1168,21 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
                   onClick={() => setShowMandateModal(true)}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#DFC8A5] bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-[#FAF7F2] cursor-pointer"
                 >
                   <Eye className="size-3" />
                   <span>Preview Text</span>
                 </button>
                 <button
                   onClick={handleCopyMandate}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#DFC8A5] bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-[#FAF7F2] cursor-pointer"
                 >
                   <Copy className="size-3" />
                   <span>{copiedForm ? "Copied!" : "Copy"}</span>
                 </button>
                 <button
                   onClick={handleDownloadMandate}
-                  className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-3 py-1 text-[11px] font-bold text-white hover:bg-sky-700 cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#0B1B4F] px-3.5 py-1 text-[11px] font-bold text-[#F5E29F] hover:bg-[#152864] cursor-pointer shadow-xs border border-[#DFB738]/40"
                 >
                   <Download className="size-3" />
                   <span>Download .txt</span>
@@ -1196,37 +1196,37 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
       {/* Affidavit Preview Modal */}
       {showAffidavitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-[#DFC8A5] bg-[#FAF7F2] p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EDE6DD] pb-3">
               <div className="flex items-center gap-2">
-                <FileBadge className="size-5 text-indigo-600" />
-                <h3 className="text-base font-bold text-slate-900">
+                <FileBadge className="size-5 text-[#0B1B4F]" />
+                <h3 className="text-base font-bold text-[#0B1B4F] font-serif">
                   Notarized One-and-the-Same Person Affidavit Format
                 </h3>
               </div>
               <button
                 onClick={() => setShowAffidavitModal(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                className="rounded-lg p-1 text-slate-400 hover:bg-[#FAF7F2] hover:text-slate-600 cursor-pointer"
               >
                 <X className="size-5" />
               </button>
             </div>
 
-            <div className="rounded-xl bg-slate-50 p-4 font-mono text-xs text-slate-800 whitespace-pre-wrap leading-relaxed border border-slate-200 max-h-96 overflow-y-auto">
+            <div className="rounded-xl bg-white p-4 font-mono text-xs text-slate-800 whitespace-pre-wrap leading-relaxed border border-[#EDE6DD] max-h-96 overflow-y-auto shadow-inner">
               {affidavitText}
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={handleCopyAffidavit}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl border border-[#DFC8A5] bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-[#FAF7F2] cursor-pointer"
               >
                 <Copy className="size-4" />
                 <span>{copiedAffidavit ? "Copied to Clipboard!" : "Copy Text"}</span>
               </button>
               <button
                 onClick={handleDownloadAffidavit}
-                className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700 cursor-pointer shadow-md"
+                className="flex items-center gap-1.5 rounded-xl bg-[#0B1B4F] px-4 py-2 text-xs font-bold text-[#F5E29F] hover:bg-[#152864] cursor-pointer shadow-md border border-[#DFB738]/40"
               >
                 <Download className="size-4" />
                 <span>Download Affidavit .txt</span>
@@ -1239,37 +1239,37 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
       {/* Mandate Preview Modal */}
       {showMandateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-[#DFC8A5] bg-[#FAF7F2] p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-[#EDE6DD] pb-3">
               <div className="flex items-center gap-2">
-                <Building className="size-5 text-sky-600" />
-                <h3 className="text-base font-bold text-slate-900">
+                <Building className="size-5 text-[#0B1B4F]" />
+                <h3 className="text-base font-bold text-[#0B1B4F] font-serif">
                   NPCI Aadhaar DBT Seeding Mandate (Annexure I)
                 </h3>
               </div>
               <button
                 onClick={() => setShowMandateModal(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                className="rounded-lg p-1 text-slate-400 hover:bg-[#FAF7F2] hover:text-slate-600 cursor-pointer"
               >
                 <X className="size-5" />
               </button>
             </div>
 
-            <div className="rounded-xl bg-slate-50 p-4 font-mono text-xs text-slate-800 whitespace-pre-wrap leading-relaxed border border-slate-200 max-h-96 overflow-y-auto">
+            <div className="rounded-xl bg-white p-4 font-mono text-xs text-slate-800 whitespace-pre-wrap leading-relaxed border border-[#EDE6DD] max-h-96 overflow-y-auto shadow-inner">
               {mandateText}
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={handleCopyMandate}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl border border-[#DFC8A5] bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-[#FAF7F2] cursor-pointer"
               >
                 <Copy className="size-4" />
                 <span>{copiedForm ? "Copied to Clipboard!" : "Copy Text"}</span>
               </button>
               <button
                 onClick={handleDownloadMandate}
-                className="flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 cursor-pointer shadow-md"
+                className="flex items-center gap-1.5 rounded-xl bg-[#0B1B4F] px-4 py-2 text-xs font-bold text-[#F5E29F] hover:bg-[#152864] cursor-pointer shadow-md border border-[#DFB738]/40"
               >
                 <Download className="size-4" />
                 <span>Download Mandate .txt</span>
