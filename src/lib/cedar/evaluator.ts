@@ -49,7 +49,10 @@ export interface CedarEvaluationResult {
   fitScore: number; // 0 to 100
   passedClauses: string[];
   failedClauses: string[];
+  matchedReasons: string[];
+  failedReasons: string[];
   missingPrerequisites: SchemeOrService[];
+  heldPrerequisites: { id: string; name: string }[];
   estimatedBenefit: string;
   actionRecommendation: string;
   cedarPolicySnippet: string;
@@ -98,7 +101,15 @@ export function evaluateCedarPolicies(rawProfile: Partial<UserProfile>): CedarEv
   const results: CedarEvaluationResult[] = [];
   const heldDocs = new Set(profile.heldDocuments || []);
 
-  for (const scheme of SCHEMES_DATABASE) {
+  // Filter active schemes: Central schemes are constant; State schemes match candidate's state
+  const candidateSchemes = SCHEMES_DATABASE.filter((s) => {
+    if (s.level === "Central") return true;
+    if (!s.applicableStates || s.applicableStates.length === 0) return true;
+    if (profile.state === "National" || !profile.state) return true;
+    return s.applicableStates.includes(profile.state);
+  });
+
+  for (const scheme of candidateSchemes) {
     const passedClauses: string[] = [];
     const failedClauses: string[] = [];
     let fitScore = 100;
@@ -299,13 +310,44 @@ export function evaluateCedarPolicies(rawProfile: Partial<UserProfile>): CedarEv
       }
     }
 
-    // 20. Missing Prerequisite Document Check
+    // 20. Prerequisite Document Check (Held vs Missing)
+    const heldPrereqs: { id: string; name: string }[] = [];
     const missingPrereqs: SchemeOrService[] = [];
     for (const prereqId of scheme.prerequisites) {
-      if (!heldDocs.has(prereqId)) {
-        const prereqScheme = SCHEMES_DATABASE.find(s => s.id === prereqId);
+      const prereqScheme = SCHEMES_DATABASE.find(s => s.id === prereqId);
+      const docTitle = prereqScheme ? prereqScheme.title : prereqId.replace(/_/g, " ");
+      if (heldDocs.has(prereqId)) {
+        heldPrereqs.push({ id: prereqId, name: docTitle });
+      } else {
         if (prereqScheme) missingPrereqs.push(prereqScheme);
       }
+    }
+
+    // User-friendly matched reasons
+    const matchedReasons: string[] = [];
+    if (profile.annualFamilyIncome <= scheme.maxIncome) {
+      matchedReasons.push(`Annual family income (₹${profile.annualFamilyIncome.toLocaleString('en-IN')}) is within statutory limit of ₹${scheme.maxIncome.toLocaleString('en-IN')}`);
+    }
+    if (scheme.educationStages.includes("All") || scheme.educationStages.includes(profile.educationLevel)) {
+      matchedReasons.push(`Currently enrolled in qualifying education stage: ${profile.educationLevel}`);
+    }
+    if (scheme.courseTypesAllowed.includes(profile.courseType)) {
+      matchedReasons.push(`Course mode is valid: ${profile.courseType}`);
+    }
+    if (!scheme.managementQuotaAllowed && profile.admissionQuota !== "Management/Direct") {
+      matchedReasons.push(`Admitted through recognized merit/counseling (${profile.admissionQuota})`);
+    }
+    if (scheme.requiresGovtSchool6To12 && profile.studiedInGovtSchool6To12) {
+      matchedReasons.push(`Continuous Government School education (Class 6 to 12) verified`);
+    }
+    if (scheme.requiresFirstGraduate && profile.isFirstGraduateInFamily) {
+      matchedReasons.push(`First Graduate status verified (Zero prior degree holders in family)`);
+    }
+    if (scheme.genderRestriction && scheme.genderRestriction === profile.gender) {
+      matchedReasons.push(`Candidate gender meets scheme criteria: ${profile.gender}`);
+    }
+    if (scheme.level === "State" && scheme.applicableStates?.includes(profile.state)) {
+      matchedReasons.push(`State domicile verified: ${profile.state} resident`);
     }
 
     const decision: "ALLOW" | "DENY" = failedClauses.length === 0 ? "ALLOW" : "DENY";
@@ -336,7 +378,10 @@ export function evaluateCedarPolicies(rawProfile: Partial<UserProfile>): CedarEv
       fitScore: clampedScore,
       passedClauses,
       failedClauses,
+      matchedReasons,
+      failedReasons: failedClauses,
       missingPrerequisites: missingPrereqs,
+      heldPrerequisites: heldPrereqs,
       estimatedBenefit,
       actionRecommendation,
       cedarPolicySnippet: scheme.cedarPolicyCode

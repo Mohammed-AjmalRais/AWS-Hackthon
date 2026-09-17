@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserProfile, CedarEvaluationResult } from "@/lib/cedar/evaluator";
 import {
   CheckCircle2,
@@ -28,8 +28,15 @@ import {
   Zap,
   Sliders,
   RotateCcw,
-  Hospital
+  Hospital,
+  ListTodo,
+  FileText,
+  MapPin,
+  HelpCircle
 } from "lucide-react";
+import { DEMO_PERSONAS, DemoPersona } from "@/data/demoPersonas";
+import { SchemeCockpitModal } from "@/components/SchemeCockpitModal";
+import { CertificateResolutionModal } from "@/components/CertificateResolutionModal";
 
 interface EligibilityTabProps {
   profile: UserProfile;
@@ -46,25 +53,54 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
   onNavigateToDocuments,
   onNavigateToRoadmap,
 }) => {
-  // Two distinct views: Profile Setup vs Scheme Evaluation
-  const [activeView, setActiveView] = useState<"PROFILE" | "RESULTS">("RESULTS");
-  const [expandedCedarPolicy, setExpandedCedarPolicy] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<
-    "ALL" | "ELIGIBLE" | "STATE_TN" | "CENTRAL" | "SCHOLARSHIP" | "HEALTHCARE" | "CERTIFICATE"
+  // Requirement 3: Default to Profile Setup on entry so user fills details first
+  const [activeView, setActiveView] = useState<"PROFILE" | "RESULTS">("PROFILE");
+
+  // Requirement 4: Classify into Eligible vs Not Eligible
+  const [eligibilityTab, setEligibilityTab] = useState<"ELIGIBLE" | "NOT_ELIGIBLE">("ELIGIBLE");
+
+  // Category filter
+  const [categoryFilter, setCategoryFilter] = useState<
+    "ALL" | "STATE_SPECIFIC" | "CENTRAL" | "SCHOLARSHIP" | "HEALTHCARE" | "CERTIFICATE"
   >("ALL");
 
-  const eligibleResults = evaluationResults.filter((r) => r.decision === "ALLOW");
-  const eligibleCount = eligibleResults.length;
-  const ineligibleCount = evaluationResults.length - eligibleCount;
+  const [expandedCedarPolicy, setExpandedCedarPolicy] = useState<string | null>(null);
 
-  // Filter logic
-  const filteredResults = evaluationResults.filter((r) => {
-    if (filterType === "ELIGIBLE") return r.decision === "ALLOW";
-    if (filterType === "STATE_TN") return r.scheme.level === "State" && r.scheme.applicableStates?.includes("Tamil Nadu");
-    if (filterType === "CENTRAL") return r.scheme.level === "Central";
-    if (filterType === "SCHOLARSHIP") return r.scheme.type === "scholarship";
-    if (filterType === "HEALTHCARE") return r.scheme.type === "healthcare";
-    if (filterType === "CERTIFICATE") return r.scheme.type === "certificate";
+  // Modals for Individual Scheme Cockpit & Missing Certificate Sub-Tree
+  const [selectedCockpitResult, setSelectedCockpitResult] = useState<CedarEvaluationResult | null>(null);
+  const [selectedCertGuideId, setSelectedCertGuideId] = useState<string | null>(null);
+
+  // Persona loading
+  const handleSelectPersona = (persona: DemoPersona) => {
+    onProfileChange(persona.profile);
+  };
+
+  const isTamilNadu = profile.state === "Tamil Nadu";
+
+  // Split results into Eligible vs Not Eligible
+  const eligibleResults = evaluationResults.filter((r) => r.decision === "ALLOW");
+  const ineligibleResults = evaluationResults.filter((r) => r.decision !== "ALLOW");
+
+  const activeClassificationResults =
+    eligibilityTab === "ELIGIBLE" ? eligibleResults : ineligibleResults;
+
+  // Filter based on category
+  const displayedResults = activeClassificationResults.filter((r) => {
+    if (categoryFilter === "STATE_SPECIFIC") {
+      return r.scheme.level === "State";
+    }
+    if (categoryFilter === "CENTRAL") {
+      return r.scheme.level === "Central";
+    }
+    if (categoryFilter === "SCHOLARSHIP") {
+      return r.scheme.type === "scholarship";
+    }
+    if (categoryFilter === "HEALTHCARE") {
+      return r.scheme.type === "healthcare";
+    }
+    if (categoryFilter === "CERTIFICATE") {
+      return r.scheme.type === "certificate";
+    }
     return true;
   });
 
@@ -85,11 +121,18 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
     });
   };
 
-  const isTamilNadu = profile.state === "Tamil Nadu";
+  const handleMarkCertObtained = (certId: string) => {
+    const currentHeld = new Set(profile.heldDocuments || []);
+    currentHeld.add(certId);
+    onProfileChange({
+      ...profile,
+      heldDocuments: Array.from(currentHeld),
+    });
+  };
 
   return (
     <div className="space-y-6">
-      {/* View Switcher Bar */}
+      {/* Top View Navigation Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
         <div className="flex items-center gap-2">
           <button
@@ -116,14 +159,14 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
             }`}
           >
             <Sparkles className="size-4 text-amber-300" />
-            <span>2. Scheme Evaluation Results</span>
+            <span>2. Scheme Classification & Evaluation</span>
             <span className="rounded-full bg-orange-700 px-2 py-0.5 text-[10px] text-orange-100">
-              {eligibleCount} Eligible
+              {eligibleResults.length} Eligible
             </span>
           </button>
         </div>
 
-        {/* Quick Summary Pill in Header */}
+        {/* Quick Snapshot in Header */}
         <div className="flex items-center gap-2 text-xs text-slate-600">
           <span className="font-semibold text-slate-800">{profile.name || "Candidate"}</span>
           <span>•</span>
@@ -135,197 +178,222 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
             onClick={() => setActiveView(activeView === "PROFILE" ? "RESULTS" : "PROFILE")}
             className="text-orange-600 font-bold hover:underline cursor-pointer ml-1"
           >
-            {activeView === "PROFILE" ? "View Schemes ➔" : "Edit Profile ✏️"}
+            {activeView === "PROFILE" ? "Check Schemes ➔" : "Edit Profile ✏️"}
           </button>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* VIEW 1: DEDICATED CITIZEN PROFILE SETUP (NON-CLUMSY, STRUCTURED FORM)   */}
+      {/* VIEW 1: DEDICATED CITIZEN PROFILE SETUP (STATE-AWARE & SUFFICIENT)        */}
       {/* ========================================================================= */}
       {activeView === "PROFILE" && (
         <div className="space-y-6">
-          {/* Banner */}
+          {/* State Scope Live Banner */}
           <div className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 via-slate-50 to-orange-50/40 p-6 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="space-y-1 max-w-2xl">
-                <div className="inline-flex items-center gap-1.5 rounded-md bg-indigo-100 px-2.5 py-0.5 font-mono text-[10px] font-bold text-indigo-800 uppercase">
-                  Civil Identity & Academic Registry
+              <div className="space-y-1.5 max-w-2xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-md bg-indigo-100 px-2.5 py-0.5 font-mono text-[10px] font-bold text-indigo-800 uppercase">
+                    Step 1: Citizen Profile Setup
+                  </span>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
+                    Evaluating Constant Central + Top Active {profile.state} Schemes
+                  </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  Citizen Profile & Entitlement Parameters
+                <h3 className="text-xl font-black text-slate-900">
+                  Citizen Profile & Eligibility Parameters
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Fill in your official particulars below. Our AWS Cedar Policy Engine screens this profile against the top 15+ central and state schemes (including Tamil Nadu state flagship programs like Pudhumai Penn, 7.5% Govt School Quota, First Graduate, and CMCHIS) with 100% deterministic accuracy.
+                  Enter your official particulars below. The system checks all top active Central Government schemes alongside {profile.state}&apos;s flagship state programs using deterministic AWS Cedar policies—with zero AI hallucination.
                 </p>
               </div>
 
               <button
                 onClick={() => setActiveView("RESULTS")}
-                className="shrink-0 flex items-center gap-2 rounded-xl bg-orange-600 px-5 py-3 text-xs font-bold text-white hover:bg-orange-700 transition-all shadow-sm cursor-pointer"
+                className="flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-6 py-3.5 text-xs font-black text-white shadow-md hover:bg-orange-700 transition-all cursor-pointer shrink-0"
               >
-                <span>Run Scheme Audit</span>
+                <span>Check My Eligibility</span>
                 <ArrowRight className="size-4" />
               </button>
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* CARD 1: Domicile, State & Social Identity */}
+          {/* Quick-Fill Verified Personas Bar */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                <Sparkles className="size-3.5 text-orange-500" />
+                Quick-Fill Verified Demo Personas
+              </span>
+              <span className="text-[11px] text-slate-400">Click to instantly populate full real-world parameters</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 pt-1">
+              {DEMO_PERSONAS.map((persona) => (
+                <button
+                  key={persona.id}
+                  onClick={() => handleSelectPersona(persona)}
+                  className={`flex flex-col text-left rounded-xl p-3 border transition-all cursor-pointer ${
+                    profile.name === persona.profile.name
+                      ? "border-orange-500 bg-orange-50/50 shadow-2xs"
+                      : "border-slate-200 bg-slate-50/60 hover:bg-slate-100 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-slate-900">{persona.name}</span>
+                    <span className="text-[9px] font-mono rounded bg-slate-200 px-1 py-0.5 text-slate-700 font-bold">
+                      {persona.profile.state}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 mt-1 line-clamp-1">{persona.tagline}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 4-Card Sufficient Profile Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* CARD 1: Social Identity & Location */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                 <div className="rounded-lg bg-orange-100 p-2 text-orange-600">
-                  <Landmark className="size-4" />
+                  <User className="size-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">1. State Domicile & Social Identity</h4>
-                  <p className="text-xs text-slate-500">Determines state vs central quota eligibility</p>
+                  <h4 className="text-sm font-bold text-slate-900">1. Social Identity & State Domicile</h4>
+                  <p className="text-xs text-slate-500">Determines state vs central welfare quotas</p>
                 </div>
               </div>
 
+              {/* Full Name */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Full Legal Name</label>
+                <input
+                  type="text"
+                  value={profile.name || ""}
+                  onChange={(e) => onProfileChange({ ...profile, name: e.target.value })}
+                  placeholder="e.g. Kavitha Selvam"
+                  className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
-                {/* State */}
+                {/* State Domicile */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Permanent Home State</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">State Domicile</label>
                   <select
                     value={profile.state}
-                    onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        state: e.target.value,
-                        district: e.target.value === "Tamil Nadu" ? "Chennai" : profile.district,
-                        tnCommunity: e.target.value === "Tamil Nadu" ? "MBC" : undefined,
-                      })
-                    }
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-semibold text-slate-800 focus:border-orange-500 focus:outline-hidden"
+                    onChange={(e) => onProfileChange({ ...profile, state: e.target.value })}
+                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold text-orange-700 focus:border-orange-500 focus:outline-hidden"
                   >
-                    <option value="Tamil Nadu">Tamil Nadu (தமிழ்நாடு)</option>
-                    <option value="Odisha">Odisha</option>
-                    <option value="Jharkhand">Jharkhand</option>
-                    <option value="Karnataka">Karnataka</option>
+                    <option value="Tamil Nadu">Tamil Nadu (11 State Schemes Active)</option>
+                    <option value="Jharkhand">Jharkhand (Tribal Welfare Active)</option>
                     <option value="Maharashtra">Maharashtra</option>
-                    <option value="Assam">Assam (NE Region)</option>
-                    <option value="National">Other / All-India</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="National">All States / Central Focus</option>
                   </select>
                 </div>
 
-                {/* District */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Home District</label>
-                  <input
-                    type="text"
-                    value={profile.district || ""}
-                    onChange={(e) => onProfileChange({ ...profile, district: e.target.value })}
-                    placeholder="e.g. Chennai / Madurai / Mayurbhanj"
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 {/* Gender */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
                   <select
                     value={profile.gender}
                     onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        gender: e.target.value as UserProfile["gender"],
-                      })
+                      onProfileChange({ ...profile, gender: e.target.value as UserProfile["gender"] })
                     }
                     className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
                   >
-                    <option value="Female">Female (Unlocks Pudhumai Penn, Pragati, KMUT)</option>
-                    <option value="Male">Male (Unlocks Tamil Pudhalvan)</option>
+                    <option value="Female">Female (Pudhumai Penn / Pragati Eligible)</option>
+                    <option value="Male">Male (Tamil Pudhalvan Eligible)</option>
                     <option value="Other">Other / Transgender</option>
-                  </select>
-                </div>
-
-                {/* Broad Category */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Central Category</label>
-                  <select
-                    value={profile.category}
-                    onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        category: e.target.value as UserProfile["category"],
-                      })
-                    }
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-semibold text-slate-800 focus:border-orange-500 focus:outline-hidden"
-                  >
-                    <option value="OBC">OBC (Other Backward Classes)</option>
-                    <option value="SC">SC (Scheduled Caste)</option>
-                    <option value="ST">ST (Scheduled Tribe)</option>
-                    <option value="EWS">EWS (Economically Weaker Section)</option>
-                    <option value="General">General / Open Category</option>
                   </select>
                 </div>
               </div>
 
-              {/* DYNAMIC TAMIL NADU COMMUNITY SELECTOR */}
-              {isTamilNadu && (
-                <div className="rounded-xl border border-orange-200 bg-orange-50/60 p-3.5 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-xs font-bold text-orange-950">
-                      Tamil Nadu Community Reservation Category (சாதிப் பிரிவு)
-                    </label>
-                    <span className="text-[10px] font-mono font-bold text-orange-700 bg-orange-100 rounded px-1.5 py-0.5">
-                      TN Statutory
-                    </span>
-                  </div>
+              {/* Dynamic Community Category */}
+              {isTamilNadu ? (
+                <div className="rounded-xl border border-orange-200 bg-orange-50/50 p-3 space-y-2">
+                  <label className="block text-xs font-bold text-orange-950">
+                    Tamil Nadu Community Category (Reservation Quota)
+                  </label>
                   <select
-                    value={profile.tnCommunity || "MBC"}
+                    value={profile.tnCommunity || "BC"}
                     onChange={(e) =>
                       onProfileChange({
                         ...profile,
                         tnCommunity: e.target.value as UserProfile["tnCommunity"],
-                        category: ["SC", "SCA"].includes(e.target.value)
-                          ? "SC"
-                          : e.target.value === "ST"
-                          ? "ST"
-                          : e.target.value === "OC"
-                          ? "General"
-                          : "OBC",
+                        category:
+                          e.target.value === "ST"
+                            ? "ST"
+                            : ["SC", "SCA"].includes(e.target.value)
+                            ? "SC"
+                            : ["BC", "BCM", "MBC", "DNC"].includes(e.target.value)
+                            ? "OBC"
+                            : "General",
                       })
                     }
-                    className="w-full rounded-lg border border-orange-300 bg-white p-2 text-xs font-bold text-orange-950 focus:border-orange-500 focus:outline-hidden"
+                    className="w-full rounded-lg border border-orange-300 bg-white p-2 text-xs font-bold text-slate-900 focus:border-orange-500 focus:outline-hidden"
                   >
-                    <option value="MBC">MBC (Most Backward Class - மிகப்பிற்படுத்தப்பட்டோர்)</option>
-                    <option value="DNC">DNC (Denotified Community - சீர்மரபினர்)</option>
-                    <option value="BC">BC (Backward Class - பிற்படுத்தப்பட்டோர்)</option>
-                    <option value="BCM">BCM (Backward Class Muslim - பிற்படுத்தப்பட்ட முஸ்லிம்)</option>
-                    <option value="SC">SC (Scheduled Caste - ஆதிதிராவிடர்)</option>
-                    <option value="SCA">SCA (Arunthathiyar - அருந்ததியர்)</option>
-                    <option value="ST">ST (Scheduled Tribe - பழங்குடியினர்)</option>
-                    <option value="OC">OC (Open Competition / General)</option>
+                    <option value="MBC">MBC - Most Backward Class (100% Free UG Tuition)</option>
+                    <option value="DNC">DNC - De-Notified Community (100% Free UG Tuition)</option>
+                    <option value="BC">BC - Backward Class</option>
+                    <option value="BCM">BCM - Backward Class Muslim</option>
+                    <option value="SC">SC - Scheduled Caste (Adi Dravidar Post-Matric)</option>
+                    <option value="SCA">SCA - SC Arunthathiyar</option>
+                    <option value="ST">ST - Scheduled Tribe (Tribal Welfare 100% Waiver)</option>
+                    <option value="OC">OC - Open Category / General</option>
                   </select>
-                  <p className="text-[11px] text-orange-900/80 leading-relaxed">
-                    * MBC/DNC students in 3-year undergraduate degree courses receive 100% free tuition with NO income limit under Tamil Nadu government orders.
+                  <p className="text-[10px] text-orange-800">
+                    MBC/DNC students in 3-yr degree courses receive 100% free tuition with zero income limit under TN Govt orders.
                   </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">National Category</label>
+                    <select
+                      value={profile.category}
+                      onChange={(e) =>
+                        onProfileChange({ ...profile, category: e.target.value as UserProfile["category"] })
+                      }
+                      className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-semibold text-slate-800 focus:border-orange-500 focus:outline-hidden"
+                    >
+                      <option value="ST">ST (Scheduled Tribe)</option>
+                      <option value="SC">SC (Scheduled Caste)</option>
+                      <option value="OBC">OBC (Other Backward Class)</option>
+                      <option value="EWS">EWS (Economically Weaker)</option>
+                      <option value="General">General (Open Merit)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Minority Religion</label>
+                    <select
+                      value={profile.minorityCommunity || "None"}
+                      onChange={(e) =>
+                        onProfileChange({
+                          ...profile,
+                          isMinority: e.target.value !== "None",
+                          minorityCommunity: e.target.value as UserProfile["minorityCommunity"],
+                        })
+                      }
+                      className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
+                    >
+                      <option value="None">Not Applicable</option>
+                      <option value="Muslim">Muslim</option>
+                      <option value="Christian">Christian</option>
+                      <option value="Sikh">Sikh</option>
+                      <option value="Buddhist">Buddhist</option>
+                      <option value="Jain">Jain</option>
+                    </select>
+                  </div>
                 </div>
               )}
 
-              {/* Minority & PwD toggles */}
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={profile.isMinority}
-                    onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        isMinority: e.target.checked,
-                        minorityCommunity: e.target.checked ? "Muslim" : "None",
-                      })
-                    }
-                    className="rounded text-orange-600 focus:ring-orange-500"
-                  />
-                  <span>Religious Minority</span>
-                </label>
-
-                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-700 cursor-pointer">
+              {/* Disability Checkbox */}
+              <div className="flex items-center gap-3 pt-1">
+                <label className="flex items-center gap-2 text-xs text-slate-700 font-medium cursor-pointer">
                   <input
                     type="checkbox"
                     checked={profile.isPersonWithDisability}
@@ -336,85 +404,64 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                         disabilityPercentage: e.target.checked ? 40 : 0,
                       })
                     }
-                    className="rounded text-orange-600 focus:ring-orange-500"
+                    className="size-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
                   />
-                  <span>PwD (&ge; 40% Disability)</span>
+                  <span>Person with Benchmark Disability (PwD &ge; 40%)</span>
                 </label>
               </div>
             </div>
 
-            {/* CARD 2: Schooling & Academic History (Crucial for TN Schemes!) */}
+            {/* CARD 2: Academic & Schooling Particulars */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                 <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
-                  <School className="size-4" />
+                  <GraduationCap className="size-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">2. Schooling & College Particulars</h4>
-                  <p className="text-xs text-slate-500">Unlocks Pudhumai Penn, First Graduate, and counseling fee exemptions</p>
+                  <h4 className="text-sm font-bold text-slate-900">2. Academic & Schooling Background</h4>
+                  <p className="text-xs text-slate-500">Crucial for 7.5% Quota, Pudhumai Penn & First Graduate</p>
                 </div>
               </div>
 
-              {/* Critical Schooling Checkbox (Pudhumai Penn & 7.5% Quota) */}
-              <div className={`rounded-xl border p-3.5 space-y-1.5 transition-all ${
-                profile.studiedInGovtSchool6To12
-                  ? "border-emerald-300 bg-emerald-50/70"
-                  : "border-slate-200 bg-slate-50"
-              }`}>
-                <label className="flex items-start gap-2.5 cursor-pointer">
+              {/* Statutory Schooling Checkboxes (Highlights of User Perspective) */}
+              <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-3.5 space-y-2.5">
+                <label className="flex items-start gap-2.5 text-xs text-blue-950 font-bold cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={profile.studiedInGovtSchool6To12}
+                    checked={profile.studiedInGovtSchool6To12 || false}
                     onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        studiedInGovtSchool6To12: e.target.checked,
-                      })
+                      onProfileChange({ ...profile, studiedInGovtSchool6To12: e.target.checked })
                     }
-                    className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 size-4"
+                    className="size-4.5 rounded border-blue-400 text-blue-600 focus:ring-blue-500 mt-0.5 cursor-pointer"
                   />
                   <div>
-                    <span className="text-xs font-bold text-slate-900 block">
-                      🏫 Studied in State Government School from Class 6 to 12 continuously
-                    </span>
-                    <span className="text-[11px] text-slate-600 leading-snug block mt-0.5">
-                      Mandatory prerequisite to unlock **Pudhumai Penn (₹1,000/mo)**, **Tamil Pudhalvan (₹1,000/mo)**, and **7.5% Preferential Quota 100% Free College Education**.
-                    </span>
+                    <span>Studied continuously in Government School (Class 6 to 12)</span>
+                    <p className="text-[10px] font-normal text-blue-800">
+                      Mandatory for ₹1,000/mo Pudhumai Penn (girls), Tamil Pudhalvan (boys), and 7.5% Full Tuition Waiver Quota.
+                    </p>
                   </div>
                 </label>
-              </div>
 
-              {/* First Graduate in Family Checkbox (Mudhal Thalaimurai Pattadhari) */}
-              <div className={`rounded-xl border p-3.5 space-y-1.5 transition-all ${
-                profile.isFirstGraduateInFamily
-                  ? "border-indigo-300 bg-indigo-50/70"
-                  : "border-slate-200 bg-slate-50"
-              }`}>
-                <label className="flex items-start gap-2.5 cursor-pointer">
+                <label className="flex items-start gap-2.5 text-xs text-blue-950 font-bold cursor-pointer pt-1 border-t border-blue-200/70">
                   <input
                     type="checkbox"
-                    checked={profile.isFirstGraduateInFamily}
+                    checked={profile.isFirstGraduateInFamily || false}
                     onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        isFirstGraduateInFamily: e.target.checked,
-                      })
+                      onProfileChange({ ...profile, isFirstGraduateInFamily: e.target.checked })
                     }
-                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 size-4"
+                    className="size-4.5 rounded border-blue-400 text-blue-600 focus:ring-blue-500 mt-0.5 cursor-pointer"
                   />
                   <div>
-                    <span className="text-xs font-bold text-slate-900 block">
-                      🎓 First Graduate in Immediate Family (Mudhal Thalaimurai Pattadhari)
-                    </span>
-                    <span className="text-[11px] text-slate-600 leading-snug block mt-0.5">
-                      Neither parents nor elder siblings hold an undergraduate degree. Unlocks **₹25,000 – ₹30,000 / Year Tuition Fee Concession** in engineering/professional colleges!
-                    </span>
+                    <span>First Graduate in Immediate Family (Mudhal Thalaimurai)</span>
+                    <p className="text-[10px] font-normal text-blue-800">
+                      Entitles to ₹25,000 to ₹30,000/yr tuition fee concession in professional college admissions.
+                    </p>
                   </div>
                 </label>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {/* Education Stage */}
+                {/* Education Level */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Education Stage</label>
                   <select
@@ -425,38 +472,17 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                         educationLevel: e.target.value as UserProfile["educationLevel"],
                       })
                     }
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
+                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-semibold text-slate-800 focus:border-orange-500 focus:outline-hidden"
                   >
-                    <option value="UG">Undergraduate (B.E / B.Tech / MBBS / B.Sc / B.Com / Arts)</option>
-                    <option value="Diploma">Diploma / Polytechnic</option>
-                    <option value="12th">Class 12th</option>
-                    <option value="11th">Class 11th</option>
-                    <option value="PG">Postgraduate (M.E / M.Sc / MBA)</option>
-                    <option value="PhD">PhD / Doctoral</option>
+                    <option value="UG">Undergraduate (B.E. / B.Tech / MBBS / B.Sc / B.A)</option>
+                    <option value="Diploma">Polytechnic / Diploma</option>
+                    <option value="11th">Class 11</option>
+                    <option value="12th">Class 12</option>
+                    <option value="PG">Postgraduate (M.E. / M.Tech / M.Sc / M.A)</option>
+                    <option value="PhD">PhD / Research</option>
                   </select>
                 </div>
 
-                {/* Course Mode */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Course Mode</label>
-                  <select
-                    value={profile.courseType}
-                    onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        courseType: e.target.value as UserProfile["courseType"],
-                      })
-                    }
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
-                  >
-                    <option value="Regular Full-Time">Regular Full-Time (On-Campus)</option>
-                    <option value="Diploma">Diploma / Vocational</option>
-                    <option value="Distance">Distance / Correspondence (Ineligible for most)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 {/* Admission Quota */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Admission Quota</label>
@@ -470,28 +496,8 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                     }
                     className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-semibold text-slate-800 focus:border-orange-500 focus:outline-hidden"
                   >
-                    <option value="Merit/Govt Counseling">Single Window Merit / Govt Counseling (TNEA/OJEE/Govt)</option>
-                    <option value="Management/Direct">Management / Direct Quota (Strictly Denied by Central & State Rules)</option>
-                  </select>
-                </div>
-
-                {/* Institution Type */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">College Category</label>
-                  <select
-                    value={profile.institutionType}
-                    onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        institutionType: e.target.value as UserProfile["institutionType"],
-                      })
-                    }
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
-                  >
-                    <option value="Government">Government College</option>
-                    <option value="Govt-Aided">Government-Aided College</option>
-                    <option value="Private Recognized">Private Affiliated (Anna Univ / State Univ)</option>
-                    <option value="Premier/Notified (IIT/NIT/AIIMS)">Premier Institute (IIT Madras / NIT / AIIMS)</option>
+                    <option value="Merit/Govt Counseling">Single Window Merit (TNEA / Govt Counseling)</option>
+                    <option value="Management/Direct">Management / Direct Quota (Disqualified by Law)</option>
                   </select>
                 </div>
               </div>
@@ -509,7 +515,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                   step={1}
                   value={profile.marksPercentage}
                   onChange={(e) => onProfileChange({ ...profile, marksPercentage: Number(e.target.value) })}
-                  className="w-full accent-orange-600"
+                  className="w-full accent-orange-600 cursor-pointer"
                 />
               </div>
             </div>
@@ -522,7 +528,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-900">3. Household Financials & Statutory Assets</h4>
-                  <p className="text-xs text-slate-500">Evaluates legal income limits & welfare criteria</p>
+                  <p className="text-xs text-slate-500">Evaluates statutory income ceilings and welfare criteria</p>
                 </div>
               </div>
 
@@ -543,7 +549,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                   onChange={(e) =>
                     onProfileChange({ ...profile, annualFamilyIncome: Number(e.target.value) })
                   }
-                  className="w-full accent-emerald-600"
+                  className="w-full accent-emerald-600 cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
                   <span>₹30K (BPL)</span>
@@ -554,7 +560,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {/* Electricity Units (for KMUT) */}
+                {/* Electricity Units */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Annual Electricity (Units/Yr)
@@ -567,209 +573,213 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                     }
                     className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
                   />
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">&lt; 3,600 units for KMUT</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">&lt; 3,600 units for KMUT DBT</span>
                 </div>
 
-                {/* Agricultural Land */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Agri Land Owned (Acres)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={profile.agriculturalLandAcres}
-                    onChange={(e) =>
-                      onProfileChange({ ...profile, agriculturalLandAcres: Number(e.target.value) })
-                    }
-                    className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-orange-500 focus:outline-hidden"
-                  />
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">&le; 5.0 acres for EWS/KMUT</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
                 {/* Hosteller vs Day Scholar */}
-                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={profile.isHosteller}
-                    onChange={(e) => onProfileChange({ ...profile, isHosteller: e.target.checked })}
-                    className="rounded text-orange-600 focus:ring-orange-500"
-                  />
-                  <span>Hosteller (Living in College Hostel)</span>
-                </label>
-
-                {/* Dual scholarship warning */}
-                <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={profile.isAlreadyReceivingOtherScholarship}
-                    onChange={(e) =>
-                      onProfileChange({
-                        ...profile,
-                        isAlreadyReceivingOtherScholarship: e.target.checked,
-                      })
-                    }
-                    className="rounded text-orange-600 focus:ring-orange-500"
-                  />
-                  <span>Already Availing Other Scholarship</span>
-                </label>
+                <div className="flex items-center pt-5">
+                  <label className="flex items-center gap-2 text-xs text-slate-700 font-medium cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={profile.isHosteller}
+                      onChange={(e) => onProfileChange({ ...profile, isHosteller: e.target.checked })}
+                      className="size-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer"
+                    />
+                    <span>Living in College Hostel (Higher Stipend)</span>
+                  </label>
+                </div>
               </div>
             </div>
 
-            {/* CARD 4: Held Documents & Prerequisite Checklist */}
+            {/* CARD 4: Currently Held Certificates & Documents */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <div className="rounded-lg bg-amber-100 p-2 text-amber-600">
-                  <ShieldCheck className="size-4" />
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg bg-purple-100 p-2 text-purple-600">
+                    <FileCheck className="size-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">4. Currently Held Documents & Certificates</h4>
+                    <p className="text-xs text-slate-500">Uncheck to test missing prerequisite roadblocks</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">4. Held Documents & Physical Certificates</h4>
-                  <p className="text-xs text-slate-500">Check what you currently hold to detect roadblocks</p>
-                </div>
+                <span className="text-xs font-mono font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-md">
+                  {profile.heldDocuments?.length || 0} Held
+                </span>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 {[
-                  { id: "Caste_Certificate", label: "Caste / Community Certificate (BC / MBC / SC / ST via e-Sevai / Tahsildar)" },
-                  { id: "Income_Certificate", label: "Income Certificate (Current FY 2026-27 via e-Sevai / Tehsildar)" },
-                  { id: "TN_First_Graduate_Cert", label: "First Graduate Certificate (TNeGA e-Sevai signed)" },
-                  { id: "Govt_School_Bonafide", label: "Class 6th-12th Government School Study Bonafide (Headmaster sealed)" },
-                  { id: "Domicile_Certificate", label: "Nativity / Domicile Certificate (PRC)" },
-                  { id: "Aadhaar_NPCI_Seeded", label: "Bank Account Seeded on NPCI DBT Mapper" },
+                  { id: "Aadhaar_Card", label: "Aadhaar Card (Linked Mobile)" },
+                  { id: "Marksheet_10_12", label: "10th & 12th Board Marksheet" },
+                  { id: "Bank_Passbook", label: "Aadhaar-Seeded Bank Passbook" },
+                  { id: "Ration_Card", label: "Family Smart Ration Card" },
+                  { id: "Caste_Certificate", label: "Community / Caste Certificate" },
+                  { id: "Income_Certificate", label: "Current FY Income Certificate" },
+                  { id: "Domicile_Certificate", label: "Nativity / Domicile Certificate" },
+                  { id: "TN_First_Graduate_Cert", label: "First Graduate Cert (REV-104)" },
+                  { id: "Govt_School_Study_Certificate", label: "Govt School 6-12 Bonafide" },
                 ].map((doc) => {
-                  const isChecked = (profile.heldDocuments || []).includes(doc.id);
+                  const isHeld = (profile.heldDocuments || []).includes(doc.id);
                   return (
                     <label
                       key={doc.id}
-                      className={`flex items-center gap-2.5 rounded-lg border p-2.5 text-xs cursor-pointer transition-all ${
-                        isChecked
-                          ? "border-emerald-400 bg-emerald-50 text-emerald-950 font-semibold"
-                          : "border-slate-200 bg-slate-50 text-slate-700"
+                      className={`flex items-center gap-2 rounded-xl border p-2.5 cursor-pointer transition-all ${
+                        isHeld
+                          ? "border-purple-300 bg-purple-50/60 font-semibold text-purple-950"
+                          : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                       }`}
                     >
                       <input
                         type="checkbox"
-                        checked={isChecked}
+                        checked={isHeld}
                         onChange={() => handleHeldDocToggle(doc.id)}
-                        className="rounded text-emerald-600 focus:ring-emerald-500 size-4"
+                        className="size-4 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
                       />
-                      <span>{doc.label}</span>
+                      <span className="truncate">{doc.label}</span>
                     </label>
                   );
                 })}
               </div>
-
-              <div className="pt-2">
-                <button
-                  onClick={() => setActiveView("RESULTS")}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3 text-xs font-bold text-white hover:bg-black transition-all cursor-pointer shadow-xs"
-                >
-                  <Sparkles className="size-4 text-amber-300" />
-                  <span>Evaluate My Profile Against All Schemes ➔</span>
-                </button>
-              </div>
             </div>
+          </div>
+
+          {/* Bottom Action Footer for Profile Setup */}
+          <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h4 className="text-base font-bold">Profile Ready for Complete Eligibility Audit</h4>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Clicking evaluate will screen {evaluationResults.length} Central and {profile.state} state schemes with exact reasons.
+              </p>
+            </div>
+            <button
+              onClick={() => setActiveView("RESULTS")}
+              className="flex items-center gap-2 rounded-xl bg-orange-500 px-7 py-3.5 text-xs font-black text-white hover:bg-orange-600 shadow-sm transition-all cursor-pointer shrink-0"
+            >
+              <span>View Scheme Evaluation Results</span>
+              <ArrowRight className="size-4" />
+            </button>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW 2: SCHEME EVALUATION RESULTS (FULL-WIDTH, IN-DEPTH, NO CLUTTER)     */}
+      {/* VIEW 2: SCHEME CLASSIFICATION & EVALUATION (ELIGIBLE VS NOT ELIGIBLE)      */}
       {/* ========================================================================= */}
       {activeView === "RESULTS" && (
         <div className="space-y-6">
-          {/* Summary Card with One-Click Edit Banner */}
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950 p-6 text-white shadow-sm">
+          {/* Top Classification Summary Banner */}
+          <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-6 text-white shadow-md">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-orange-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                    {profile.state} Civic Registry
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold">
+                    {profile.state} Citizen Profile
                   </span>
-                  <span className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-medium text-slate-200">
-                    {isTamilNadu ? `${profile.tnCommunity || "MBC"} Community` : profile.category}
+                  <span className="rounded-md bg-white/10 text-slate-200 px-2 py-0.5 text-[10px] font-bold">
+                    {isTamilNadu ? profile.tnCommunity : profile.category}
                   </span>
                   {profile.studiedInGovtSchool6To12 && (
-                    <span className="rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold">
+                    <span className="rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 text-[10px] font-bold">
                       Govt School (6-12)
                     </span>
                   )}
                   {profile.isFirstGraduateInFamily && (
-                    <span className="rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 text-[10px] font-bold">
+                    <span className="rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold">
                       First Graduate
                     </span>
                   )}
                 </div>
 
-                <h3 className="text-xl font-bold tracking-tight">
-                  {profile.name || "Candidate"}: {eligibleCount} Schemes Legally Qualified
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight">
+                  {profile.name || "Candidate"}: {eligibleResults.length} Schemes Legally Qualified
                 </h3>
                 <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                  Evaluated with AWS Cedar deterministic policies across {evaluationResults.length} real central & state schemes. Review approved benefits, detect missing prerequisite roadblocks, and launch your step-by-step roadmap.
+                  Evaluated across top Central and {profile.state} schemes with AWS Cedar deterministic policies. Every scheme card shows why you qualified or the exact legal clause failed.
                 </p>
               </div>
 
-              {/* Action stats */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-xl bg-white/10 p-3 text-center min-w-[90px] border border-white/10">
-                  <span className="text-xl font-extrabold text-emerald-400 block">{eligibleCount}</span>
-                  <span className="text-[10px] text-slate-300 uppercase font-semibold">Eligible</span>
-                </div>
-                <div className="rounded-xl bg-white/10 p-3 text-center min-w-[90px] border border-white/10">
-                  <span className="text-xl font-extrabold text-rose-400 block">{ineligibleCount}</span>
-                  <span className="text-[10px] text-slate-300 uppercase font-semibold">Ineligible</span>
-                </div>
+              {/* Classification Action Pills */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setEligibilityTab("ELIGIBLE")}
+                  className={`rounded-2xl p-4 text-center min-w-[120px] border transition-all cursor-pointer ${
+                    eligibilityTab === "ELIGIBLE"
+                      ? "bg-emerald-600/30 border-emerald-400 text-white shadow-xs"
+                      : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                  }`}
+                >
+                  <span className="text-2xl font-black text-emerald-400 block">{eligibleResults.length}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Eligible Schemes</span>
+                </button>
+
+                <button
+                  onClick={() => setEligibilityTab("NOT_ELIGIBLE")}
+                  className={`rounded-2xl p-4 text-center min-w-[120px] border transition-all cursor-pointer ${
+                    eligibilityTab === "NOT_ELIGIBLE"
+                      ? "bg-rose-600/30 border-rose-400 text-white shadow-xs"
+                      : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                  }`}
+                >
+                  <span className="text-2xl font-black text-rose-400 block">{ineligibleResults.length}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Not Eligible</span>
+                </button>
+
                 <button
                   onClick={() => setActiveView("PROFILE")}
-                  className="flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 py-3 text-xs font-bold text-white hover:bg-orange-700 transition-colors cursor-pointer shadow-sm"
+                  className="rounded-2xl bg-orange-600 p-4 text-center text-xs font-black text-white hover:bg-orange-700 transition-all cursor-pointer shrink-0"
                 >
+                  <Sliders className="size-5 mx-auto mb-1" />
                   <span>Edit Profile</span>
-                  <Sliders className="size-4" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Filter Tabs Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white p-3 border border-slate-200 shadow-xs">
-            <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium">
+          {/* Filter Chips Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-3 border border-slate-200 shadow-xs">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
               <button
-                onClick={() => setFilterType("ALL")}
-                className={`rounded-lg px-3 py-1.5 cursor-pointer transition-all ${
-                  filterType === "ALL" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:bg-slate-100"
+                onClick={() => setCategoryFilter("ALL")}
+                className={`rounded-xl px-3.5 py-2 cursor-pointer transition-all font-bold ${
+                  categoryFilter === "ALL"
+                    ? "bg-slate-900 text-white"
+                    : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                All Schemes ({evaluationResults.length})
+                All {eligibilityTab === "ELIGIBLE" ? "Eligible" : "Ineligible"} ({activeClassificationResults.length})
               </button>
 
               <button
-                onClick={() => setFilterType("ELIGIBLE")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 cursor-pointer transition-all ${
-                  filterType === "ELIGIBLE" ? "bg-emerald-600 text-white font-bold" : "text-emerald-800 bg-emerald-50 hover:bg-emerald-100"
+                onClick={() => setCategoryFilter("STATE_SPECIFIC")}
+                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 cursor-pointer transition-all font-bold ${
+                  categoryFilter === "STATE_SPECIFIC"
+                    ? "bg-orange-600 text-white"
+                    : "text-orange-800 bg-orange-50 hover:bg-orange-100"
                 }`}
               >
-                <CheckCircle2 className="size-3.5" />
-                <span>Eligible Only ({eligibleCount})</span>
+                <Building2 className="size-3.5" />
+                <span>{profile.state} State Schemes</span>
               </button>
 
-              {isTamilNadu && (
-                <button
-                  onClick={() => setFilterType("STATE_TN")}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 cursor-pointer transition-all ${
-                    filterType === "STATE_TN" ? "bg-orange-600 text-white font-bold" : "text-orange-800 bg-orange-50 hover:bg-orange-100"
-                  }`}
-                >
-                  <Building2 className="size-3.5" />
-                  <span>Tamil Nadu Flagship</span>
-                </button>
-              )}
+              <button
+                onClick={() => setCategoryFilter("CENTRAL")}
+                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 cursor-pointer transition-all font-bold ${
+                  categoryFilter === "CENTRAL"
+                    ? "bg-purple-600 text-white"
+                    : "text-purple-800 bg-purple-50 hover:bg-purple-100"
+                }`}
+              >
+                <Landmark className="size-3.5" />
+                <span>Central Government</span>
+              </button>
 
               <button
-                onClick={() => setFilterType("HEALTHCARE")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 cursor-pointer transition-all ${
-                  filterType === "HEALTHCARE" ? "bg-teal-700 text-white font-bold" : "text-teal-800 bg-teal-50 hover:bg-teal-100"
+                onClick={() => setCategoryFilter("HEALTHCARE")}
+                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 cursor-pointer transition-all font-bold ${
+                  categoryFilter === "HEALTHCARE"
+                    ? "bg-teal-700 text-white"
+                    : "text-teal-800 bg-teal-50 hover:bg-teal-100"
                 }`}
               >
                 <Hospital className="size-3.5" />
@@ -777,34 +787,26 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
               </button>
 
               <button
-                onClick={() => setFilterType("SCHOLARSHIP")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 cursor-pointer transition-all ${
-                  filterType === "SCHOLARSHIP" ? "bg-blue-600 text-white font-bold" : "text-blue-800 bg-blue-50 hover:bg-blue-100"
+                onClick={() => setCategoryFilter("SCHOLARSHIP")}
+                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 cursor-pointer transition-all font-bold ${
+                  categoryFilter === "SCHOLARSHIP"
+                    ? "bg-blue-600 text-white"
+                    : "text-blue-800 bg-blue-50 hover:bg-blue-100"
                 }`}
               >
                 <GraduationCap className="size-3.5" />
                 <span>Scholarships</span>
               </button>
-
-              <button
-                onClick={() => setFilterType("CERTIFICATE")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 cursor-pointer transition-all ${
-                  filterType === "CERTIFICATE" ? "bg-purple-600 text-white font-bold" : "text-purple-800 bg-purple-50 hover:bg-purple-100"
-                }`}
-              >
-                <ShieldCheck className="size-3.5" />
-                <span>Certificates</span>
-              </button>
             </div>
 
-            <span className="text-xs text-slate-500">
-              Showing {filteredResults.length} schemes
+            <span className="text-xs text-slate-500 font-semibold pr-2">
+              Showing {displayedResults.length} schemes
             </span>
           </div>
 
-          {/* Scheme Cards Grid */}
+          {/* Scheme Cards List */}
           <div className="space-y-4">
-            {filteredResults.map((result) => {
+            {displayedResults.map((result) => {
               const isAllowed = result.decision === "ALLOW";
               const isExpanded = expandedCedarPolicy === result.scheme.id;
               const hasMissingPrereqs = result.missingPrerequisites.length > 0;
@@ -812,186 +814,200 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
               return (
                 <div
                   key={result.scheme.id}
-                  className={`rounded-2xl border transition-all ${
+                  className={`rounded-3xl border transition-all ${
                     isAllowed
                       ? "border-slate-200 bg-white shadow-xs hover:border-orange-300"
-                      : "border-slate-200 bg-slate-50/70 opacity-85"
+                      : "border-slate-200 bg-slate-50/70"
                   }`}
                 >
-                  <div className="p-5 sm:p-6">
-                    {/* Top Row: Ministry, Short Code & Status Badge */}
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-                        <Building2 className="size-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate max-w-[280px] sm:max-w-md">{result.scheme.ministry}</span>
-                        <span className="text-slate-300">•</span>
-                        <span className="font-mono text-[10px] text-slate-700 bg-slate-100 rounded px-1.5 py-0.5 font-bold">
-                          {result.scheme.shortCode}
-                        </span>
-                        <span className="text-slate-300">•</span>
-                        <span className="text-[11px] text-slate-600">
+                  <div className="p-6">
+                    {/* Top Row: Scheme Level, Ministry, Code, and Status */}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                        <span
+                          className={`rounded-md px-2 py-0.5 font-bold uppercase text-[10px] ${
+                            result.scheme.level === "Central"
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-orange-100 text-orange-800"
+                          }`}
+                        >
                           {result.scheme.level} Scheme
                         </span>
+
+                        <span className="font-semibold text-slate-700">{result.scheme.ministry}</span>
+                        <span className="text-slate-300">•</span>
+                        <span className="font-mono text-[10px] text-slate-600 bg-slate-100 rounded px-1.5 py-0.5 font-bold">
+                          {result.scheme.shortCode}
+                        </span>
                       </div>
 
-                      <div>
-                        {isAllowed ? (
-                          hasMissingPrereqs ? (
-                            <span className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800 border border-amber-300">
-                              <AlertTriangle className="size-3.5 text-amber-600" />
-                              QUALIFIED (BLOCKED BY MISSING DOCS)
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
-                              <CheckCircle2 className="size-3.5 text-emerald-600" />
-                              ELIGIBLE (READY TO APPLY)
-                            </span>
-                          )
-                        ) : (
-                          <span className="flex items-center gap-1 rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700 border border-rose-200">
-                            <XCircle className="size-3.5 text-rose-600" />
-                            INELIGIBLE (CRITERIA UNMET)
-                          </span>
-                        )}
+                      {/* Application End Date Badge */}
+                      <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 rounded-full px-3 py-1">
+                        <Calendar className="size-3.5 text-slate-500" />
+                        <span>Deadline: {result.scheme.deadline}</span>
+                        <span className="text-slate-400">•</span>
+                        <span className="text-orange-600">{result.scheme.daysRemaining}d left</span>
                       </div>
                     </div>
 
-                    {/* Title */}
-                    <h4 className="mt-2 text-lg font-bold text-slate-900">
-                      {result.scheme.title}
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {result.scheme.sponsoringBody}
-                    </p>
-
-                    {/* Financial Benefit Highlight Banner */}
-                    <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl bg-orange-50/70 p-3.5 text-xs border border-orange-200/80">
-                      <div className="flex items-center gap-1.5 font-bold text-orange-950">
-                        <IndianRupee className="size-4 text-orange-600 shrink-0" />
-                        <span>{result.estimatedBenefit}</span>
+                    {/* Scheme Title & Benefit Headline */}
+                    <div className="mt-3 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
+                      <div>
+                        <h4 className="text-lg font-black text-slate-900 leading-snug">
+                          {result.scheme.title}
+                        </h4>
+                        <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                          {result.scheme.benefitDescription}
+                        </p>
                       </div>
-                      <span className="text-orange-200 hidden sm:inline">|</span>
-                      <div className="flex items-center gap-1.5 text-slate-700 font-medium">
-                        <Calendar className="size-4 text-slate-400 shrink-0" />
-                        <span>
-                          Deadline: <strong>{result.scheme.deadline}</strong> ({result.scheme.daysRemaining} days remaining)
+
+                      <div className="sm:text-right shrink-0">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                          Potential Entitlement
+                        </span>
+                        <span className="text-sm font-black text-emerald-600">
+                          {result.estimatedBenefit}
                         </span>
                       </div>
                     </div>
 
-                    <p className="mt-3 text-xs leading-relaxed text-slate-700">
-                      {result.scheme.benefitDescription}
-                    </p>
-
-                    {/* MISSING PREREQUISITES / ROADBLOCK BOX */}
-                    {isAllowed && hasMissingPrereqs && (
-                      <div className="mt-3.5 rounded-xl border border-amber-300 bg-amber-50/90 p-4 text-xs space-y-1.5">
-                        <div className="flex items-center gap-2 text-amber-950 font-bold">
-                          <AlertTriangle className="size-4 text-amber-700 shrink-0" />
-                          <span>Action Required to Complete Application:</span>
+                    {/* ===================================================== */}
+                    {/* PRIMARY DETAILS: WHY ELIGIBLE vs WHY NOT ELIGIBLE    */}
+                    {/* ===================================================== */}
+                    <div className="mt-4 rounded-2xl border p-4 text-xs space-y-2.5 transition-all">
+                      {isAllowed ? (
+                        <div className="border-emerald-200 bg-emerald-50/50 rounded-xl p-3">
+                          <div className="flex items-center gap-2 text-emerald-900 font-bold mb-2">
+                            <CheckCircle2 className="size-4 text-emerald-600" />
+                            <span>WHY YOU ARE ELIGIBLE (SATISFIED CRITERIA):</span>
+                          </div>
+                          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-emerald-950">
+                            {result.matchedReasons.map((reason, rIdx) => (
+                              <li key={rIdx} className="flex items-start gap-1.5">
+                                <span className="text-emerald-600 font-bold">✓</span>
+                                <span className="font-medium">{reason}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <p className="font-normal text-amber-900 leading-relaxed">
-                          You meet the primary criteria! However, government submission is currently blocked because you have not obtained:{" "}
-                          <strong>
-                            {result.missingPrerequisites.map((p) => p.title).join(", ")}
-                          </strong>.
-                        </p>
-                        <div className="pt-1">
-                          <button
-                            onClick={onNavigateToDocuments}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-amber-950 underline hover:text-amber-800 cursor-pointer"
-                          >
-                            Resolve this in Document Audit ➔
-                          </button>
+                      ) : (
+                        <div className="border-rose-200 bg-rose-50/60 rounded-xl p-3">
+                          <div className="flex items-center gap-2 text-rose-900 font-bold mb-2">
+                            <AlertTriangle className="size-4 text-rose-600" />
+                            <span>WHY NOT ELIGIBLE (FAILED STATUTORY CLAUSES):</span>
+                          </div>
+                          <ul className="space-y-1.5 text-rose-950">
+                            {result.failedReasons.map((clause, cIdx) => (
+                              <li key={cIdx} className="flex items-start gap-1.5">
+                                <span className="text-rose-600 font-bold">✗</span>
+                                <span className="font-semibold">{clause}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* REASONS / OBJECTIONS BOX FOR INELIGIBLE SCHEMES */}
-                    {!isAllowed && (
-                      <div className="mt-3.5 rounded-xl border border-rose-200 bg-rose-50/60 p-4 text-xs space-y-1.5">
-                        <div className="flex items-center gap-2 text-rose-950 font-bold">
-                          <XCircle className="size-4 text-rose-600 shrink-0" />
-                          <span>Objections / Why You Are Ineligible:</span>
+                      {/* MISSING PREREQUISITE ROADBLOCK ALERT (Amber) */}
+                      {isAllowed && hasMissingPrereqs && (
+                        <div className="rounded-xl border border-amber-300 bg-amber-50 p-3.5 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="flex items-center gap-1.5 font-black text-amber-950 text-xs">
+                              <AlertTriangle className="size-4 text-amber-600" />
+                              PREREQUISITE ROADBLOCK: {result.missingPrerequisites.length} MANDATORY CERTIFICATE(S) MISSING
+                            </span>
+                            <span className="text-[10px] text-amber-800 font-semibold">
+                              Must obtain before portal submission
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {result.missingPrerequisites.map((prereq) => (
+                              <button
+                                key={prereq.id}
+                                onClick={() => setSelectedCertGuideId(prereq.id)}
+                                className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-amber-900 border border-amber-300 shadow-2xs hover:bg-amber-100 cursor-pointer"
+                              >
+                                <span>{prereq.title}</span>
+                                <span className="rounded bg-amber-600 px-1.5 py-0.5 text-[9px] font-black text-white">
+                                  Resolve Guide ➔
+                                </span>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                        <ul className="space-y-1 list-disc list-inside text-rose-900 text-[11px]">
-                          {result.failedClauses.map((clause, i) => (
-                            <li key={i} className="font-semibold">{clause}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Audit Trail Clauses */}
-                    <div className="mt-4 space-y-1.5 border-t border-slate-100 pt-3">
-                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                        Statutory Clause Audit:
-                      </span>
-                      {result.passedClauses.map((clause, i) => (
-                        <p key={i} className="flex items-center gap-1.5 text-xs text-emerald-700">
-                          <CheckCircle2 className="size-3 text-emerald-500 shrink-0" />
-                          <span>{clause}</span>
-                        </p>
-                      ))}
+                      )}
                     </div>
-
-                    {/* Collapsible Cedar Policy */}
-                    {isExpanded && (
-                      <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-950 p-4 font-mono text-xs text-indigo-200">
-                        <div className="flex items-center justify-between border-b border-indigo-800 pb-2 text-[11px] text-indigo-400">
-                          <span>AWS Cedar Deterministic Policy Specification</span>
-                          <span className="rounded bg-indigo-900 px-1.5 py-0.5 text-[10px] text-indigo-300">
-                            Formal Verification
-                          </span>
-                        </div>
-                        <pre className="mt-2 overflow-x-auto whitespace-pre leading-relaxed text-[11px]">
-                          {result.cedarPolicySnippet}
-                        </pre>
-                        <div className="mt-2 text-[10px] text-indigo-400">
-                          Official Gazette Reference: {result.scheme.officialGazetteRef}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Action Bar */}
-                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                      <button
-                        onClick={() => togglePolicyView(result.scheme.id)}
-                        className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer"
-                      >
-                        <Code2 className="size-3.5" />
-                        <span>{isExpanded ? "Hide Cedar Policy" : "Inspect Cedar Policy"}</span>
-                        {isExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
-                      </button>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        {onNavigateToRoadmap && (
-                          <button
-                            onClick={() => onNavigateToRoadmap(result.scheme.id)}
-                            className="flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-colors cursor-pointer"
-                          >
-                            <Layers className="size-3.5 text-indigo-600" />
-                            <span>View Specific Roadmap</span>
-                          </button>
-                        )}
-
-                        <a
-                          href={result.scheme.officialPortalUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-orange-700 transition-colors"
+                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => togglePolicyView(result.scheme.id)}
+                          className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 cursor-pointer font-medium"
                         >
-                          <span>Apply on {result.scheme.portalName}</span>
-                          <ExternalLink className="size-3" />
-                        </a>
+                          <Code2 className="size-3.5 text-slate-400" />
+                          <span>{isExpanded ? "Hide AWS Cedar Policy" : "Inspect Cedar Policy"}</span>
+                          {isExpanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Primary Button: Open Scheme Cockpit */}
+                        <button
+                          onClick={() => setSelectedCockpitResult(result)}
+                          className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all cursor-pointer shadow-xs ${
+                            isAllowed
+                              ? "bg-orange-600 text-white hover:bg-orange-700"
+                              : "bg-slate-800 text-white hover:bg-slate-900"
+                          }`}
+                        >
+                          <ListTodo className="size-3.5 text-amber-300" />
+                          <span>Open Scheme Cockpit & Action Tracker</span>
+                          <ArrowRight className="size-3.5" />
+                        </button>
                       </div>
                     </div>
+
+                    {/* Expandable AWS Cedar Policy Code */}
+                    {isExpanded && (
+                      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-900 p-4 font-mono text-[11px] text-slate-200 shadow-inner">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2">
+                          <span className="text-orange-400 font-bold">AWS Cedar Declarative Policy Rule</span>
+                          <span className="text-[10px] text-slate-400">cedar/policies/schemes.cedar</span>
+                        </div>
+                        <pre className="overflow-x-auto whitespace-pre leading-relaxed text-slate-300">
+                          {result.cedarPolicySnippet}
+                        </pre>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
             })}
           </div>
         </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 1: INDIVIDUAL SCHEME COCKPIT & ACTION TRACKER ("Where I Am Present") */}
+      {/* ========================================================================= */}
+      {selectedCockpitResult && (
+        <SchemeCockpitModal
+          result={selectedCockpitResult}
+          onClose={() => setSelectedCockpitResult(null)}
+          onOpenCertificateGuide={(certId) => setSelectedCertGuideId(certId)}
+          onNavigateToDocumentsTab={onNavigateToDocuments}
+        />
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 2: MISSING CERTIFICATE RESOLUTION SUB-TREE (Step-by-Step Guide)    */}
+      {/* ========================================================================= */}
+      {selectedCertGuideId && (
+        <CertificateResolutionModal
+          certificateId={selectedCertGuideId}
+          onClose={() => setSelectedCertGuideId(null)}
+          onMarkAsObtained={handleMarkCertObtained}
+        />
       )}
     </div>
   );

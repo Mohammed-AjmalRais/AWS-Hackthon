@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { AwsArchitectureModal } from "@/components/AwsArchitectureModal";
 import { EligibilityTab } from "@/components/EligibilityTab";
@@ -28,10 +28,35 @@ export default function Home() {
     "eligibility" | "audit" | "roadmap" | "offline" | "copilot" | "dossier"
   >("eligibility");
 
-  // Initial Profile: Default to Rajesh Kumar Munda (ST Student)
+  // Initial Profile: Default to Kavitha Selvam (Tamil Nadu)
   const [profile, setProfile] = useState<UserProfile>(DEMO_PERSONAS[0].profile);
   const [auditInput, setAuditInput] = useState<DocumentAuditInput>(DEMO_PERSONAS[0].auditInput);
   const [targetRoadmapSchemeId, setTargetRoadmapSchemeId] = useState<string>("TN_Pudhumai_Penn");
+
+  // Restore saved profile on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("jansetu_user_profile");
+        if (saved) {
+          setProfile(JSON.parse(saved));
+        }
+      } catch (e) {
+        console.error("Failed to restore saved profile", e);
+      }
+    }
+  }, []);
+
+  const handleProfileChange = (newProfile: UserProfile) => {
+    setProfile(newProfile);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("jansetu_user_profile", JSON.stringify(newProfile));
+      } catch (e) {
+        console.error("Failed to persist profile", e);
+      }
+    }
+  };
 
   // Live Cedar policy evaluation
   const evaluationResults = useMemo(() => {
@@ -51,7 +76,7 @@ export default function Home() {
   };
 
   const handleSelectPersona = (persona: DemoPersona) => {
-    setProfile(persona.profile);
+    handleProfileChange(persona.profile);
     setAuditInput(persona.auditInput);
   };
 
@@ -165,7 +190,7 @@ export default function Home() {
             <EligibilityTab
               profile={profile}
               evaluationResults={evaluationResults}
-              onProfileChange={setProfile}
+              onProfileChange={handleProfileChange}
               onNavigateToDocuments={() => setActiveTab("audit")}
               onNavigateToRoadmap={handleNavigateToRoadmap}
             />
