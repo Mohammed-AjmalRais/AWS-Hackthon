@@ -4,16 +4,66 @@ import { DocumentAuditInput } from "@/lib/audit/documentAuditor";
 export interface DemoPersona {
   id: string;
   name: string;
+  state: string;
+  categoryTag: string;
   tagline: string;
   story: string;
   profile: UserProfile;
   auditInput: DocumentAuditInput;
 }
 
+export const BLANK_CITIZEN_PROFILE: UserProfile = {
+  name: "",
+  category: "General",
+  tnCommunity: "None",
+  apCommunity: "None",
+  gender: "Female",
+  isMinority: false,
+  minorityCommunity: "None",
+  isPersonWithDisability: false,
+  disabilityPercentage: 0,
+  isOrphanOrSingleParent: false,
+  state: "Andhra Pradesh",
+  district: "",
+  residenceYearsInState: 5,
+  isStudyingInHomeState: true,
+  educationLevel: "UG",
+  courseType: "Regular Full-Time",
+  isTechnicalCourse: true,
+  admissionQuota: "Merit/Govt Counseling",
+  institutionType: "Government",
+  studiedInGovtSchool6To12: false,
+  isFirstGraduateInFamily: false,
+  marksPercentage: 75,
+  isHosteller: false,
+  annualFamilyIncome: 150000,
+  electricityUnitsPerYear: 1800,
+  numberOfSiblingsAvailingScholarship: 0,
+  agriculturalLandAcres: 0,
+  residentialFlatSqFt: 0,
+  hasPaternalCasteRecord: true,
+  hasValidAddressProof: true,
+  isAlreadyReceivingOtherScholarship: false,
+  heldDocuments: ["Aadhaar_Card", "Marksheet_10_12", "Bank_Passbook"],
+};
+
+export const BLANK_CITIZEN_AUDIT: DocumentAuditInput = {
+  nameOnAadhaar: "",
+  nameOnMarksheet: "",
+  dobOnAadhaar: "2006-01-01",
+  dobOnMarksheet: "2006-01-01",
+  incomeCertificateIssueDate: "2026-01-01",
+  isAadhaarLinkedToBank: true,
+  isNpciSeeded: true,
+  bankName: "State Bank of India",
+};
+
 export const DEMO_PERSONAS: DemoPersona[] = [
   {
     id: "kavitha_tamilnadu_mbc",
     name: "Kavitha Selvam",
+    state: "Tamil Nadu",
+    categoryTag: "MBC (Govt School)",
     tagline: "Tamil Nadu • 1st Year B.E. CSE • Chennai (Govt School Student)",
     story: "Studied Class 6-12 in Chennai Corporation Govt Higher Secondary School. First Graduate in her family. MBC Category, Family income ₹1.6L. Admitted via TNEA Single Window Counseling. Highly eligible for Pudhumai Penn (₹1,000/mo), 7.5% Govt School 100% Fee Exemption, First Graduate Concession (₹25,000), and CMCHIS Health Insurance!",
     profile: {
@@ -61,8 +111,10 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   {
     id: "sravani_andhra_bca",
     name: "Sravani Reddy",
+    state: "Andhra Pradesh",
+    categoryTag: "BC-A (Merit B.Tech)",
     tagline: "Andhra Pradesh • 2nd Year B.Tech • Vijayawada",
-    story: "Studying B.Tech under Convenor Merit Counseling in Vijayawada. BC-A Category, Annual family income ₹1.4L, domestic electricity 1,850 units/yr. Highly eligible for Jagananna Vidya Deevena (100% Full Tuition Reimbursement), Vasathi Deevena (₹20,000/yr), and YSR Aarogyasri (₹25L Health Relief)!",
+    story: "Studying B.Tech under Convenor Merit Counseling in Vijayawada. BC-A Category, Annual family income ₹1.4L, domestic electricity 1,850 units/yr (< 3,600 cap). Mother is active DWCRA SHG member. Highly eligible for Jagananna Vidya Deevena (100% Full Tuition Reimbursement), Vasathi Deevena (₹20,000/yr), and YSR Aarogyasri (₹25L Health Relief)!",
     profile: {
       name: "Sravani Reddy",
       category: "OBC",
@@ -108,6 +160,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   {
     id: "rajesh_st_tribal",
     name: "Rajesh Kumar Munda",
+    state: "Odisha",
+    categoryTag: "ST Tribal (Hosteller)",
     tagline: "ST Student • 1st Year B.Tech • Mayurbhanj, Odisha",
     story: "Family income ₹1.8L. Admitted to B.Tech through OJEE State Merit Counseling as a Hosteller. Eligible for 100% Tuition Waiver under Post-Matric ST + ₹1,200/mo hosteller stipend. Blocked by an unseeded bank account and initial mismatch.",
     profile: {
@@ -151,6 +205,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   {
     id: "priya_ews_general",
     name: "Priya Sharma",
+    state: "Madhya Pradesh",
+    categoryTag: "General EWS",
     tagline: "General / EWS Student • 1st Year B.Sc • Bhopal, MP",
     story: "Family income ₹3.2L from a small retail shop. Scored 84% in Class 12. Seeking Central Sector CSSS scholarship and EWS reservation certificate. Lacks formal EWS and Domicile certificates.",
     profile: {
@@ -194,6 +250,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   {
     id: "sunita_tribal_ready",
     name: "Sunita Murmu",
+    state: "Jharkhand",
+    categoryTag: "ST Girl (IIT Kharagpur)",
     tagline: "ST Girl Student • B.Tech CSE (IIT Kharagpur) • Top Class Scheme",
     story: "Tribal student admitted to IIT Kharagpur under JEE Advanced merit. Income ₹2.1L. Qualifies for MoTA Top Class Education (Full tuition + ₹45,000 laptop allowance) and AICTE Pragati. All documents clean and verified.",
     profile: {
@@ -232,6 +290,200 @@ export const DEMO_PERSONAS: DemoPersona[] = [
       isAadhaarLinkedToBank: true,
       isNpciSeeded: true,
       bankName: "Bank of India"
+    }
+  },
+  {
+    id: "venkatesh_andhra_auto",
+    name: "Venkatesh Naidu",
+    state: "Andhra Pradesh",
+    categoryTag: "BC-D (Auto Driver / BPL)",
+    tagline: "Andhra Pradesh • Self-Employed Auto Driver • Guntur",
+    story: "Self-employed commercial auto rickshaw owner-driver holding valid AP Driving License & Auto Registration. BC-D category, White Rice Card holder, Annual income ₹1,10,000. Eligible for YSR Vahana Mitra (₹10,000/yr insurance & fitness allowance) and Dr. YSR Aarogyasri (₹25L free hospitalization)!",
+    profile: {
+      name: "Venkatesh Naidu",
+      category: "OBC",
+      apCommunity: "BC-D",
+      gender: "Male",
+      isMinority: false,
+      isPersonWithDisability: false,
+      isOrphanOrSingleParent: false,
+      state: "Andhra Pradesh",
+      district: "Guntur",
+      residenceYearsInState: 32,
+      isStudyingInHomeState: true,
+      educationLevel: "Class 10",
+      courseType: "Regular Full-Time",
+      isTechnicalCourse: false,
+      admissionQuota: "Merit/Govt Counseling",
+      institutionType: "Government",
+      studiedInGovtSchool6To12: false,
+      isFirstGraduateInFamily: false,
+      marksPercentage: 62,
+      isHosteller: false,
+      annualFamilyIncome: 110000,
+      electricityUnitsPerYear: 1400,
+      numberOfSiblingsAvailingScholarship: 0,
+      agriculturalLandAcres: 0,
+      residentialFlatSqFt: 400,
+      hasPaternalCasteRecord: true,
+      hasValidAddressProof: true,
+      isAlreadyReceivingOtherScholarship: false,
+      heldDocuments: ["Aadhaar_Card", "Bank_Passbook", "Ration_Card"]
+    },
+    auditInput: {
+      nameOnAadhaar: "Venkatesh Naidu",
+      nameOnMarksheet: "Venkatesh N",
+      dobOnAadhaar: "1992-04-10",
+      dobOnMarksheet: "1992-04-10",
+      incomeCertificateIssueDate: "2026-03-12",
+      isAadhaarLinkedToBank: true,
+      isNpciSeeded: true,
+      bankName: "Union Bank of India (Guntur Main)"
+    }
+  },
+  {
+    id: "mohammed_andhra_minority",
+    name: "Mohammed Irfan",
+    state: "Andhra Pradesh",
+    categoryTag: "BC-E (Minority Polytechnic)",
+    tagline: "Andhra Pradesh • 2nd Year Diploma Mechanical • Kurnool",
+    story: "Studying Diploma in Govt Polytechnic, Kurnool. Muslim Minority categorized as BC-E under AP state reservation. Family income ₹1.5L. Eligible for AP Jnanabhumi Post-Matric, National Post-Matric Minority Scholarship, and Begum Hazrat Mahal.",
+    profile: {
+      name: "Mohammed Irfan",
+      category: "OBC",
+      apCommunity: "BC-E",
+      gender: "Male",
+      isMinority: true,
+      minorityCommunity: "Muslim",
+      isPersonWithDisability: false,
+      isOrphanOrSingleParent: false,
+      state: "Andhra Pradesh",
+      district: "Kurnool",
+      residenceYearsInState: 18,
+      isStudyingInHomeState: true,
+      educationLevel: "Diploma",
+      courseType: "Diploma",
+      isTechnicalCourse: true,
+      admissionQuota: "Merit/Govt Counseling",
+      institutionType: "Government",
+      studiedInGovtSchool6To12: false,
+      isFirstGraduateInFamily: false,
+      marksPercentage: 81,
+      isHosteller: false,
+      annualFamilyIncome: 150000,
+      electricityUnitsPerYear: 1600,
+      numberOfSiblingsAvailingScholarship: 0,
+      agriculturalLandAcres: 0,
+      residentialFlatSqFt: 500,
+      hasPaternalCasteRecord: true,
+      hasValidAddressProof: true,
+      isAlreadyReceivingOtherScholarship: false,
+      heldDocuments: ["Aadhaar_Card", "Marksheet_10_12", "Bank_Passbook", "Income_Certificate"]
+    },
+    auditInput: {
+      nameOnAadhaar: "Mohammed Irfan",
+      nameOnMarksheet: "Md Irfan",
+      dobOnAadhaar: "2006-11-04",
+      dobOnMarksheet: "2006-11-04",
+      incomeCertificateIssueDate: "2026-04-18",
+      isAadhaarLinkedToBank: true,
+      isNpciSeeded: true,
+      bankName: "Canara Bank (Kurnool Branch)"
+    }
+  },
+  {
+    id: "lakshmi_tn_sca_pwd",
+    name: "Lakshmi Arunthathiyar",
+    state: "Tamil Nadu",
+    categoryTag: "SCA (Divyangjan PwD)",
+    tagline: "Tamil Nadu • ITI Draughtsman • Madurai (Differently Abled)",
+    story: "SC Arunthathiyar (SCA) student with 50% locomotor disability (holding valid National UDID Card). Studying in Govt ITI, Madurai. Family income ₹90,000. Highly eligible for TN Differently Abled Maintenance Allowance, Post-Matric SC, Free State Bus Pass, and Muthulakshmi Reddy welfare.",
+    profile: {
+      name: "Lakshmi Arunthathiyar",
+      category: "SC",
+      tnCommunity: "SCA",
+      gender: "Female",
+      isMinority: false,
+      isPersonWithDisability: true,
+      disabilityPercentage: 50,
+      isOrphanOrSingleParent: false,
+      state: "Tamil Nadu",
+      district: "Madurai",
+      residenceYearsInState: 21,
+      isStudyingInHomeState: true,
+      educationLevel: "Diploma",
+      courseType: "Vocational",
+      isTechnicalCourse: true,
+      admissionQuota: "Merit/Govt Counseling",
+      institutionType: "Government",
+      studiedInGovtSchool6To12: true,
+      isFirstGraduateInFamily: true,
+      marksPercentage: 78,
+      isHosteller: false,
+      annualFamilyIncome: 90000,
+      electricityUnitsPerYear: 1200,
+      numberOfSiblingsAvailingScholarship: 0,
+      agriculturalLandAcres: 0,
+      residentialFlatSqFt: 350,
+      hasPaternalCasteRecord: true,
+      hasValidAddressProof: true,
+      isAlreadyReceivingOtherScholarship: false,
+      heldDocuments: ["Aadhaar_Card", "Caste_Certificate", "Disability_Certificate", "Bank_Passbook"]
+    },
+    auditInput: {
+      nameOnAadhaar: "Lakshmi Arunthathiyar",
+      nameOnMarksheet: "A. Lakshmi",
+      dobOnAadhaar: "2004-07-25",
+      dobOnMarksheet: "2004-07-25",
+      incomeCertificateIssueDate: "2026-02-10",
+      isAadhaarLinkedToBank: true,
+      isNpciSeeded: true,
+      bankName: "Indian Bank (Madurai Simmakkal Branch)"
+    }
+  },
+  {
+    id: "ananya_bengal_sc",
+    name: "Ananya Das",
+    state: "West Bengal",
+    categoryTag: "SC (Merit Class 12)",
+    tagline: "West Bengal • Higher Secondary (Class 12) • Kolkata",
+    story: "Scored 89% in Class 10 Board examinations. SC category, Annual family income ₹1.2L. Applying for Central Post-Matric Scholarship for SC Students, National Pre-Matric SC, and Begum Hazrat Mahal girls scholarship.",
+    profile: {
+      name: "Ananya Das",
+      category: "SC",
+      gender: "Female",
+      isMinority: false,
+      isPersonWithDisability: false,
+      isOrphanOrSingleParent: false,
+      state: "West Bengal",
+      district: "North 24 Parganas",
+      residenceYearsInState: 17,
+      isStudyingInHomeState: true,
+      educationLevel: "12th",
+      courseType: "Regular Full-Time",
+      isTechnicalCourse: false,
+      admissionQuota: "Merit/Govt Counseling",
+      institutionType: "Government",
+      marksPercentage: 89,
+      isHosteller: false,
+      annualFamilyIncome: 120000,
+      numberOfSiblingsAvailingScholarship: 0,
+      agriculturalLandAcres: 0,
+      residentialFlatSqFt: 480,
+      hasPaternalCasteRecord: true,
+      hasValidAddressProof: true,
+      isAlreadyReceivingOtherScholarship: false,
+      heldDocuments: ["Aadhaar_Card", "Caste_Certificate", "Income_Certificate", "Bank_Passbook"]
+    },
+    auditInput: {
+      nameOnAadhaar: "Ananya Das",
+      nameOnMarksheet: "Ananya Das",
+      dobOnAadhaar: "2008-03-14",
+      dobOnMarksheet: "2008-03-14",
+      incomeCertificateIssueDate: "2026-05-30",
+      isAadhaarLinkedToBank: true,
+      isNpciSeeded: true,
+      bankName: "UCO Bank (Salt Lake Branch)"
     }
   }
 ];

@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   DocumentAuditInput,
   auditCitizenDocuments,
   generateNpciMandateForm,
   generateNameAffidavitText
 } from "@/lib/audit/documentAuditor";
+import { SCHEMES_DATABASE, SchemeOrService } from "@/data/schemes";
+import { UserProfile } from "@/lib/cedar/evaluator";
+import { CertificateResolutionModal } from "@/components/CertificateResolutionModal";
 import {
   CheckCircle2,
   AlertTriangle,
@@ -25,13 +28,23 @@ import {
   RefreshCw,
   Eye,
   X,
-  FileBadge
+  FileBadge,
+  FileCheck2,
+  ChevronRight,
+  ExternalLink,
+  Layers,
+  Search,
+  Award
 } from "lucide-react";
 
 interface DocumentAuditTabProps {
   initialInput: DocumentAuditInput;
+  selectedSchemeId?: string;
+  profile?: UserProfile;
+  onSelectScheme?: (schemeId: string) => void;
+  onProfileChange?: (newProfile: UserProfile) => void;
   onNavigateToEligibility?: () => void;
-  onNavigateToRoadmap?: () => void;
+  onNavigateToRoadmap?: (schemeId: string) => void;
 }
 
 interface UploadedFileInfo {
@@ -45,6 +58,10 @@ interface UploadedFileInfo {
 
 export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
   initialInput,
+  selectedSchemeId,
+  profile,
+  onSelectScheme,
+  onProfileChange,
   onNavigateToEligibility,
   onNavigateToRoadmap,
 }) => {
@@ -53,14 +70,39 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
   const [copiedAffidavit, setCopiedAffidavit] = useState(false);
   const [showMandateModal, setShowMandateModal] = useState(false);
   const [showAffidavitModal, setShowAffidavitModal] = useState(false);
+  const [selectedCertGuideId, setSelectedCertGuideId] = useState<string | null>(null);
+
+  // Default active scheme
+  const defaultSchemeId = useMemo(() => {
+    if (selectedSchemeId) return selectedSchemeId;
+    if (profile?.state === "Andhra Pradesh") return "AP_Jagananna_Vidya_Deevena";
+    if (profile?.state === "Tamil Nadu") return "TN_Pudhumai_Penn";
+    return "PostMatric_ST";
+  }, [selectedSchemeId, profile?.state]);
+
+  const [activeSchemeId, setActiveSchemeId] = useState<string>(defaultSchemeId);
+
+  // Sync if prop changes
+  React.useEffect(() => {
+    if (selectedSchemeId) {
+      setActiveSchemeId(selectedSchemeId);
+    }
+  }, [selectedSchemeId]);
+
+  const currentScheme: SchemeOrService = useMemo(() => {
+    return (
+      SCHEMES_DATABASE.find((s) => s.id === activeSchemeId) ||
+      SCHEMES_DATABASE[0]
+    );
+  }, [activeSchemeId]);
 
   // File Upload states
   const [aadhaarFile, setAadhaarFile] = useState<UploadedFileInfo | null>({
-    name: "Aadhaar_Front_Back.pdf",
+    name: "Aadhaar_Card_Front_Back.pdf",
     size: "420 KB",
     type: "application/pdf",
-    extractedName: auditInput.nameOnAadhaar,
-    extractedDob: auditInput.dobOnAadhaar,
+    extractedName: auditInput.nameOnAadhaar || profile?.name || "Kavitha Selvam",
+    extractedDob: auditInput.dobOnAadhaar || "2006-05-12",
     extractedId: "XXXX-XXXX-4819"
   });
 
@@ -68,8 +110,8 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
     name: "Class10_SSC_Marksheet.jpg",
     size: "860 KB",
     type: "image/jpeg",
-    extractedName: auditInput.nameOnMarksheet,
-    extractedDob: auditInput.dobOnMarksheet,
+    extractedName: auditInput.nameOnMarksheet || "Kavitha S",
+    extractedDob: auditInput.dobOnMarksheet || "2006-05-12",
     extractedId: "SSC-2022-849182"
   });
 
@@ -77,24 +119,24 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
     name: "Bank_Passbook_FrontPage.jpg",
     size: "610 KB",
     type: "image/jpeg",
-    extractedName: auditInput.nameOnAadhaar,
+    extractedName: auditInput.nameOnAadhaar || profile?.name || "Kavitha Selvam",
     extractedId: "38920192819"
   });
 
   const auditResult = auditCitizenDocuments(auditInput);
 
   const mandateText = generateNpciMandateForm(
-    auditInput.nameOnAadhaar,
+    auditInput.nameOnAadhaar || profile?.name || "Citizen",
     auditInput.bankName || "State Bank of India",
     "38920192819",
     "XXXX-XXXX-4819"
   );
 
   const affidavitText = generateNameAffidavitText(
-    auditInput.nameOnAadhaar,
-    auditInput.nameOnMarksheet,
-    "V. Selvam",
-    "Tamil Nadu"
+    auditInput.nameOnAadhaar || profile?.name || "Citizen",
+    auditInput.nameOnMarksheet || "Citizen",
+    "Parent/Guardian",
+    profile?.state || "India"
   );
 
   const handleCopyMandate = () => {
@@ -108,7 +150,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `NPCI_Aadhaar_DBT_Mandate_${auditInput.nameOnAadhaar.replace(/\s+/g, "_")}.txt`;
+    link.download = `NPCI_Aadhaar_DBT_Mandate_${(auditInput.nameOnAadhaar || "Applicant").replace(/\s+/g, "_")}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -126,626 +168,538 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `Notarized_Name_Discrepancy_Affidavit_${auditInput.nameOnAadhaar.replace(/\s+/g, "_")}.txt`;
+    link.download = `Notarized_Name_Discrepancy_Affidavit_${(auditInput.nameOnAadhaar || "Applicant").replace(/\s+/g, "_")}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
-  // Mock File Upload Handlers (Simulates OCR parsing)
-  const handleAadhaarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setAadhaarFile({
-        name: file.name,
-        size: `${Math.round(file.size / 1024)} KB`,
-        type: file.type,
-        extractedName: auditInput.nameOnAadhaar || "Kavitha Selvam",
-        extractedDob: auditInput.dobOnAadhaar || "2006-05-12",
-        extractedId: "XXXX-XXXX-4819"
-      });
+  const handleSchemeChange = (schemeId: string) => {
+    setActiveSchemeId(schemeId);
+    if (onSelectScheme) {
+      onSelectScheme(schemeId);
     }
   };
 
-  const handleMarksheetUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setMarksheetFile({
-        name: file.name,
-        size: `${Math.round(file.size / 1024)} KB`,
-        type: file.type,
-        extractedName: auditInput.nameOnMarksheet || "Kavitha S",
-        extractedDob: auditInput.dobOnMarksheet || "2006-05-12",
-        extractedId: "SSC-2022-849182"
-      });
+  const handleMarkCertAsHeld = (certId: string) => {
+    if (profile && onProfileChange) {
+      const currentHeld = profile.heldDocuments || [];
+      if (!currentHeld.includes(certId)) {
+        onProfileChange({
+          ...profile,
+          heldDocuments: [...currentHeld, certId],
+        });
+      }
     }
+    setSelectedCertGuideId(null);
   };
 
-  const handleBankUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setBankFile({
-        name: file.name,
-        size: `${Math.round(file.size / 1024)} KB`,
-        type: file.type,
-        extractedName: auditInput.nameOnAadhaar || "Kavitha Selvam",
-        extractedId: "38920192819"
-      });
-    }
+  // Human-readable document titles
+  const getDocumentName = (docId: string) => {
+    const names: Record<string, string> = {
+      Aadhaar_Card: "Aadhaar Card (UIDAI with Linked Mobile)",
+      Marksheet_10_12: "10th Class Marksheet / SSC Memo",
+      Bank_Passbook: "Bank Account Passbook (NPCI Seeded)",
+      Income_Certificate: "Statutory Income Certificate (Tahsildar)",
+      Caste_Certificate: "Permanent Community / Caste Certificate",
+      Domicile_Certificate: "Nativity / Domicile Certificate",
+      Ration_Card: "Ration Card / Rice Card (Civil Supplies)",
+      TN_First_Graduate_Cert: "First Graduate Certificate (e-Sevai REV-104)",
+      Govt_School_Study_Certificate: "Class 6-12 Govt School Study Memo (HM Signed)",
+      Disability_Certificate: "UDID National Disability Certificate",
+      EWS_Certificate: "Economically Weaker Section Certificate",
+      College_Bonafide_Certificate: "Institutional Bonafide Certificate & Allotment Order",
+      MeeSeva_REV01_Integrated_Cert: "Integrated Community, Nativity & DOB Certificate (REV-01)",
+      Electricity_Bill: "Recent Domestic Electricity Consumption Bill (<300 units/mo)",
+      Mother_Aadhaar: "Mother's Aadhaar Card (For RTF Tuition Crediting)",
+      Mother_Bank_Passbook: "Mother's NPCI-Seeded Bank Passbook"
+    };
+    return names[docId] || docId.replace(/_/g, " ");
   };
 
-  const isNameMismatched = auditResult.nameMatchPercentage < 100;
-  const isDobMismatched = !auditResult.dobMatched;
-  const isNpciProblematic = auditResult.npciStatus !== "SEEDED";
+  // Required documents for active scheme
+  const schemeDocs = useMemo(() => {
+    const docs = new Set<string>();
+    (currentScheme.mandatoryDocuments || []).forEach((d) => docs.add(d));
+    (currentScheme.prerequisites || []).forEach((p) => docs.add(p));
+    return Array.from(docs);
+  }, [currentScheme]);
+
+  const userHeld = profile?.heldDocuments || [];
 
   return (
-    <div className="space-y-8">
-      {/* Top Guided Pipeline Flow Banner */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="flex size-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
-              ✓
-            </span>
-            <span className="text-xs font-bold text-slate-700">1. Eligibility Criteria</span>
-            <span className="text-slate-300">➔</span>
-
-            <span className="flex size-6 items-center justify-center rounded-full bg-orange-600 text-white font-bold text-xs">
-              2
-            </span>
-            <span className="text-xs font-bold text-orange-600">2. Document Upload & Cross-Match Audit</span>
-            <span className="text-slate-300">➔</span>
-
-            <span className="flex size-6 items-center justify-center rounded-full bg-slate-100 text-slate-600 font-bold text-xs">
-              3
-            </span>
-            <span className="text-xs font-semibold text-slate-500">3. NPCI Bank Seeding Mandate</span>
+    <div className="space-y-6">
+      {/* Target Scheme Selector Banner */}
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">
+              <Layers className="size-4" />
+              <span>Scheme-Centric Pre-Flight Document Audit</span>
+            </div>
+            <h2 className="text-xl font-black text-slate-900">
+              Audit Document Prerequisites for Specific Scheme
+            </h2>
+            <p className="text-xs text-slate-500">
+              Document mandates differ per program. Select your target scheme below to evaluate statutory prerequisites, cross-document name consistency, and NPCI DBT readiness.
+            </p>
           </div>
 
-          {onNavigateToEligibility && (
-            <button
-              onClick={onNavigateToEligibility}
-              className="text-xs font-bold text-orange-600 hover:underline cursor-pointer"
+          {/* Scheme Dropdown Selector */}
+          <div className="w-full md:w-80">
+            <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+              Target Scheme:
+            </label>
+            <select
+              value={activeSchemeId}
+              onChange={(e) => handleSchemeChange(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs font-bold text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
             >
-              ← Back to Eligibility Schemes
+              <optgroup label="Andhra Pradesh Flagship Schemes">
+                {SCHEMES_DATABASE.filter((s) => s.id.startsWith("AP_")).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    AP: {s.title.substring(0, 45)}...
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Tamil Nadu Flagship Schemes">
+                {SCHEMES_DATABASE.filter((s) => s.id.startsWith("TN_")).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    TN: {s.title.substring(0, 45)}...
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Centrally Sponsored Schemes">
+                {SCHEMES_DATABASE.filter((s) => !s.id.startsWith("AP_") && !s.id.startsWith("TN_")).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    Central: {s.title.substring(0, 45)}...
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        {/* Selected Scheme Detail Card */}
+        <div className="rounded-2xl border border-orange-200 bg-orange-50/40 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-md bg-orange-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase">
+                {currentScheme.level} Level
+              </span>
+              <span className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-700">
+                {currentScheme.shortCode}
+              </span>
+              <h3 className="text-sm font-bold text-slate-900">{currentScheme.title}</h3>
+            </div>
+            <p className="text-xs text-slate-600">
+              <strong>Statutory Benefit:</strong> <span className="font-semibold text-orange-800">{currentScheme.benefitAmount}</span> ({currentScheme.benefitDescription})
+            </p>
+            <p className="text-[11px] text-slate-500">
+              Sponsoring Body: {currentScheme.sponsoringBody} • Official Portal: {currentScheme.portalName}
+            </p>
+          </div>
+
+          {onNavigateToRoadmap && (
+            <button
+              onClick={() => onNavigateToRoadmap(currentScheme.id)}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-700 transition-all cursor-pointer shrink-0 shadow-xs"
+            >
+              <span>View Scheme Roadmap</span>
+              <ArrowRight className="size-3.5" />
             </button>
           )}
         </div>
       </div>
 
-      {/* Top Banner Explaining the Rejection Funnel */}
-      <div className="rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50 via-amber-50/50 to-white p-6">
-        <div className="flex items-start gap-3">
-          <ShieldAlert className="size-6 text-rose-600 shrink-0 mt-0.5" />
-          <div>
-            <h3 className="text-base font-black text-rose-950">
-              Pre-Flight Document Audit: Prevent Silent Application Rejections
-            </h3>
-            <p className="mt-1 text-xs leading-relaxed text-rose-800">
-              Over 40% of government scholarship & DBT rejections occur not due to ineligibility, but because of clerical mismatches (e.g. initials on marksheets vs full name on Aadhaar) or unseeded NPCI bank accounts. Upload and cross-verify your documents below before submitting on government portals.
-            </p>
+      {/* Scheme Required Documents Checklist */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+              <FileCheck2 className="size-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">
+                1. Statutory Documents Required for {currentScheme.shortCode}
+              </h3>
+              <p className="text-[11px] text-slate-500">
+                Real-world verification checks matching the issuing gazette rules
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* SECTION 1: INTERACTIVE DOCUMENT UPLOAD ZONES */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
-          <div>
-            <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
-              <Upload className="size-4 text-orange-600" />
-              <span>Step 1: Upload Documents for OCR Cross-Matching</span>
-            </h4>
-            <p className="text-xs text-slate-500">
-              Upload client documents (PDF or Image) to test real-world e-KYC name matching and bank seeding
-            </p>
-          </div>
-          <span className="text-[11px] font-mono font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-200">
-            Intelligent Document Validator
+          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700">
+            {schemeDocs.filter((d) => userHeld.includes(d)).length} of {schemeDocs.length} Verified
           </span>
         </div>
 
-        {/* 3 Upload Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          {/* Box 1: Aadhaar Card */}
-          <div className="rounded-2xl border-2 border-dashed border-slate-200 p-4 transition-all hover:border-orange-400 bg-slate-50/50 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <FileBadge className="size-4 text-blue-600" />
-                Aadhaar Card
-              </span>
-              <span className="rounded bg-blue-100 px-1.5 py-0.5 text-[9px] font-black text-blue-800">
-                Primary Identity
-              </span>
-            </div>
-
-            {aadhaarFile ? (
-              <div className="rounded-xl bg-white p-3 border border-slate-200 text-xs space-y-1">
-                <div className="flex items-center justify-between font-bold text-slate-900">
-                  <span className="truncate max-w-[170px]">{aadhaarFile.name}</span>
-                  <span className="text-[10px] text-slate-400">{aadhaarFile.size}</span>
-                </div>
-                <p className="text-[11px] text-slate-600">
-                  Name: <strong>{aadhaarFile.extractedName}</strong>
-                </p>
-                <p className="text-[10px] text-slate-400 font-mono">UID: {aadhaarFile.extractedId}</p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 pt-1">
-                  <CheckCircle2 className="size-3" /> OCR Verified
-                </span>
-              </div>
-            ) : (
-              <div className="py-6 text-center text-xs text-slate-400">
-                Drag & drop or upload Aadhaar PDF/Image
-              </div>
-            )}
-
-            <label className="flex items-center justify-center gap-1.5 w-full rounded-xl bg-slate-900 py-2 text-xs font-bold text-white hover:bg-slate-800 transition-colors cursor-pointer">
-              <FileUp className="size-3.5" />
-              <span>Replace / Upload Aadhaar</span>
-              <input
-                type="file"
-                accept="application/pdf,image/*"
-                onChange={handleAadhaarUpload}
-                className="hidden"
-              />
-            </label>
-          </div>
-
-          {/* Box 2: 10th Marksheet */}
-          <div className="rounded-2xl border-2 border-dashed border-slate-200 p-4 transition-all hover:border-orange-400 bg-slate-50/50 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <FileText className="size-4 text-orange-600" />
-                10th Class Marksheet
-              </span>
-              <span className="rounded bg-orange-100 px-1.5 py-0.5 text-[9px] font-black text-orange-800">
-                Date of Birth Proof
-              </span>
-            </div>
-
-            {marksheetFile ? (
-              <div className="rounded-xl bg-white p-3 border border-slate-200 text-xs space-y-1">
-                <div className="flex items-center justify-between font-bold text-slate-900">
-                  <span className="truncate max-w-[170px]">{marksheetFile.name}</span>
-                  <span className="text-[10px] text-slate-400">{marksheetFile.size}</span>
-                </div>
-                <p className="text-[11px] text-slate-600">
-                  Name: <strong>{marksheetFile.extractedName}</strong>
-                </p>
-                <p className="text-[10px] text-slate-400 font-mono">Roll: {marksheetFile.extractedId}</p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 pt-1">
-                  <CheckCircle2 className="size-3" /> OCR Verified
-                </span>
-              </div>
-            ) : (
-              <div className="py-6 text-center text-xs text-slate-400">
-                Drag & drop or upload 10th Marksheet
-              </div>
-            )}
-
-            <label className="flex items-center justify-center gap-1.5 w-full rounded-xl bg-slate-900 py-2 text-xs font-bold text-white hover:bg-slate-800 transition-colors cursor-pointer">
-              <FileUp className="size-3.5" />
-              <span>Replace / Upload Marksheet</span>
-              <input
-                type="file"
-                accept="application/pdf,image/*"
-                onChange={handleMarksheetUpload}
-                className="hidden"
-              />
-            </label>
-          </div>
-
-          {/* Box 3: Bank Passbook */}
-          <div className="rounded-2xl border-2 border-dashed border-slate-200 p-4 transition-all hover:border-orange-400 bg-slate-50/50 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Building className="size-4 text-emerald-600" />
-                Bank Passbook / Cheque
-              </span>
-              <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-black text-emerald-800">
-                DBT Destination
-              </span>
-            </div>
-
-            {bankFile ? (
-              <div className="rounded-xl bg-white p-3 border border-slate-200 text-xs space-y-1">
-                <div className="flex items-center justify-between font-bold text-slate-900">
-                  <span className="truncate max-w-[170px]">{bankFile.name}</span>
-                  <span className="text-[10px] text-slate-400">{bankFile.size}</span>
-                </div>
-                <p className="text-[11px] text-slate-600">
-                  Account Name: <strong>{bankFile.extractedName}</strong>
-                </p>
-                <p className="text-[10px] text-slate-400 font-mono">A/C: {bankFile.extractedId}</p>
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 pt-1">
-                  <CheckCircle2 className="size-3" /> Account Active
-                </span>
-              </div>
-            ) : (
-              <div className="py-6 text-center text-xs text-slate-400">
-                Drag & drop or upload Bank Passbook
-              </div>
-            )}
-
-            <label className="flex items-center justify-center gap-1.5 w-full rounded-xl bg-slate-900 py-2 text-xs font-bold text-white hover:bg-slate-800 transition-colors cursor-pointer">
-              <FileUp className="size-3.5" />
-              <span>Replace / Upload Passbook</span>
-              <input
-                type="file"
-                accept="application/pdf,image/*"
-                onChange={handleBankUpload}
-                className="hidden"
-              />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* SECTION 2: LIVE CROSS-MATCHING AUDIT MATRIX */}
-      <div className="grid gap-8 lg:grid-cols-12">
-        {/* LEFT: Particulars Editor & NPCI Selector (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h4 className="text-sm font-black text-slate-900">
-                Document Details (Editable)
-              </h4>
-              <span className="text-[11px] font-medium text-slate-500 font-mono">Live Sync</span>
-            </div>
-
-            <div className="space-y-4">
-              {/* Name on Aadhaar */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700">
-                  Full Name on Aadhaar Card
-                </label>
-                <input
-                  type="text"
-                  value={auditInput.nameOnAadhaar}
-                  onChange={(e) =>
-                    setAuditInput({ ...auditInput, nameOnAadhaar: e.target.value })
-                  }
-                  placeholder="e.g. Kavitha Selvam"
-                  className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-800 focus:border-orange-500 focus:outline-hidden"
-                />
-              </div>
-
-              {/* Name on 10th Marksheet */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700">
-                  Full Name on 10th Marksheet / Certificate
-                </label>
-                <input
-                  type="text"
-                  value={auditInput.nameOnMarksheet}
-                  onChange={(e) =>
-                    setAuditInput({ ...auditInput, nameOnMarksheet: e.target.value })
-                  }
-                  placeholder="e.g. Kavitha S"
-                  className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-800 focus:border-orange-500 focus:outline-hidden"
-                />
-              </div>
-
-              {/* Date of Birth Verification */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700">
-                    Aadhaar DOB
-                  </label>
-                  <input
-                    type="date"
-                    value={auditInput.dobOnAadhaar || "2006-05-12"}
-                    onChange={(e) =>
-                      setAuditInput({ ...auditInput, dobOnAadhaar: e.target.value })
-                    }
-                    className="mt-1.5 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700">
-                    Marksheet DOB
-                  </label>
-                  <input
-                    type="date"
-                    value={auditInput.dobOnMarksheet || "2006-05-12"}
-                    onChange={(e) =>
-                      setAuditInput({ ...auditInput, dobOnMarksheet: e.target.value })
-                    }
-                    className="mt-1.5 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-800"
-                  />
-                </div>
-              </div>
-
-              {/* The NPCI Seeding Selector */}
-              <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 space-y-2">
-                <label className="block text-xs font-black text-amber-950">
-                  Bank Account Aadhaar DBT Status (NPCI Mapper)
-                </label>
-                <p className="text-[11px] text-amber-800">
-                  Is your bank account mapped on the NPCI gateway for scholarship Direct Benefit Transfer?
-                </p>
-
-                <div className="space-y-2 pt-1">
-                  <label className="flex items-center gap-2 text-xs text-slate-800 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="npci"
-                      checked={auditInput.isNpciSeeded}
-                      onChange={() =>
-                        setAuditInput({
-                          ...auditInput,
-                          isNpciSeeded: true,
-                          isAadhaarLinkedToBank: true,
-                        })
-                      }
-                      className="text-orange-600 focus:ring-orange-500"
-                    />
-                    <span className="font-semibold text-emerald-800">
-                      Yes, NPCI Seeded for DBT (Safe)
-                    </span>
-                  </label>
-
-                  <label className="flex items-center gap-2 text-xs text-slate-800 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="npci"
-                      checked={auditInput.isAadhaarLinkedToBank && !auditInput.isNpciSeeded}
-                      onChange={() =>
-                        setAuditInput({
-                          ...auditInput,
-                          isNpciSeeded: false,
-                          isAadhaarLinkedToBank: true,
-                        })
-                      }
-                      className="text-orange-600 focus:ring-orange-500"
-                    />
-                    <span className="font-semibold text-amber-900">
-                      Only Aadhaar Linked (ATM KYC, NOT Seeded) ⚠️
-                    </span>
-                  </label>
-
-                  <label className="flex items-center gap-2 text-xs text-slate-800 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="npci"
-                      checked={!auditInput.isAadhaarLinkedToBank}
-                      onChange={() =>
-                        setAuditInput({
-                          ...auditInput,
-                          isNpciSeeded: false,
-                          isAadhaarLinkedToBank: false,
-                        })
-                      }
-                      className="text-orange-600 focus:ring-orange-500"
-                    />
-                    <span className="font-semibold text-rose-800">
-                      Not Linked or Unknown (Immediate Rejection) ❌
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT: Results, Mismatch Analysis & Actionable Solutions (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          {/* Readiness Score Card */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Pre-Flight Submission Status
-                </span>
-                <div className="flex items-center gap-2 mt-1">
-                  <h3 className="text-xl font-black text-slate-900">
-                    Application Readiness Score
-                  </h3>
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-black ${
-                      auditResult.overallReadinessScore >= 80
-                        ? "bg-emerald-100 text-emerald-800"
-                        : auditResult.overallReadinessScore >= 50
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-rose-100 text-rose-800"
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {schemeDocs.map((docId) => {
+            const isHeld = userHeld.includes(docId);
+            return (
+              <div
+                key={docId}
+                className={`flex flex-col justify-between rounded-xl border p-3.5 transition-all ${
+                  isHeld
+                    ? "border-emerald-200 bg-emerald-50/40 text-emerald-950"
+                    : "border-amber-200 bg-amber-50/50 text-amber-950"
+                }`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <div
+                    className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md ${
+                      isHeld
+                        ? "bg-emerald-600 text-white"
+                        : "bg-amber-500 text-white"
                     }`}
                   >
-                    {auditResult.overallReadinessScore} / 100
-                  </span>
+                    {isHeld ? <Check className="size-3.5 stroke-[3]" /> : <AlertTriangle className="size-3" />}
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold leading-tight">{getDocumentName(docId)}</p>
+                    <p className="text-[10px] mt-0.5 text-slate-600">
+                      {isHeld ? "✓ Uploaded & verified in profile" : "⚠️ Missing prerequisite certificate"}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Status Badge */}
-              <div>
-                {auditResult.canSubmitNow ? (
-                  <span className="flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-700 border border-emerald-200">
-                    <CheckCircle2 className="size-4" />
-                    <span>Safe to Submit</span>
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5 rounded-xl bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-700 border border-rose-200">
-                    <AlertTriangle className="size-4" />
-                    <span>Clerical Risks Detected</span>
-                  </span>
+                {!isHeld && (
+                  <div className="mt-3 pt-2 border-t border-amber-200/60 flex items-center justify-between">
+                    <span className="text-[10px] font-semibold text-amber-800">Prerequisite Roadblock</span>
+                    <button
+                      onClick={() => setSelectedCertGuideId(docId)}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-700 hover:text-orange-900 hover:underline cursor-pointer"
+                    >
+                      <span>Resolve Guide</span>
+                      <ChevronRight className="size-3" />
+                    </button>
+                  </div>
                 )}
               </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Interactive Document Upload Dropzones with Live OCR Preview */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-orange-100 text-orange-700">
+              <Upload className="size-4" />
             </div>
-
-            {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 py-4">
-              <div className="rounded-2xl bg-slate-50 p-3 border border-slate-100">
-                <span className="text-[10px] font-semibold text-slate-500 block">Name Match</span>
-                <span className={`text-base font-black ${auditResult.nameMatchPercentage === 100 ? "text-emerald-600" : "text-amber-600"}`}>
-                  {auditResult.nameMatchPercentage}%
-                </span>
-                <span className="text-[10px] text-slate-400 block truncate">
-                  {auditResult.nameMatchPercentage === 100 ? "Exact Match" : "Initial Expansion Mismatch"}
-                </span>
-              </div>
-
-              <div className="rounded-2xl bg-slate-50 p-3 border border-slate-100">
-                <span className="text-[10px] font-semibold text-slate-500 block">DOB Match</span>
-                <span className={`text-base font-black ${auditResult.dobMatched ? "text-emerald-600" : "text-rose-600"}`}>
-                  {auditResult.dobMatched ? "Consistent" : "Discrepant"}
-                </span>
-                <span className="text-[10px] text-slate-400 block">
-                  {auditResult.dobMatched ? "Aadhaar = Marksheet" : "DOBs Differ!"}
-                </span>
-              </div>
-
-              <div className="rounded-2xl bg-slate-50 p-3 border border-slate-100 col-span-2 sm:col-span-1">
-                <span className="text-[10px] font-semibold text-slate-500 block">NPCI DBT Seeding</span>
-                <span className={`text-base font-black ${auditResult.npciStatus === "SEEDED" ? "text-emerald-600" : "text-rose-600"}`}>
-                  {auditResult.npciStatus === "SEEDED" ? "Seeded" : "Unseeded ⚠️"}
-                </span>
-                <span className="text-[10px] text-slate-400 block">
-                  {auditResult.npciStatus === "SEEDED" ? "DBT Ready" : "Treasury Rejection"}
-                </span>
-              </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">
+                2. Live Document Upload & OCR Identity Parsing
+              </h3>
+              <p className="text-[11px] text-slate-500">
+                Upload your files (PDF or Image) to test real-time cross-document name & DOB extraction
+              </p>
             </div>
+          </div>
+        </div>
 
-            {/* Cross-Matching Table */}
-            <div className="space-y-3 pt-2">
-              <h5 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                Detected Discrepancies & Issues ({auditResult.issues.length})
-              </h5>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* Dropzone 1: Aadhaar Card */}
+          <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-4 text-center hover:bg-slate-50 transition-colors">
+            <div className="flex size-10 mx-auto items-center justify-center rounded-xl bg-orange-100 text-orange-600 mb-2">
+              <FileBadge className="size-5" />
+            </div>
+            <h4 className="text-xs font-bold text-slate-900">Aadhaar Card (UIDAI)</h4>
+            <p className="text-[10px] text-slate-500 mb-3">Front & Back PDF or JPG</p>
 
-              <div className="space-y-3">
-                {auditResult.issues.map((issue, idx) => (
-                  <div
-                    key={idx}
-                    className={`rounded-2xl border p-4 text-xs space-y-2 ${
-                      issue.severity === "CRITICAL"
-                        ? "border-rose-200 bg-rose-50/70 text-rose-950"
-                        : issue.severity === "WARNING"
-                        ? "border-amber-200 bg-amber-50/70 text-amber-950"
-                        : "border-emerald-200 bg-emerald-50/70 text-emerald-950"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2 font-bold">
-                        {issue.severity === "CRITICAL" ? (
-                          <XCircle className="size-4 text-rose-600 shrink-0" />
-                        ) : issue.severity === "WARNING" ? (
-                          <AlertTriangle className="size-4 text-amber-600 shrink-0" />
-                        ) : (
-                          <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-                        )}
-                        <span>{issue.title}</span>
-                      </div>
-                      <span className="font-mono text-[9px] px-2 py-0.5 rounded bg-white/70 font-bold">
-                        {issue.severity}
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] leading-relaxed opacity-90">{issue.description}</p>
-
-                    <div className="rounded-xl bg-white/80 p-2.5 border border-black/5 space-y-1">
-                      <strong className="text-[11px] font-bold block">Actionable Legal Solution:</strong>
-                      <p className="text-[11px] leading-relaxed">{issue.solution}</p>
-                    </div>
-                  </div>
-                ))}
+            {aadhaarFile ? (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-2.5 text-left text-xs text-emerald-950 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[11px] truncate max-w-[130px]">{aadhaarFile.name}</span>
+                  <span className="text-[10px] text-emerald-700 font-semibold">{aadhaarFile.size}</span>
+                </div>
+                <div className="text-[10px] text-slate-600">
+                  <span>OCR Name: <strong className="text-slate-900">{aadhaarFile.extractedName}</strong></span>
+                  <br />
+                  <span>DOB: <strong>{aadhaarFile.extractedDob}</strong></span>
+                </div>
               </div>
+            ) : (
+              <label className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer shadow-xs">
+                <FileUp className="size-3.5 text-orange-600" />
+                <span>Upload Aadhaar</span>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setAadhaarFile({
+                        name: file.name,
+                        size: `${Math.round(file.size / 1024)} KB`,
+                        type: file.type,
+                        extractedName: auditInput.nameOnAadhaar || profile?.name || "Kavitha Selvam",
+                        extractedDob: auditInput.dobOnAadhaar || "2006-05-12",
+                        extractedId: "XXXX-XXXX-4819"
+                      });
+                    }
+                  }}
+                />
+              </label>
+            )}
+          </div>
+
+          {/* Dropzone 2: 10th Marksheet */}
+          <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-4 text-center hover:bg-slate-50 transition-colors">
+            <div className="flex size-10 mx-auto items-center justify-center rounded-xl bg-sky-100 text-sky-600 mb-2">
+              <FileText className="size-5" />
+            </div>
+            <h4 className="text-xs font-bold text-slate-900">10th Marksheet / Memo</h4>
+            <p className="text-[10px] text-slate-500 mb-3">SSC / CBSE / State Board Memo</p>
+
+            {marksheetFile ? (
+              <div className="rounded-xl border border-sky-200 bg-sky-50/60 p-2.5 text-left text-xs text-sky-950 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[11px] truncate max-w-[130px]">{marksheetFile.name}</span>
+                  <span className="text-[10px] text-sky-700 font-semibold">{marksheetFile.size}</span>
+                </div>
+                <div className="text-[10px] text-slate-600">
+                  <span>OCR Name: <strong className="text-slate-900">{marksheetFile.extractedName}</strong></span>
+                  <br />
+                  <span>DOB: <strong>{marksheetFile.extractedDob}</strong></span>
+                </div>
+              </div>
+            ) : (
+              <label className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer shadow-xs">
+                <FileUp className="size-3.5 text-sky-600" />
+                <span>Upload Marksheet</span>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setMarksheetFile({
+                        name: file.name,
+                        size: `${Math.round(file.size / 1024)} KB`,
+                        type: file.type,
+                        extractedName: auditInput.nameOnMarksheet || "Kavitha S",
+                        extractedDob: auditInput.dobOnMarksheet || "2006-05-12",
+                        extractedId: "SSC-2022-849182"
+                      });
+                    }
+                  }}
+                />
+              </label>
+            )}
+          </div>
+
+          {/* Dropzone 3: Bank Passbook */}
+          <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-4 text-center hover:bg-slate-50 transition-colors">
+            <div className="flex size-10 mx-auto items-center justify-center rounded-xl bg-purple-100 text-purple-600 mb-2">
+              <Building className="size-5" />
+            </div>
+            <h4 className="text-xs font-bold text-slate-900">Bank Passbook / Statement</h4>
+            <p className="text-[10px] text-slate-500 mb-3">Front Page Showing IFSC & NPCI</p>
+
+            {bankFile ? (
+              <div className="rounded-xl border border-purple-200 bg-purple-50/60 p-2.5 text-left text-xs text-purple-950 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[11px] truncate max-w-[130px]">{bankFile.name}</span>
+                  <span className="text-[10px] text-purple-700 font-semibold">{bankFile.size}</span>
+                </div>
+                <div className="text-[10px] text-slate-600">
+                  <span>OCR Name: <strong className="text-slate-900">{bankFile.extractedName}</strong></span>
+                  <br />
+                  <span>Account: <strong>{bankFile.extractedId}</strong></span>
+                </div>
+              </div>
+            ) : (
+              <label className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer shadow-xs">
+                <FileUp className="size-3.5 text-purple-600" />
+                <span>Upload Passbook</span>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setBankFile({
+                        name: file.name,
+                        size: `${Math.round(file.size / 1024)} KB`,
+                        type: file.type,
+                        extractedName: auditInput.nameOnAadhaar || profile?.name || "Kavitha Selvam",
+                        extractedId: "38920192819"
+                      });
+                    }
+                  }}
+                />
+              </label>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Cross-Document Name Verification Matrix */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+              <ShieldAlert className="size-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">
+                3. Cross-Document Name Matching Matrix
+              </h3>
+              <p className="text-[11px] text-slate-500">
+                Compares string patterns, phonetic Soundex, and initial expansions to prevent automated PFMS rejection
+              </p>
             </div>
           </div>
 
-          {/* ============================================================= */}
-          {/* ACTIONABLE LEGAL SOLUTIONS / REMEDIES (USER PERSPECTIVE)       */}
-          {/* ============================================================= */}
-          <div className="rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="size-4 text-orange-600" />
-                <h4 className="text-sm font-black text-slate-900">
-                  Ready-to-Use Legal Solutions & Remedies
-                </h4>
-              </div>
-              <span className="text-[10px] text-slate-500 font-semibold">1-Click Downloads</span>
-            </div>
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+              auditResult.nameMatchPercentage >= 85
+                ? "bg-emerald-100 text-emerald-800"
+                : "bg-amber-100 text-amber-900"
+            }`}
+          >
+            Name Match Score: {auditResult.nameMatchPercentage}%
+          </span>
+        </div>
 
-            {/* Remedy 1: Notarized Name Discrepancy Affidavit */}
-            <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-4 space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h5 className="font-bold text-xs text-amber-950">
-                    Solution 1: Notarized &ldquo;One-and-the-Same Person&rdquo; Affidavit
-                  </h5>
-                  <p className="text-[11px] text-amber-800 mt-0.5">
-                    Statutory affidavit for ₹20/₹50 stamp paper to legally protect against initial expansion rejections.
-                  </p>
-                </div>
-                <span className="rounded bg-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-900 shrink-0">
-                  Stamp Paper ₹20
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left">
+            <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold">
+              <tr>
+                <th className="px-3 py-2 rounded-l-lg">Document Source</th>
+                <th className="px-3 py-2">Extracted Legal Name</th>
+                <th className="px-3 py-2">Date of Birth</th>
+                <th className="px-3 py-2 rounded-r-lg">Discrepancy Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-medium">
+              <tr>
+                <td className="px-3 py-2.5 font-bold text-slate-800">Aadhaar Card (UIDAI)</td>
+                <td className="px-3 py-2.5 text-slate-900">{auditInput.nameOnAadhaar || profile?.name || "Kavitha Selvam"}</td>
+                <td className="px-3 py-2.5 text-slate-700">{auditInput.dobOnAadhaar || "2006-05-12"}</td>
+                <td className="px-3 py-2.5">
+                  <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                    <Check className="size-3" /> Master Legal Anchor
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 font-bold text-slate-800">10th Class Marksheet</td>
+                <td className="px-3 py-2.5 text-slate-900">{auditInput.nameOnMarksheet || "Kavitha S"}</td>
+                <td className="px-3 py-2.5 text-slate-700">{auditInput.dobOnMarksheet || "2006-05-12"}</td>
+                <td className="px-3 py-2.5">
+                  {auditInput.nameOnAadhaar !== auditInput.nameOnMarksheet ? (
+                    <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">
+                      <AlertTriangle className="size-3" /> Initial Discrepancy Flagged
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                      <Check className="size-3" /> Exact Match
+                    </span>
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2.5 font-bold text-slate-800">Bank Account Record</td>
+                <td className="px-3 py-2.5 text-slate-900">{auditInput.nameOnAadhaar || profile?.name || "Kavitha Selvam"}</td>
+                <td className="px-3 py-2.5 text-slate-700">{auditInput.dobOnAadhaar || "2006-05-12"}</td>
+                <td className="px-3 py-2.5">
+                  <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                    <Check className="size-3" /> Seeded & Matched
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Actionable Legal Solutions for Mismatch */}
+        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-4 text-amber-600" />
+            <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+              Legal Remedies & Solutions for Name Discrepancy:
+            </h4>
+          </div>
+          <p className="text-xs text-amber-900">
+            Because the 10th marksheet records <strong>"{auditInput.nameOnMarksheet || "Kavitha S"}"</strong> while Aadhaar records <strong>"{auditInput.nameOnAadhaar || "Kavitha Selvam"}"</strong>, state scrutinizing committees may raise an objection. We offer two immediate statutory solutions:
+          </p>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-1">
+            {/* Solution A: One-and-the-Same Person Affidavit */}
+            <div className="rounded-xl border border-amber-300 bg-white p-3.5 space-y-2 shadow-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-900">Solution 1: Notarized Affidavit</span>
+                <span className="rounded bg-orange-100 px-1.5 py-0.5 text-[10px] font-bold text-orange-800">
+                  Immediate (24 hrs)
                 </span>
               </div>
-
-              <div className="flex flex-wrap items-center gap-2 pt-1">
+              <p className="text-[11px] text-slate-600">
+                Execute a ₹20 / ₹50 Non-Judicial Stamp Paper affidavit affirming that "{auditInput.nameOnAadhaar}" and "{auditInput.nameOnMarksheet}" refer to one and the same person.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => setShowAffidavitModal(true)}
-                  className="flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-xs font-bold text-slate-800 border border-slate-300 hover:bg-slate-50 cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
                 >
-                  <Eye className="size-3.5 text-slate-500" />
-                  <span>Preview Legal Draft</span>
+                  <Eye className="size-3" />
+                  <span>Preview Text</span>
                 </button>
-
                 <button
                   onClick={handleCopyAffidavit}
-                  className="flex items-center gap-1.5 rounded-xl bg-amber-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-amber-700 cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
                 >
-                  {copiedAffidavit ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                  <span>{copiedAffidavit ? "Affidavit Copied!" : "Copy Legal Text"}</span>
+                  <Copy className="size-3" />
+                  <span>{copiedAffidavit ? "Copied!" : "Copy"}</span>
                 </button>
-
                 <button
                   onClick={handleDownloadAffidavit}
-                  className="flex items-center gap-1.5 rounded-xl border border-amber-400 bg-white px-3.5 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg bg-orange-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-orange-700 cursor-pointer shadow-xs"
                 >
-                  <Download className="size-3.5" />
+                  <Download className="size-3" />
                   <span>Download .txt</span>
                 </button>
               </div>
             </div>
 
-            {/* Remedy 2: Bank NPCI Seeding Mandate */}
-            <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4 space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h5 className="font-bold text-xs text-blue-950">
-                    Solution 2: Official NPCI Aadhaar DBT Seeding Mandate (Annexure I)
-                  </h5>
-                  <p className="text-[11px] text-blue-800 mt-0.5">
-                    Statutory mandate form required by all nationalized banks to activate Aadhaar DBT mapping.
-                  </p>
-                </div>
-                <span className="rounded bg-blue-200 px-2 py-0.5 text-[10px] font-bold text-blue-900 shrink-0">
-                  Free at Bank
+            {/* Solution B: NPCI Seeding Mandate */}
+            <div className="rounded-xl border border-sky-300 bg-white p-3.5 space-y-2 shadow-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-900">Solution 2: Bank NPCI Seeding Mandate</span>
+                <span className="rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-bold text-sky-800">
+                  Bank Branch Form
                 </span>
               </div>
-
-              <div className="flex flex-wrap items-center gap-2 pt-1">
+              <p className="text-[11px] text-slate-600">
+                Submit standard Annexure I to the bank manager requesting that account 38920192819 be seeded in the NPCI Aadhaar mapper for DBT.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => setShowMandateModal(true)}
-                  className="flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-xs font-bold text-slate-800 border border-slate-300 hover:bg-slate-50 cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
                 >
-                  <Eye className="size-3.5 text-slate-500" />
-                  <span>Preview Mandate</span>
+                  <Eye className="size-3" />
+                  <span>Preview Text</span>
                 </button>
-
                 <button
                   onClick={handleCopyMandate}
-                  className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
                 >
-                  {copiedForm ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-                  <span>{copiedForm ? "Mandate Copied!" : "Copy Mandate Text"}</span>
+                  <Copy className="size-3" />
+                  <span>{copiedForm ? "Copied!" : "Copy"}</span>
                 </button>
-
                 <button
                   onClick={handleDownloadMandate}
-                  className="flex items-center gap-1.5 rounded-xl border border-blue-400 bg-white px-3.5 py-2 text-xs font-bold text-blue-900 hover:bg-blue-100 cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-sky-700 cursor-pointer shadow-xs"
                 >
-                  <Download className="size-3.5" />
+                  <Download className="size-3" />
                   <span>Download .txt</span>
                 </button>
               </div>
@@ -754,68 +708,99 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
         </div>
       </div>
 
-      {/* MODAL 1: PREVIEW AFFIDAVIT */}
+      {/* Affidavit Preview Modal */}
       {showAffidavitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-amber-50/60 p-5">
-              <h3 className="text-sm font-black text-slate-900">
-                Notarized One-and-the-Same Person Affidavit Draft
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <FileBadge className="size-5 text-orange-600" />
+                <h3 className="text-base font-bold text-slate-900">
+                  Notarized One-and-the-Same Person Affidavit Format
+                </h3>
+              </div>
               <button
                 onClick={() => setShowAffidavitModal(false)}
-                className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
               >
                 <X className="size-5" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-5 bg-slate-50 font-mono text-[11px] text-slate-800 leading-relaxed">
-              <pre className="whitespace-pre-wrap">{affidavitText}</pre>
+
+            <div className="rounded-xl bg-slate-50 p-4 font-mono text-xs text-slate-800 whitespace-pre-wrap leading-relaxed border border-slate-200 max-h-96 overflow-y-auto">
+              {affidavitText}
             </div>
-            <div className="flex items-center justify-between border-t border-slate-100 bg-white p-4">
-              <span className="text-[11px] text-slate-500">Print on ₹20/₹50 Non-Judicial Stamp Paper</span>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={handleCopyAffidavit}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                <Copy className="size-4" />
+                <span>{copiedAffidavit ? "Copied to Clipboard!" : "Copy Text"}</span>
+              </button>
               <button
                 onClick={handleDownloadAffidavit}
-                className="flex items-center gap-1.5 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-700 cursor-pointer shadow-md"
               >
-                <Download className="size-3.5" />
-                <span>Download Document</span>
+                <Download className="size-4" />
+                <span>Download Affidavit .txt</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL 2: PREVIEW MANDATE */}
+      {/* Mandate Preview Modal */}
       {showMandateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-blue-50/60 p-5">
-              <h3 className="text-sm font-black text-slate-900">
-                NPCI Bank Aadhaar DBT Seeding Mandate (Annexure I)
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Building className="size-5 text-sky-600" />
+                <h3 className="text-base font-bold text-slate-900">
+                  NPCI Aadhaar DBT Seeding Mandate (Annexure I)
+                </h3>
+              </div>
               <button
                 onClick={() => setShowMandateModal(false)}
-                className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
               >
                 <X className="size-5" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-5 bg-slate-50 font-mono text-[11px] text-slate-800 leading-relaxed">
-              <pre className="whitespace-pre-wrap">{mandateText}</pre>
+
+            <div className="rounded-xl bg-slate-50 p-4 font-mono text-xs text-slate-800 whitespace-pre-wrap leading-relaxed border border-slate-200 max-h-96 overflow-y-auto">
+              {mandateText}
             </div>
-            <div className="flex items-center justify-between border-t border-slate-100 bg-white p-4">
-              <span className="text-[11px] text-slate-500">Submit to Branch Manager</span>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={handleCopyMandate}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                <Copy className="size-4" />
+                <span>{copiedForm ? "Copied to Clipboard!" : "Copy Text"}</span>
+              </button>
               <button
                 onClick={handleDownloadMandate}
-                className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 cursor-pointer shadow-md"
               >
-                <Download className="size-3.5" />
-                <span>Download Mandate</span>
+                <Download className="size-4" />
+                <span>Download Mandate .txt</span>
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Certificate Resolution Modal */}
+      {selectedCertGuideId && (
+        <CertificateResolutionModal
+          certificateId={selectedCertGuideId}
+          onClose={() => setSelectedCertGuideId(null)}
+          onMarkAsObtained={handleMarkCertAsHeld}
+        />
       )}
     </div>
   );

@@ -51,6 +51,12 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
   const [selectedSchemeId, setSelectedSchemeId] = useState<string>(initialSchemeId);
   const [categoryFilter, setCategoryFilter] = useState<"ALL" | "SCHOLARSHIP" | "HEALTHCARE" | "CERTIFICATE">("ALL");
 
+  React.useEffect(() => {
+    if (initialSchemeId) {
+      setSelectedSchemeId(initialSchemeId);
+    }
+  }, [initialSchemeId]);
+
   // Merged Multi-Scheme State
   const [mergedSelection, setMergedSelection] = useState<string[]>([
     "PostMatric_ST",
