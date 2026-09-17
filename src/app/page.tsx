@@ -19,18 +19,16 @@ import {
   Building,
   Bot,
   FileBadge,
-  Sparkles,
-  Award
+  Sparkles
 } from "lucide-react";
 
 export default function Home() {
-  const [currentLanguage, setCurrentLanguage] = useState<"en" | "hi">("en");
   const [isArchitectureOpen, setIsArchitectureOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<
     "eligibility" | "audit" | "roadmap" | "offline" | "copilot" | "dossier"
   >("eligibility");
 
-  // Initial Profile: Default to Rajesh Kumar Munda (ST Tribal Student)
+  // Initial Profile: Default to Rajesh Kumar Munda (ST Student)
   const [profile, setProfile] = useState<UserProfile>(DEMO_PERSONAS[0].profile);
   const [auditInput, setAuditInput] = useState<DocumentAuditInput>(DEMO_PERSONAS[0].auditInput);
 
@@ -55,8 +53,6 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50/70 text-slate-900 flex flex-col font-sans">
       {/* Header */}
       <Header
-        currentLanguage={currentLanguage}
-        onLanguageChange={setCurrentLanguage}
         onSelectPersona={handleSelectPersona}
         onOpenArchitecture={() => setIsArchitectureOpen(true)}
       />
@@ -68,14 +64,14 @@ export default function Home() {
           <div className="flex w-max min-w-full space-x-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xs">
             <button
               onClick={() => setActiveTab("eligibility")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "eligibility"
                   ? "bg-orange-600 text-white shadow-xs"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <ShieldCheck className="size-4" />
-              <span>{currentLanguage === "hi" ? "1. योग्यता एवं नीतियां" : "1. Eligibility & Cedar Policies"}</span>
+              <span>1. Eligibility & Cedar Policies</span>
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   activeTab === "eligibility"
@@ -89,55 +85,55 @@ export default function Home() {
 
             <button
               onClick={() => setActiveTab("audit")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "audit"
                   ? "bg-orange-600 text-white shadow-xs"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <FileCheck2 className="size-4" />
-              <span>{currentLanguage === "hi" ? "2. दस्तावेज़ व बैंक जांच" : "2. Document Audit & NPCI"}</span>
+              <span>2. Document Audit & NPCI</span>
               {auditResult.npciStatus !== "SEEDED" && (
-                <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-800">
-                  ⚠️ Risk
+                <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800">
+                  Risk
                 </span>
               )}
             </button>
 
             <button
               onClick={() => setActiveTab("roadmap")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "roadmap"
                   ? "bg-orange-600 text-white shadow-xs"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <GitFork className="size-4" />
-              <span>{currentLanguage === "hi" ? "3. दस्तावेज़ श्रृंखला" : "3. Prerequisite Roadmap"}</span>
+              <span>3. Prerequisite Roadmap</span>
             </button>
 
             <button
               onClick={() => setActiveTab("offline")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "offline"
                   ? "bg-orange-600 text-white shadow-xs"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <Building className="size-4" />
-              <span>{currentLanguage === "hi" ? "4. ऑफलाइन केंद्र व फीस" : "4. Offline & Fee Guard"}</span>
+              <span>4. Offline Centers & Fee Calculator</span>
             </button>
 
             <button
               onClick={() => setActiveTab("copilot")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "copilot"
                   ? "bg-orange-600 text-white shadow-xs"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <Bot className="size-4" />
-              <span>{currentLanguage === "hi" ? "5. आवाज व एआई साथी" : "5. Bedrock AI Copilot"}</span>
+              <span>5. Bedrock AI Copilot</span>
               <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">
                 <Sparkles className="size-2.5" /> Voice
               </span>
@@ -145,14 +141,14 @@ export default function Home() {
 
             <button
               onClick={() => setActiveTab("dossier")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "dossier"
                   ? "bg-orange-600 text-white shadow-xs"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <FileBadge className="size-4" />
-              <span>{currentLanguage === "hi" ? "6. आवेदन डॉसियर" : "6. Application Dossier"}</span>
+              <span>6. Application Dossier</span>
             </button>
           </div>
         </div>
@@ -163,7 +159,6 @@ export default function Home() {
             <EligibilityTab
               profile={profile}
               evaluationResults={evaluationResults}
-              currentLanguage={currentLanguage}
               onProfileChange={setProfile}
               onNavigateToDocuments={() => setActiveTab("audit")}
             />
@@ -172,23 +167,21 @@ export default function Home() {
           {activeTab === "audit" && (
             <DocumentAuditTab
               initialInput={auditInput}
-              currentLanguage={currentLanguage}
             />
           )}
 
           {activeTab === "roadmap" && (
-            <PrerequisiteRoadmapTab currentLanguage={currentLanguage} />
+            <PrerequisiteRoadmapTab />
           )}
 
           {activeTab === "offline" && (
             <OfflineNavigatorTab
-              currentLanguage={currentLanguage}
               userState={profile.state}
             />
           )}
 
           {activeTab === "copilot" && (
-            <AiCopilotTab currentLanguage={currentLanguage} />
+            <AiCopilotTab />
           )}
 
           {activeTab === "dossier" && (
@@ -196,7 +189,6 @@ export default function Home() {
               profile={profile}
               evaluationResults={evaluationResults}
               auditResult={auditResult}
-              currentLanguage={currentLanguage}
             />
           )}
         </div>
@@ -208,20 +200,20 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-800">JanSetu AI</span>
             <span>•</span>
-            <span>Built for WeMakeDevs × AWS Bharat Builds Tour</span>
+            <span>Unified Civic Access Architecture for WeMakeDevs × AWS Hackathon</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
             <button
               onClick={() => setIsArchitectureOpen(true)}
-              className="text-orange-600 hover:underline cursor-pointer"
+              className="text-orange-600 hover:underline cursor-pointer font-medium"
             >
               Inspect AWS Stack
             </button>
             <span className="text-slate-300">|</span>
-            <span>Official Cedar Policies Open Source</span>
+            <span>Open Source AWS Cedar Policies</span>
             <span className="text-slate-300">|</span>
-            <span>SAM / LocalStack Ready</span>
+            <span>SAM CLI & LocalStack Compliant</span>
           </div>
         </div>
       </footer>

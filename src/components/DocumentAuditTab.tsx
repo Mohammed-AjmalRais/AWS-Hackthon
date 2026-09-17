@@ -11,18 +11,15 @@ import {
   ShieldAlert,
   FileText,
   Building,
-  Sparkles,
   Check
 } from "lucide-react";
 
 interface DocumentAuditTabProps {
   initialInput: DocumentAuditInput;
-  currentLanguage: "en" | "hi";
 }
 
 export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
   initialInput,
-  currentLanguage,
 }) => {
   const [auditInput, setAuditInput] = useState<DocumentAuditInput>(initialInput);
   const [copiedForm, setCopiedForm] = useState(false);
@@ -62,14 +59,10 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           <ShieldAlert className="size-6 text-rose-600 shrink-0 mt-0.5" />
           <div>
             <h3 className="text-base font-bold text-rose-950">
-              {currentLanguage === "hi"
-                ? "प्री-फ्लाइट दस्तावेज़ जांच: आवेदन खारिज होने से रोकें"
-                : "Pre-Flight Document Audit: Prevent Silent Application Rejections"}
+              Pre-Flight Document Audit: Prevent Silent Application Rejections
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-rose-800">
-              {currentLanguage === "hi"
-                ? "भारत में 42% छात्रवृत्तियां केवल इसलिए खारिज हो जाती हैं क्योंकि आधार कार्ड और मार्कशीट के नाम में थोड़ा सा अंतर होता है या बैंक खाता NPCI मैपर पर सीड नहीं होता। पोर्टल पर आवेदन करने से पहले यहां जांचें।"
-                : "Over 40% of government scholarship rejections in India occur not because the student was ineligible, but due to subtle clerical mismatches (e.g., initials on marksheets vs full name on Aadhaar) or unseeded NPCI bank mappers. Audit your records below before submitting."}
+              Over 40% of government scholarship rejections in India occur not because the student was ineligible, but due to subtle clerical mismatches (such as initials on marksheets vs full name on Aadhaar) or unseeded NPCI bank mappers. Audit your records below before submitting on the portal.
             </p>
           </div>
         </div>
@@ -81,9 +74,9 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h4 className="text-sm font-bold text-slate-900">
-                {currentLanguage === "hi" ? "दस्तावेज़ विवरण दर्ज करें" : "Enter Document Details"}
+                Enter Document Particulars
               </h4>
-              <span className="text-[11px] font-medium text-slate-500">Live Validator</span>
+              <span className="text-[11px] font-medium text-slate-500 font-mono">Live Validator</span>
             </div>
 
             <div className="mt-4 space-y-4">
@@ -155,10 +148,10 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                   Bank Account Aadhaar DBT Status (NPCI Mapper)
                 </label>
                 <p className="text-[11px] text-amber-800 mt-0.5">
-                  Does your bank have active NPCI DBT Seeding?
+                  Is your bank account active on the NPCI Aadhaar DBT mapper?
                 </p>
 
-                <div className="mt-2 space-y-2">
+                <div className="mt-2.5 space-y-2">
                   <label className="flex items-center gap-2 text-xs text-slate-800 cursor-pointer">
                     <input
                       type="radio"
@@ -235,7 +228,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                   className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-800"
                 />
                 <span className="mt-1 block text-[10px] text-slate-500">
-                  Must be issued after April 1, 2026 for 2026–27 scholarships.
+                  Must be issued after April 1, 2026 for academic year 2026–27.
                 </span>
               </div>
             </div>
@@ -358,13 +351,13 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setShowMandateModal(true)}
-                    className="rounded-lg border border-indigo-300 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-900 hover:bg-indigo-50 transition-colors"
+                    className="rounded-lg border border-indigo-300 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-900 hover:bg-indigo-50 transition-colors cursor-pointer"
                   >
                     View Form
                   </button>
                   <button
                     onClick={handleDownloadMandate}
-                    className="flex items-center gap-1.5 rounded-lg bg-indigo-700 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-800 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-indigo-700 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-800 transition-colors cursor-pointer"
                   >
                     <Download className="size-3.5" />
                     Download Form
@@ -386,7 +379,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
               </h4>
               <button
                 onClick={() => setShowMandateModal(false)}
-                className="rounded p-1 text-slate-400 hover:text-slate-600"
+                className="rounded p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 ✕
               </button>
@@ -399,7 +392,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
             <div className="mt-4 flex justify-between">
               <button
                 onClick={handleCopyMandate}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 cursor-pointer"
               >
                 {copiedForm ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
                 {copiedForm ? "Copied!" : "Copy Text"}
@@ -407,7 +400,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
               <button
                 onClick={handleDownloadMandate}
-                className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700"
+                className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 cursor-pointer"
               >
                 <Download className="size-3.5" />
                 Download Form (Text)

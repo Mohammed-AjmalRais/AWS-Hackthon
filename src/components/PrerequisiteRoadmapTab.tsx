@@ -9,30 +9,19 @@ import {
   Building2,
   CreditCard,
   Send,
-  HelpCircle,
   Clock
 } from "lucide-react";
 
-interface PrerequisiteRoadmapTabProps {
-  currentLanguage: "en" | "hi";
-}
-
-export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
-  currentLanguage,
-}) => {
+export const PrerequisiteRoadmapTab: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Overview Banner */}
       <div className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50/60 p-6">
         <h3 className="text-lg font-bold text-indigo-950">
-          {currentLanguage === "hi"
-            ? "दस्तावेज़ निर्भरता श्रृंखला एवं आवेदन रोडमैप"
-            : "The Document Dependency Chain & 5-Stage Application Roadmap"}
+          The Document Dependency Chain & 5-Stage Application Roadmap
         </h3>
         <p className="mt-1 text-xs text-indigo-800 leading-relaxed max-w-3xl">
-          {currentLanguage === "hi"
-            ? "सरकारी छात्रवृत्ति सीधे नहीं मिलती; यह एक क्रमबद्ध प्रक्रिया है। पहले आधारभूत प्रमाण पत्र (जाति, आय, निवास) बनते हैं, फिर संस्थान सत्यापन होता है, और अंत में पीएफएमएस द्वारा बैंक खाते में राशि भेजी जाती है।"
-            : "Government scholarships cannot be applied for in isolation—they follow a strict prerequisite hierarchy. You must unlock basic statutory certificates first, then register on the portal, obtain physical college clerk sign-off, and finally receive DBT disbursement via PFMS."}
+          Government scholarships cannot be applied for in isolation—they follow a strict prerequisite hierarchy. You must unlock basic statutory certificates first, then register on the portal, obtain physical college clerk sign-off, and finally receive DBT disbursement via PFMS.
         </p>
       </div>
 
@@ -41,11 +30,9 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div>
             <h4 className="text-base font-bold text-slate-900">
-              {currentLanguage === "hi"
-                ? "चरण 1: दस्तावेज़ निर्भरता वृक्ष (Document Dependency Tree)"
-                : "Phase 1: Document Dependency Tree"}
+              Phase 1: Document Dependency Tree
             </h4>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 mt-0.5">
               See what documents are required to unlock subsequent certificates and scholarships.
             </p>
           </div>
@@ -165,9 +152,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
       {/* PART 2: The 5-Stage Lifecycle Roadmap */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
         <h4 className="text-base font-bold text-slate-900">
-          {currentLanguage === "hi"
-            ? "आवेदन से भुगतान तक: 5-चरणीय सरकारी जीवनचक्र"
-            : "From Application to Bank Credit: The 5-Stage Lifecycle"}
+          From Application to Bank Credit: The 5-Stage Lifecycle
         </h4>
         <p className="text-xs text-slate-500 mt-0.5">
           Step-by-step breakdown of how your file travels through government departments.

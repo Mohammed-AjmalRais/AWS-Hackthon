@@ -195,12 +195,25 @@ To ensure the platform remains accurate, JanSetu AI employs an automated ingesti
 ## 5. Detailed Module-by-Module Walkthrough
 
 ### 5.1 Deterministic Cedar Policy Engine (`cedar/`, `src/lib/cedar/evaluator.ts`)
-* **Purpose:** Evaluates whether a student meets official statutory criteria.
+* **Purpose:** Evaluates whether a student meets official statutory criteria across 12 real, active central and state schemes.
 * **Mechanism:** 
-  - Takes a `UserProfile` (category, income, education stage, state, gender, held certificates).
-  - Evaluates each scheme's Cedar policy conditions.
-  - Generates an array of `passedClauses`, `failedClauses`, and calculates an exact `fitScore` (0–100%).
-  - Identifies **missing prerequisite documents** (e.g., if a student qualifies for PostMatric_ST but lacks an Income Certificate, it flags the missing certificate as a blocker).
+  - Takes a comprehensive, real-world `UserProfile` with 15+ civic dimensions:
+    1. Social Category (`ST`, `SC`, `OBC`, `EWS`, `General`) & Notified Religious Minorities
+    2. Benchmark Disability percentage under RPwD Act 2016 (≥40%)
+    3. Annual Statutory Family Income Ceilings (₹1.5L to ₹8L)
+    4. Education Stage (`11th`, `12th`, `UG`, `PG`, `PhD`, `Diploma`)
+    5. Course Mode: **Strict check for Regular Full-Time vs Distance/Vocational**
+    6. Admission Quota: **Management / Direct Quota Exclusion** (mandates merit/counseling)
+    7. Institution Category (Government, Aided, Premier/Notified IIT/NIT/AIIMS)
+    8. Qualifying Examination Merit Threshold (e.g. 80th percentile / 60% min marks)
+    9. Gender Exclusions (e.g. AICTE Pragati for Girls, Begum Hazrat Mahal for Minority Girls)
+    10. Sibling Beneficiary Cap (e.g. max 2 daughters for AICTE Pragati)
+    11. EWS Statutory Asset Exclusions (≤5 acres agricultural land, ≤1,000 sq ft residential flat)
+    12. Domicile Requirements (e.g. UGC Ishaan Uday restricted to 8 NE States)
+    13. Concurrency Protection (prevents simultaneous dual scholarship maintenance stipends)
+  - Evaluates each scheme's declarative Cedar policy conditions with full audit trails.
+  - Generates `passedClauses`, `failedClauses`, and calculates an exact `fitScore` (0–100%).
+  - Identifies **missing prerequisite documents** (e.g., if a student qualifies for PostMatric_ST but lacks an Income Certificate, it flags the missing certificate as an actionable blocker).
   - Exposes the raw Cedar policy code directly in the UI so judges and technical reviewers can verify the rule logic.
 
 ### 5.2 Pre-Flight Document Audit & NPCI Seeding Scanner (`src/lib/audit/documentAuditor.ts`)
@@ -221,12 +234,12 @@ To ensure the platform remains accurate, JanSetu AI employs an automated ingesti
     4. District/State Nodal Officer (DNO/SNO) Sanction
     5. PFMS Treasury Disbursal (Direct into bank account)
 
-### 5.4 Offline Navigator & Fee Transparency Guard (`src/components/OfflineNavigatorTab.tsx`)
+### 5.4 Offline Center & Fee Transparency Navigator (`src/components/OfflineNavigatorTab.tsx`)
 * **Purpose:** Bridges the digital divide and protects rural citizens from cyber cafe extortion.
 * **Mechanism:**
-  - Directory of Common Service Centers (CSCs), Tehsildar offices, MeeSeva, and Bangalore One desks searchable by state and district.
-  - Publishes official statutory fees (e.g., ₹0 for scholarships, ₹25–₹30 for certificates).
-  - Highlights statutory grievance hotlines (CSC Helpline 1800-3000-3468, NSP Helpdesk 0120-6619540).
+  - **Verified Center Directory:** Searchable directory of Common Service Centers (CSCs), Tehsildar offices, MeeSeva, and Bangalore One desks with real addresses, counter names, working hours, and Google Maps transit directions across Odisha, Jharkhand, Karnataka, Telangana, Maharashtra, Assam, etc.
+  - **Interactive Statutory Fee vs Extortion Calculator:** Citizens select the government service and input what their local cyber cafe demanded. The tool instantly calculates the illegal extortion amount, cites the official State Right to Public Services Act (RTSA) clause, and provides statutory grievance hotlines (CSC Helpline 1800-3000-3468, NSP Helpdesk 0120-6619540).
+  - **Service Fee Schedule:** Publishes official government fee caps (e.g., ₹0 for central scholarships, ₹25–₹30 for certificates).
 
 ### 5.5 Vernacular Voice & Bedrock Copilot (`src/components/AiCopilotTab.tsx`, `src/lib/bedrock/bedrockClient.ts`)
 * **Purpose:** Provides voice-first, multilingual civic guidance for citizens with low digital literacy.

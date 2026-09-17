@@ -7,8 +7,6 @@ import {
   Printer,
   FileCheck,
   CheckCircle2,
-  AlertTriangle,
-  ExternalLink,
   ShieldCheck,
   Building,
   QrCode,
@@ -21,14 +19,12 @@ interface ApplicationDossierTabProps {
   profile: UserProfile;
   evaluationResults: CedarEvaluationResult[];
   auditResult: DocumentAuditResult;
-  currentLanguage: "en" | "hi";
 }
 
 export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
   profile,
   evaluationResults,
   auditResult,
-  currentLanguage,
 }) => {
   const [appTrackerId, setAppTrackerId] = useState<string>("NSP2026ST89201");
   const [isTracking, setIsTracking] = useState<boolean>(false);
@@ -49,9 +45,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
             Verified Pre-Flight Submission Dossier
           </div>
           <h3 className="mt-1 text-xl font-bold tracking-tight">
-            {currentLanguage === "hi"
-              ? "नागरिक आवेदन डॉसियर (Citizen Application Dossier)"
-              : "1-Click Citizen Application Dossier"}
+            1-Click Citizen Application Dossier
           </h3>
           <p className="mt-1 text-xs text-slate-300">
             Carry this single-page verified card to your College Nodal Officer or CSC center to prevent operator errors.
@@ -78,7 +72,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
                   JanSetu AI
                 </span>
                 <span className="font-mono text-xs text-slate-500">
-                  Dossier Ref: #JS-{Math.floor(100000 + Math.random() * 900000)}
+                  Dossier Ref: #JS-918204
                 </span>
               </div>
               <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
@@ -193,12 +187,12 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
           </h4>
           <div className="mt-3 grid gap-2 sm:grid-cols-2 text-xs">
             {[
-              "Digital ST / SC / OBC Caste Certificate (with State Barcode)",
-              "Income Certificate issued after April 1, 2026 (< ₹2.5L)",
-              "Aadhaar Card (Original + Xerox with mobile verified)",
+              "Digital Caste / Community Certificate (with Barcode verification)",
+              "Annual Income Certificate (< ₹2.50L) issued on or after April 1, 2026",
+              "Aadhaar Card (linked to active mobile number)",
               "Bank Passbook with NPCI DBT Mapper Active Stamp",
-              "10th Class Passing Certificate / Date of Birth Proof",
-              "Current Year College Bonafide Certificate & Fee Receipt",
+              "10th Class Board Marksheet / Date of Birth Proof",
+              "Current Academic Year College Bonafide Certificate & Fee Receipt",
             ].map((doc, idx) => (
               <div
                 key={idx}
@@ -221,13 +215,13 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
               <div>
                 <span className="text-amber-900 block font-semibold">Where to Submit:</span>
                 <span className="text-slate-700">
-                  College Nodal Officer (INO) Desk / Block Tribal Welfare Office
+                  College Nodal Officer (INO) Desk / District Welfare Office
                 </span>
               </div>
               <div>
                 <span className="text-amber-900 block font-semibold">Statutory Government Fee:</span>
                 <span className="text-emerald-800 font-bold">
-                  ₹0 (Completely Free under MoTA / NSP)
+                  ₹0 (Completely Free under Central Guidelines)
                 </span>
               </div>
               <div>
@@ -236,7 +230,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
               </div>
             </div>
             <div className="mt-3 text-[10px] text-amber-800 border-t border-amber-200/60 pt-2 font-medium">
-              * Notice to CSC Operators / Cyber Cafes: Under the Information Technology Act and MoTA Citizen Charter, charging unauthorized fees for government scholarship filing is illegal.
+              * Notice to CSC Operators / Cyber Cafes: Under the Information Technology Act and Central Citizen Charters, charging unauthorized fees for government scholarship filing is illegal.
             </div>
           </div>
         </div>
@@ -245,9 +239,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
       {/* PART 2: LIVE APPLICATION STATUS TRACKER */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
         <h4 className="text-base font-bold text-slate-900">
-          {currentLanguage === "hi"
-            ? "लाइव छात्रवृत्ति आवेदन ट्रैकर"
-            : "Live Application Status Tracker"}
+          Live Application Status Tracker
         </h4>
         <p className="text-xs text-slate-500 mt-0.5">
           Track the real-time progress of your submitted application across government tiers.
@@ -266,7 +258,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
           </div>
           <button
             onClick={() => setIsTracking(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <span>Track Application</span>
             <ArrowRight className="size-3.5" />

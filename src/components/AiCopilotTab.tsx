@@ -11,23 +11,16 @@ import {
   User,
   Sparkles,
   ShieldCheck,
-  RefreshCw,
-  HelpCircle
+  RefreshCw
 } from "lucide-react";
 import { ChatMessage, askJanSetuCopilot } from "@/lib/bedrock/bedrockClient";
 
-interface AiCopilotTabProps {
-  currentLanguage: "en" | "hi";
-}
-
-export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) => {
+export const AiCopilotTab: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
       content:
-        currentLanguage === "hi"
-          ? "नमस्ते! मैं जनसेतु एआई (JanSetu AI) सहायक हूँ। आप मुझसे छात्रवृत्ति पात्रता, जाति/आय प्रमाण पत्र, बैंक एनपीसीआई सीडिंग या आवेदन प्रक्रिया के बारे में कोई भी प्रश्न पूछ सकते हैं। आप बोलकर भी सवाल पूछ सकते हैं!"
-          : "Hello! I am your JanSetu AI Civic Copilot, powered by AWS Bedrock architecture. Ask me anything about scholarship eligibility rules, certificate prerequisites, NPCI bank seeding, or offline counters. You can also tap the microphone to speak your question!",
+        "Hello! I am your JanSetu AI Civic Copilot, powered by AWS Bedrock architecture. Ask me anything about scholarship eligibility rules, certificate prerequisites, NPCI bank seeding, or offline counters. You can also tap the microphone to speak your question!",
     },
   ]);
   const [inputQuery, setInputQuery] = useState<string>("");
@@ -48,7 +41,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = currentLanguage === "hi" ? "hi-IN" : "en-IN";
+        recognition.lang = "en-IN";
 
         recognition.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
@@ -67,7 +60,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
         recognitionRef.current = recognition;
       }
     }
-  }, [currentLanguage]);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -84,7 +77,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
       setIsListening(false);
     } else {
       try {
-        recognitionRef.current.lang = currentLanguage === "hi" ? "hi-IN" : "en-IN";
+        recognitionRef.current.lang = "en-IN";
         recognitionRef.current.start();
         setIsListening(true);
       } catch (err) {
@@ -105,10 +98,9 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
       return;
     }
 
-    // Clean markdown asterisks for smooth speech
     const cleanText = text.replace(/[*_#`]/g, "");
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = currentLanguage === "hi" ? "hi-IN" : "en-IN";
+    utterance.lang = "en-IN";
     utterance.rate = 0.95;
 
     utterance.onstart = () => setIsSpeaking(true);
@@ -134,7 +126,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
         body: JSON.stringify({
           query,
           history: newMessages.slice(-5),
-          language: currentLanguage,
+          language: "en",
         }),
       });
 
@@ -150,7 +142,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
       }
     } catch (err) {
       // Fallback
-      const fallbackResponse = await askJanSetuCopilot(query, newMessages, currentLanguage);
+      const fallbackResponse = await askJanSetuCopilot(query, newMessages, "en");
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: fallbackResponse.answer },
@@ -166,20 +158,12 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
     }
   };
 
-  const quickPrompts =
-    currentLanguage === "hi"
-      ? [
-          "बैंक खाता केवल लिंक होने और NPCI सीड होने में क्या अंतर है?",
-          "एसटी पोस्ट-मैट्रिक छात्रवृत्ति की अधिकतम आय सीमा क्या है?",
-          "सीएससी सेंटर पर जाति प्रमाण पत्र की सरकारी फीस कितनी है?",
-          "आधार और मार्कशीट के नाम में अंतर होने पर क्या करें?",
-        ]
-      : [
-          "Why is NPCI Aadhaar seeding different from normal linking?",
-          "What is the maximum income limit for Post-Matric ST scholarship?",
-          "How much fee can a CSC center legally charge for certificates?",
-          "How to fix name mismatch between Aadhaar and 10th marksheet?",
-        ];
+  const quickPrompts = [
+    "Why is NPCI Aadhaar seeding different from normal linking?",
+    "What is the maximum income limit for Post-Matric ST scholarship?",
+    "How much fee can a CSC center legally charge for certificates?",
+    "How to fix name mismatch between Aadhaar and 10th marksheet?",
+  ];
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -188,12 +172,10 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-400">
             <Sparkles className="size-4" />
-            Amazon Bedrock Vernacular Copilot
+            Amazon Bedrock Conversational Copilot
           </div>
           <h3 className="mt-1 text-xl font-bold tracking-tight">
-            {currentLanguage === "hi"
-              ? "आवाज और भाषा समर्थित जनसेतु एआई साथी"
-              : "Voice & Language Enabled Civic Assistant"}
+            Voice & Text Enabled Civic Assistant
           </h3>
           <p className="mt-1 text-xs text-slate-300">
             Citing official Ministry of Tribal Affairs & Social Justice gazettes. Zero hallucinations.
@@ -236,7 +218,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
                     <span className="font-mono text-[10px]">JanSetu AWS Copilot</span>
                     <button
                       onClick={() => handleSpeak(m.content)}
-                      className="flex items-center gap-1 text-orange-600 hover:text-orange-800 font-medium transition-colors"
+                      className="flex items-center gap-1 text-orange-600 hover:text-orange-800 font-medium transition-colors cursor-pointer"
                       title="Read aloud"
                     >
                       {isSpeaking ? (
@@ -247,7 +229,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
                       ) : (
                         <>
                           <Volume2 className="size-3.5" />
-                          <span>Listen (आवाज़ में सुनें)</span>
+                          <span>Listen (Read Aloud)</span>
                         </>
                       )}
                     </button>
@@ -286,7 +268,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
               <button
                 key={i}
                 onClick={() => handleSendMessage(prompt)}
-                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800 transition-all text-left"
+                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800 transition-all text-left cursor-pointer"
               >
                 {prompt}
               </button>
@@ -298,12 +280,12 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
             <button
               type="button"
               onClick={toggleListening}
-              className={`rounded-xl p-2.5 transition-all ${
+              className={`rounded-xl p-2.5 transition-all cursor-pointer ${
                 isListening
                   ? "bg-rose-600 text-white animate-pulse shadow-md shadow-rose-500/30"
                   : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-orange-600"
               }`}
-              title={isListening ? "Listening... click to stop" : "Click to speak in Hindi/English"}
+              title={isListening ? "Listening... click to stop" : "Click to speak your question"}
             >
               {isListening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
             </button>
@@ -316,8 +298,6 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
               placeholder={
                 isListening
                   ? "Listening to your voice..."
-                  : currentLanguage === "hi"
-                  ? "अपना प्रश्न यहाँ लिखें या माइक पर क्लिक करें..."
                   : "Ask about scholarships, documents, or NPCI bank seeding..."
               }
               className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-orange-500 focus:outline-hidden"
@@ -327,7 +307,7 @@ export const AiCopilotTab: React.FC<AiCopilotTabProps> = ({ currentLanguage }) =
               type="button"
               onClick={() => handleSendMessage()}
               disabled={isLoading || !inputQuery.trim()}
-              className="flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs hover:bg-orange-700 disabled:opacity-50 transition-all"
+              className="flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs hover:bg-orange-700 disabled:opacity-50 transition-all cursor-pointer"
             >
               <span>Ask</span>
               <Send className="size-3.5" />

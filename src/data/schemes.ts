@@ -2,6 +2,7 @@ export interface OfflineSubmissionDetail {
   centerName: string;
   counterName: string;
   officialStatutoryFee: string;
+  maxAuthorizedFee: string;
   feeWarning: string;
   statutoryDaysLimit: number;
   rtsaClause: string;
@@ -10,536 +11,697 @@ export interface OfflineSubmissionDetail {
 export interface SchemeOrService {
   id: string;
   title: string;
-  hindiTitle: string;
-  type: "scholarship" | "certificate" | "welfare";
+  shortCode: string;
+  type: "scholarship" | "certificate";
   ministry: string;
+  sponsoringBody: string;
   level: "Central" | "State";
   targetCategories: string[];
   maxIncome: number;
   educationStages: string[];
+  courseTypesAllowed: ("Regular Full-Time" | "Diploma" | "Distance" | "Vocational")[];
+  minimumMarksPercentage?: number;
+  genderRestriction?: "Female" | "Male" | "All";
+  disabilityRequirement?: boolean;
+  minDisabilityPercentage?: number;
+  minorityOnly?: boolean;
+  technicalOnly?: boolean;
+  maxSiblingsBenefited?: number;
+  managementQuotaAllowed: boolean;
   benefitAmount: string;
+  maintenanceAllowanceHosteller?: string;
+  maintenanceAllowanceDayScholar?: string;
   benefitDescription: string;
   officialPortalUrl: string;
   portalName: string;
+  portalSchemeCode: string;
   deadline: string;
   daysRemaining: number;
   prerequisites: string[];
-  requiredDocuments: string[];
+  mandatoryDocuments: string[];
   offlineSubmission: OfflineSubmissionDetail;
-  cedarPolicyId: string;
   cedarPolicyCode: string;
   officialGazetteRef: string;
-  frequentlyAsked: { q: string; a: string }[];
+  faqs: { q: string; a: string }[];
 }
 
 export const SCHEMES_DATABASE: SchemeOrService[] = [
+  // 1. Post-Matric Scholarship for ST Students (MoTA)
   {
     id: "PostMatric_ST",
-    title: "Centrally Sponsored Post-Matric Scholarship for ST Students",
-    hindiTitle: "अनुसूचित जनजाति (ST) छात्रों के लिए पोस्ट-मैट्रिक छात्रवृत्ति",
+    title: "Centrally Sponsored Post-Matric Scholarship for Scheduled Tribe (ST) Students",
+    shortCode: "MoTA-PMS-ST",
     type: "scholarship",
-    ministry: "Ministry of Tribal Affairs (MoTA), Govt. of India",
+    ministry: "Ministry of Tribal Affairs (MoTA), Government of India",
+    sponsoringBody: "Centrally Sponsored Scheme (75:25 Central:State funding; 90:10 for NE & Himalayan States)",
     level: "Central",
     targetCategories: ["ST"],
     maxIncome: 250000,
     educationStages: ["11th", "12th", "UG", "PG", "PhD", "Diploma", "Professional"],
-    benefitAmount: "Up to ₹1,20,000 / year",
-    benefitDescription: "100% compulsory non-refundable fees reimbursed + up to ₹1,200/month maintenance allowance for hostellers.",
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    managementQuotaAllowed: false,
+    benefitAmount: "100% Compulsory Non-Refundable Tuition Waiver + Living Allowance",
+    maintenanceAllowanceHosteller: "Up to ₹1,200 / month (Group 1 courses: Engineering, Medical)",
+    maintenanceAllowanceDayScholar: "Up to ₹550 / month",
+    benefitDescription: "Reimburses 100% compulsory tuition and examination fees fixed by the State Fee Regulatory Committee, plus annual academic allowance and monthly maintenance stipend deposited via DBT.",
     officialPortalUrl: "https://scholarships.gov.in",
     portalName: "National Scholarship Portal (NSP)",
-    deadline: "Nov 30, 2026",
+    portalSchemeCode: "MOTA-PMS-ST-2026",
+    deadline: "November 30, 2026",
     daysRemaining: 74,
     prerequisites: ["Caste_Certificate", "Income_Certificate", "Domicile_Certificate"],
-    requiredDocuments: [
-      "Valid ST Caste/Tribe Certificate (Digital Barcode preferred)",
-      "Current Financial Year Income Certificate (< ₹2.5 Lakh)",
-      "Aadhaar-NPCI Seeded Bank Account Passbook",
-      "Bonafide Student Certificate from College / Institute",
-      "Previous Year Marksheet (Passed)",
-      "Fee Receipt from Current Institution"
+    mandatoryDocuments: [
+      "Valid ST Caste Certificate issued by Sub-Divisional Officer (SDO) / Tehsildar (Digital barcode)",
+      "Current Financial Year Income Certificate (< ₹2,50,000) issued on or after April 1, 2026",
+      "Aadhaar Number (active mobile number linked for NSP e-KYC)",
+      "Aadhaar-Seeded Bank Account Passbook (must be mapped on NPCI DBT gateway)",
+      "Bonafide Certificate issued by College / Institute Principal",
+      "Passing Marksheet of previous qualifying board/university examination",
+      "Current Academic Year Official Fee Receipt"
     ],
     offlineSubmission: {
-      centerName: "Institute Nodal Officer (INO) Desk & District Tribal Welfare Office",
-      counterName: "Scholarship / Student Welfare Cell at College",
-      officialStatutoryFee: "₹0 (Completely Free)",
-      feeWarning: "Official government fee is ₹0. Never pay commission or fee to private agents.",
+      centerName: "Institute Nodal Officer (INO) Desk at College & District Tribal Welfare Office",
+      counterName: "Student Welfare & Scholarship Verification Cell",
+      officialStatutoryFee: "₹0 (Completely Free under MoTA guidelines)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Colleges and cyber cafes cannot charge processing or application fees for government scholarships.",
       statutoryDaysLimit: 30,
-      rtsaClause: "MoTA Post-Matric Operational Guidelines Rev. 2024 Section 7.2"
+      rtsaClause: "MoTA Operational Guidelines Rev. 2024 Section 7.2"
     },
-    cedarPolicyId: "scholarships.cedar#PostMatric_ST",
     cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"PostMatric_ST")
 when {
     principal.category == "ST" &&
     principal.annualFamilyIncome <= 250000 &&
+    principal.courseType == "Regular Full-Time" &&
+    principal.admissionQuota != "Management" &&
     (principal.educationLevel in ["11th", "12th", "UG", "PG", "PhD", "Diploma", "Professional"])
 };`,
     officialGazetteRef: "MoTA Notification No. 14013/01/2021-Scholarship, Gazetted Dec 2023",
-    frequentlyAsked: [
+    faqs: [
       {
-        q: "What if my college has not yet verified my application?",
-        a: "Your College Institute Nodal Officer (INO) must verify your physical documents on the NSP portal before the deadline. Contact your college scholarship nodal desk immediately."
+        q: "Can students admitted under Management or NRI quota apply?",
+        a: "No. Central scheme guidelines strictly mandate that candidates must be admitted through recognized government merit counseling."
       },
       {
-        q: "Does normal Aadhaar linking work for scholarship credit?",
-        a: "No! Normal Aadhaar linking only links for KYC. You must request 'Aadhaar Seeding on NPCI Mapper' at your bank branch for DBT disbursals."
+        q: "What if my family income exceeds ₹2,50,000 by even ₹1,000?",
+        a: "The income ceiling of ₹2.50 Lakh is a statutory hard limit. Applications with higher income declarations will be rejected during revenue verification."
       }
     ]
   },
+
+  // 2. Central Sector Scheme of Scholarship for College & University Students (CSSS - DoHE)
   {
-    id: "PreMatric_ST",
-    title: "Centrally Sponsored Pre-Matric Scholarship for ST Students (Class 9 & 10)",
-    hindiTitle: "एसटी छात्रों के लिए प्री-मैट्रिक छात्रवृत्ति (कक्षा 9 और 10)",
+    id: "CentralSector_College",
+    title: "Central Sector Scheme of Scholarship for College and University Students (CSSS)",
+    shortCode: "DoHE-CSSS",
     type: "scholarship",
-    ministry: "Ministry of Tribal Affairs (MoTA), Govt. of India",
+    ministry: "Department of Higher Education (DoHE), Ministry of Education",
+    sponsoringBody: "Central Sector Scheme (100% funded by Govt. of India)",
     level: "Central",
-    targetCategories: ["ST"],
-    maxIncome: 250000,
-    educationStages: ["Class 9", "Class 10"],
-    benefitAmount: "₹3,500 – ₹7,000 / year",
-    benefitDescription: "Books, uniform allowance and monthly maintenance to minimize dropout rates before board exams.",
+    targetCategories: ["ST", "SC", "OBC", "EWS", "General"],
+    maxIncome: 450000,
+    educationStages: ["UG", "PG"],
+    courseTypesAllowed: ["Regular Full-Time"],
+    minimumMarksPercentage: 80,
+    managementQuotaAllowed: false,
+    benefitAmount: "₹12,000 / year for UG (1st to 3rd yr); ₹20,000 / year for PG",
+    benefitDescription: "Financial assistance for meritorious students who are above the 80th percentile of successful candidates in the relevant stream from the respective State Examination Board in Class 12.",
     officialPortalUrl: "https://scholarships.gov.in",
     portalName: "National Scholarship Portal (NSP)",
-    deadline: "Oct 31, 2026",
+    portalSchemeCode: "DOHE-CSSS-2026",
+    deadline: "October 31, 2026",
     daysRemaining: 44,
-    prerequisites: ["Caste_Certificate", "Income_Certificate"],
-    requiredDocuments: [
-      "ST Certificate of Student or Father",
-      "Income Certificate (< ₹2.5 Lakh)",
-      "Student Aadhaar or Parent Aadhaar Consent",
-      "School Headmaster Bonafide Certificate"
+    prerequisites: ["Income_Certificate"],
+    mandatoryDocuments: [
+      "Class 12 Board Passing Marksheet (showing >= 80th percentile in relevant board)",
+      "Income Certificate (< ₹4.50 Lakh/year) from Revenue Authority",
+      "Joining Report & Bonafide Certificate from College/University",
+      "Aadhaar Card and NPCI DBT Seeded Bank Passbook",
+      "Fee receipt of current undergraduate degree course"
     ],
     offlineSubmission: {
-      centerName: "School Headmaster Desk / Block Education Office (BEO)",
-      counterName: "Scholarship Coordinator Desk",
-      officialStatutoryFee: "₹0 (Completely Free)",
-      feeWarning: "Schools are strictly prohibited from charging form processing fees.",
-      statutoryDaysLimit: 20,
-      rtsaClause: "Samagra Shiksha & MoTA Joint Directive 2023"
+      centerName: "Registrar / Dean of Student Welfare Office at University",
+      counterName: "Central Sector Scholarship Verification Desk",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Direct DBT scheme through NSP. No offline intermediary allowed.",
+      statutoryDaysLimit: 25,
+      rtsaClause: "Department of Higher Education Operational Norms Para 4"
     },
-    cedarPolicyId: "scholarships.cedar#PreMatric_ST",
-    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"PreMatric_ST")
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"CentralSector_College")
 when {
-    principal.category == "ST" &&
-    principal.annualFamilyIncome <= 250000 &&
-    (principal.educationLevel in ["Class 9", "Class 10"])
-};`,
-    officialGazetteRef: "MoTA Scheme Code ST-PRE-2024",
-    frequentlyAsked: [
-      {
-        q: "Can day scholars apply, or only hostellers?",
-        a: "Both day scholars and hostellers are eligible; hostellers receive a higher maintenance grant."
-      }
-    ]
-  },
-  {
-    id: "TopClass_ST",
-    title: "National Scholarship for Higher Education / Top Class Education for ST Students",
-    hindiTitle: "एसटी छात्रों के लिए राष्ट्रीय शीर्ष श्रेणी शिक्षा छात्रवृत्ति",
-    type: "scholarship",
-    ministry: "Ministry of Tribal Affairs (MoTA)",
-    level: "Central",
-    targetCategories: ["ST"],
-    maxIncome: 600000,
-    educationStages: ["UG", "PG"],
-    benefitAmount: "Full Tuition Fee + ₹45,000 living/books allowance",
-    benefitDescription: "Complete tuition coverage at notified top institutes (IITs, NITs, IIMs, AIIMS, National Law Universities, Central Universities).",
-    officialPortalUrl: "https://scholarships.gov.in",
-    portalName: "NSP Top Class ST Module",
-    deadline: "Dec 15, 2026",
-    daysRemaining: 89,
-    prerequisites: ["Caste_Certificate", "Income_Certificate", "Domicile_Certificate"],
-    requiredDocuments: [
-      "Allotment letter from JEE/NEET/CAT/CLAT or entrance rank",
-      "Caste Certificate issued by SDO / Sub-Collector",
-      "Income Certificate up to ₹6.0 Lakh/year",
-      "Institute Admission Fee Structure"
-    ],
-    offlineSubmission: {
-      centerName: "Dean of Student Affairs / Financial Aid Cell at Notified Institute",
-      counterName: "Nodal Officer Desk",
-      officialStatutoryFee: "₹0 (Completely Free)",
-      feeWarning: "Official MoTA Direct Scheme. No third-party fee applies.",
-      statutoryDaysLimit: 45,
-      rtsaClause: "MoTA Top Class Higher Education Manual Par. 4.1"
-    },
-    cedarPolicyId: "scholarships.cedar#TopClass_ST",
-    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"TopClass_ST")
-when {
-    principal.category == "ST" &&
-    principal.annualFamilyIncome <= 600000 &&
+    principal.annualFamilyIncome <= 450000 &&
+    principal.marksPercentage >= 80 &&
+    principal.courseType == "Regular Full-Time" &&
     (principal.educationLevel in ["UG", "PG"])
 };`,
-    officialGazetteRef: "MoTA Top Class Gazette S.O. 441(E)",
-    frequentlyAsked: [
+    officialGazetteRef: "DoHE Scheme Guidelines F.No. 1-1/2022-NS-I",
+    faqs: [
       {
-        q: "Are private colleges covered under Top Class ST?",
-        a: "Only MoTA-notified premier institutions are covered. Check if your institute is in the 256 notified list."
+        q: "Is this scheme open for students pursuing distance education?",
+        a: "No. Only regular, full-time undergraduate and postgraduate students enrolled in recognized universities/colleges are eligible."
       }
     ]
   },
-  {
-    id: "PostMatric_SC",
-    title: "Post-Matric Scholarship for Scheduled Caste (SC) Students",
-    hindiTitle: "अनुसूचित जाति (SC) छात्रों के लिए पोस्ट-मैट्रिक छात्रवृत्ति",
-    type: "scholarship",
-    ministry: "Ministry of Social Justice & Empowerment (MoSJE)",
-    level: "Central",
-    targetCategories: ["SC"],
-    maxIncome: 250000,
-    educationStages: ["11th", "12th", "UG", "PG", "PhD", "Diploma", "Professional"],
-    benefitAmount: "Up to ₹90,000 / year",
-    benefitDescription: "Tuition waiver + annual academic allowance credited directly via DBT to Aadhaar seeded accounts.",
-    officialPortalUrl: "https://scholarships.gov.in",
-    portalName: "National Scholarship Portal & State Portals",
-    deadline: "Nov 30, 2026",
-    daysRemaining: 74,
-    prerequisites: ["Caste_Certificate", "Income_Certificate", "Domicile_Certificate"],
-    requiredDocuments: [
-      "SC Caste Certificate issued by competent Revenue Authority",
-      "Annual Income Certificate (< ₹2.5L)",
-      "Bank Account with NPCI Active Seeding",
-      "Previous Qualifying Exam Marksheet"
-    ],
-    offlineSubmission: {
-      centerName: "District Social Welfare Office & College Nodal Cell",
-      counterName: "SC Welfare Section",
-      officialStatutoryFee: "₹0 (Completely Free)",
-      feeWarning: "Centrally sponsored scheme. Zero application processing fee.",
-      statutoryDaysLimit: 30,
-      rtsaClause: "MoSJE Scheme Guidelines Revision 2022 Section 5"
-    },
-    cedarPolicyId: "scholarships.cedar#PostMatric_SC",
-    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"PostMatric_SC")
-when {
-    principal.category == "SC" &&
-    principal.annualFamilyIncome <= 250000 &&
-    (principal.educationLevel in ["11th", "12th", "UG", "PG", "PhD", "Diploma", "Professional"])
-};`,
-    officialGazetteRef: "MoSJE Notification F.No. 11014/03/2020-SCD-V",
-    frequentlyAsked: [
-      {
-        q: "What is the central:state funding share?",
-        a: "60% central share and 40% state share (90:10 for NE states), deposited directly via DBT."
-      }
-    ]
-  },
+
+  // 3. PM-YASASVI Post-Matric Scholarship for OBC, EBC & DNT Students (MoSJE)
   {
     id: "PM_YASASVI_OBC",
-    title: "PM YASASVI Post-Matric Scholarship for OBC, EBC & DNT Students",
-    hindiTitle: "ओबीसी, ईबीसी और डीएनटी छात्रों के लिए पीएम यशस्वी पोस्ट-मैट्रिक छात्रवृत्ति",
+    title: "PM-YASASVI Post-Matric Scholarship for OBC, EBC and DNT Students",
+    shortCode: "MoSJE-YASASVI-OBC",
     type: "scholarship",
-    ministry: "Ministry of Social Justice & Empowerment",
+    ministry: "Ministry of Social Justice & Empowerment (MoSJE)",
+    sponsoringBody: "Centrally Sponsored Scheme (60:40 Central:State share)",
     level: "Central",
     targetCategories: ["OBC", "EBC", "DNT"],
     maxIncome: 250000,
     educationStages: ["11th", "12th", "UG", "PG", "PhD", "Diploma"],
-    benefitAmount: "Up to ₹50,000 / year",
-    benefitDescription: "Financial assistance for post-matric or post-secondary stages for Other Backward Classes and Nomadic tribes.",
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    managementQuotaAllowed: false,
+    benefitAmount: "Up to ₹45,000 / year (Tuition fee waiver + academic allowance)",
+    maintenanceAllowanceHosteller: "Up to ₹1,000 / month",
+    maintenanceAllowanceDayScholar: "Up to ₹500 / month",
+    benefitDescription: "Empowers Other Backward Classes, Economically Backward Classes, and De-Notified Nomadic Tribes through direct tuition assistance and monthly maintenance grants.",
     officialPortalUrl: "https://scholarships.gov.in",
-    portalName: "NSP PM YASASVI Section",
-    deadline: "Oct 31, 2026",
-    daysRemaining: 44,
+    portalName: "National Scholarship Portal (NSP)",
+    portalSchemeCode: "MOSJE-YASASVI-PMS-2026",
+    deadline: "November 15, 2026",
+    daysRemaining: 59,
     prerequisites: ["Caste_Certificate", "OBC_NCL_Certificate", "Income_Certificate"],
-    requiredDocuments: [
-      "OBC / Non-Creamy Layer (NCL) Certificate",
-      "Family Income Certificate (< ₹2.5L)",
-      "Aadhaar Card",
-      "College Admission Proof"
+    mandatoryDocuments: [
+      "OBC Certificate with current financial year Non-Creamy Layer (NCL) status",
+      "Income Certificate issued by Tehsildar/Revenue Officer (< ₹2.50L)",
+      "Aadhaar Card and NPCI Seeded Bank Account",
+      "Admission letter and fee receipt from recognized institution"
     ],
     offlineSubmission: {
-      centerName: "District Backward Classes Welfare Office",
-      counterName: "OBC / EBC Development Desk",
+      centerName: "District Backward Classes Welfare Office & College Nodal Officer",
+      counterName: "BC Welfare Cell",
       officialStatutoryFee: "₹0 (Free)",
-      feeWarning: "No government fee for student registration.",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Centrally funded scheme. No form filing charges.",
       statutoryDaysLimit: 30,
-      rtsaClause: "PM YASASVI Umbrella Guidelines 2023"
+      rtsaClause: "PM-YASASVI Umbrella Framework Chapter III"
     },
-    cedarPolicyId: "scholarships.cedar#PM_YASASVI_OBC",
     cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"PM_YASASVI_OBC")
 when {
     (principal.category in ["OBC", "EBC", "DNT"]) &&
     principal.annualFamilyIncome <= 250000 &&
+    principal.courseType == "Regular Full-Time" &&
     (principal.educationLevel in ["11th", "12th", "UG", "PG", "PhD", "Diploma"])
 };`,
-    officialGazetteRef: "MoSJE PM-YASASVI Operational Manual 2023-24",
-    frequentlyAsked: [
+    officialGazetteRef: "MoSJE Operational Manual PM-YASASVI 2023-26",
+    faqs: [
       {
-        q: "Is Non-Creamy Layer (NCL) certificate mandatory for OBC?",
-        a: "Yes. OBC quota benefits strictly require an active financial year NCL endorsement."
+        q: "Is Non-Creamy Layer (NCL) status mandatory?",
+        a: "Yes. Candidates belonging to the Creamy Layer are statutorily ineligible for OBC reservation benefits and scholarships."
       }
     ]
   },
+
+  // 4. AICTE Pragati Scholarship for Girl Students (Technical Education)
   {
-    id: "BegumHazratMahal",
-    title: "Begum Hazrat Mahal National Scholarship for Minority Girls",
-    hindiTitle: "अल्पसंख्यक छात्राओं के लिए बेगम हज़रत महल राष्ट्रीय छात्रवृत्ति",
+    id: "AICTE_Pragati",
+    title: "AICTE Pragati Scholarship Scheme for Girl Students (Degree & Diploma)",
+    shortCode: "AICTE-PRAGATI",
     type: "scholarship",
-    ministry: "Ministry of Minority Affairs (MoMA)",
+    ministry: "All India Council for Technical Education (AICTE), Ministry of Education",
+    sponsoringBody: "Central Council Scheme (100% AICTE Grant)",
     level: "Central",
-    targetCategories: ["Minority", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Parsi"],
-    maxIncome: 200000,
-    educationStages: ["Class 9", "Class 10", "11th", "12th"],
-    benefitAmount: "₹5,000 to ₹6,000 / year",
-    benefitDescription: "Direct stipend for meritorious girl students belonging to notified national minority communities.",
+    targetCategories: ["ST", "SC", "OBC", "EWS", "General"],
+    maxIncome: 800000,
+    educationStages: ["UG", "Diploma"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    genderRestriction: "Female",
+    technicalOnly: true,
+    maxSiblingsBenefited: 2,
+    managementQuotaAllowed: false,
+    benefitAmount: "₹50,000 / year (Every year of study)",
+    benefitDescription: "Provides a fixed lump-sum amount of ₹50,000 per annum to girl students admitted to 1st year degree/diploma courses in AICTE-approved institutions towards college fee, computer/laptop purchase, and stationeries.",
     officialPortalUrl: "https://scholarships.gov.in",
-    portalName: "National Scholarship Portal",
-    deadline: "Nov 15, 2026",
-    daysRemaining: 59,
-    prerequisites: ["Income_Certificate"],
-    requiredDocuments: [
-      "Self-declaration of Minority Community",
-      "Income Certificate (< ₹2.0 Lakh)",
-      "Marksheet of previous class with >= 50% marks",
-      "School verification certificate signed by Principal"
+    portalName: "National Scholarship Portal (AICTE Pragati Section)",
+    portalSchemeCode: "AICTE-PRAGATI-DEG-2026",
+    deadline: "December 31, 2026",
+    daysRemaining: 105,
+    prerequisites: ["Income_Certificate", "Domicile_Certificate"],
+    mandatoryDocuments: [
+      "AICTE-approved Institution Centralized Admission Receipt (e.g. state CET/JEE counseling allotment letter)",
+      "Family Income Certificate issued by Tehsildar / SDO (income <= ₹8.00 Lakh/year)",
+      "Aadhaar Number and NPCI-mapped active Bank Passbook",
+      "Parents declaration stating not more than two girl children are availing this scheme",
+      "Class 10 and 12 passing certificates"
     ],
     offlineSubmission: {
-      centerName: "School Principal Office & District Minority Welfare Officer",
-      counterName: "Minority Scholarship Counter",
+      centerName: "Institute AICTE Coordinator / Scholarship Nodal Officer at College",
+      counterName: "AICTE Cell",
       officialStatutoryFee: "₹0 (Free)",
-      feeWarning: "Ministry of Minority Affairs explicitly forbids fee charges.",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Direct DBT into girl student bank account. College cannot deduct charges.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "AICTE Pragati Regulations Clause 4.1"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AICTE_Pragati")
+when {
+    principal.gender == "Female" &&
+    principal.annualFamilyIncome <= 800000 &&
+    principal.isTechnicalCourse == true &&
+    principal.courseType == "Regular Full-Time" &&
+    principal.admissionQuota != "Management" &&
+    (principal.educationLevel in ["UG", "Diploma"])
+};`,
+    officialGazetteRef: "AICTE Regulation F.No. 1-104/AICTE/P&AP/Pragati-Saksham/2021",
+    faqs: [
+      {
+        q: "Can two daughters from the same family receive the Pragati Scholarship?",
+        a: "Yes. Maximum 2 girl children per family are permitted."
+      }
+    ]
+  },
+
+  // 5. AICTE Saksham Scholarship for Specially-Abled Students
+  {
+    id: "AICTE_Saksham",
+    title: "AICTE Saksham Scholarship Scheme for Specially-Abled Students",
+    shortCode: "AICTE-SAKSHAM",
+    type: "scholarship",
+    ministry: "All India Council for Technical Education (AICTE)",
+    sponsoringBody: "Central Council Scheme",
+    level: "Central",
+    targetCategories: ["ST", "SC", "OBC", "EWS", "General"],
+    maxIncome: 800000,
+    educationStages: ["UG", "Diploma"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    disabilityRequirement: true,
+    minDisabilityPercentage: 40,
+    technicalOnly: true,
+    managementQuotaAllowed: false,
+    benefitAmount: "₹50,000 / year (Fixed grant)",
+    benefitDescription: "Assists students with disabilities (minimum 40% benchmark disability) pursuing technical degree or diploma courses in AICTE-approved institutions.",
+    officialPortalUrl: "https://scholarships.gov.in",
+    portalName: "National Scholarship Portal",
+    portalSchemeCode: "AICTE-SAKSHAM-2026",
+    deadline: "December 31, 2026",
+    daysRemaining: 105,
+    prerequisites: ["UDID_Certificate", "Income_Certificate"],
+    mandatoryDocuments: [
+      "Unique Disability Identity Card (UDID) or State Medical Board Disability Certificate (>= 40% disability)",
+      "Family Income Certificate (up to ₹8 Lakh/annum)",
+      "Allotment letter through centralized counseling process",
+      "Aadhaar and NPCI DBT Seeded Account Passbook"
+    ],
+    offlineSubmission: {
+      centerName: "Institute Academic Section & District Disability Rehabilitation Centre (DDRC)",
+      counterName: "Disability & Equal Opportunity Cell",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Statutory reservation benefit. Zero administrative fee.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "Rights of Persons with Disabilities Act 2016"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AICTE_Saksham")
+when {
+    principal.isPersonWithDisability == true &&
+    principal.disabilityPercentage >= 40 &&
+    principal.annualFamilyIncome <= 800000 &&
+    principal.isTechnicalCourse == true &&
+    (principal.educationLevel in ["UG", "Diploma"])
+};`,
+    officialGazetteRef: "AICTE Saksham Guidelines Ref 2021-22",
+    faqs: [
+      {
+        q: "What is the minimum disability required?",
+        a: "Candidates must have not less than 40% benchmark disability certified by an authorized medical board."
+      }
+    ]
+  },
+
+  // 6. Post-Matric Scholarship for SC Students (MoSJE)
+  {
+    id: "PostMatric_SC",
+    title: "Centrally Sponsored Post-Matric Scholarship for Scheduled Caste (SC) Students",
+    shortCode: "MoSJE-PMS-SC",
+    type: "scholarship",
+    ministry: "Ministry of Social Justice & Empowerment (MoSJE)",
+    sponsoringBody: "Centrally Sponsored Scheme (60:40 Central:State share)",
+    level: "Central",
+    targetCategories: ["SC"],
+    maxIncome: 250000,
+    educationStages: ["11th", "12th", "UG", "PG", "PhD", "Diploma", "Professional"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma"],
+    managementQuotaAllowed: false,
+    benefitAmount: "100% Tuition Fee Waiver + Annual Academic Allowance",
+    maintenanceAllowanceHosteller: "Up to ₹1,200 / month",
+    maintenanceAllowanceDayScholar: "Up to ₹550 / month",
+    benefitDescription: "Comprehensive financial support for Scheduled Caste students studying in post-matric or post-secondary courses to complete their higher education.",
+    officialPortalUrl: "https://scholarships.gov.in",
+    portalName: "National Scholarship Portal & State Portals",
+    portalSchemeCode: "MOSJE-PMS-SC-2026",
+    deadline: "November 30, 2026",
+    daysRemaining: 74,
+    prerequisites: ["Caste_Certificate", "Income_Certificate", "Domicile_Certificate"],
+    mandatoryDocuments: [
+      "SC Caste Certificate issued by Tehsildar / SDO",
+      "Current Financial Year Income Certificate (< ₹2.50 Lakh)",
+      "Aadhaar Number and NPCI Active Seeded Bank Account",
+      "Previous Exam Passing Marksheet and College Bonafide"
+    ],
+    offlineSubmission: {
+      centerName: "District Social Welfare Office & College Nodal Cell",
+      counterName: "SC Welfare Section",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Centrally sponsored scheme. Zero processing fee.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "MoSJE Scheme Guidelines Revision 2022 Section 5"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"PostMatric_SC")
+when {
+    principal.category == "SC" &&
+    principal.annualFamilyIncome <= 250000 &&
+    principal.courseType == "Regular Full-Time" &&
+    (principal.educationLevel in ["11th", "12th", "UG", "PG", "PhD", "Diploma", "Professional"])
+};`,
+    officialGazetteRef: "MoSJE Notification F.No. 11014/03/2020-SCD-V",
+    faqs: [
+      {
+        q: "How are funds disbursed?",
+        a: "The Central and State shares are directly credited into the student's Aadhaar-seeded bank account through PFMS DBT."
+      }
+    ]
+  },
+
+  // 7. Top Class Education Scheme for ST Students (MoTA)
+  {
+    id: "TopClass_ST",
+    title: "National Scholarship for Higher Education / Top Class Education for ST Students",
+    shortCode: "MoTA-TOPCLASS-ST",
+    type: "scholarship",
+    ministry: "Ministry of Tribal Affairs (MoTA)",
+    sponsoringBody: "Central Sector Scheme (100% Central Funding)",
+    level: "Central",
+    targetCategories: ["ST"],
+    maxIncome: 600000,
+    educationStages: ["UG", "PG"],
+    courseTypesAllowed: ["Regular Full-Time"],
+    managementQuotaAllowed: false,
+    benefitAmount: "Full Tuition Fee Reimbursed + ₹45,000 Living / Book / Laptop Allowance",
+    benefitDescription: "Covers 100% non-refundable fees at notified top premier institutes across India (IITs, NITs, IIMs, AIIMS, National Law Universities, Central Universities).",
+    officialPortalUrl: "https://scholarships.gov.in",
+    portalName: "NSP Top Class ST Module",
+    portalSchemeCode: "MOTA-TOPCLASS-2026",
+    deadline: "December 15, 2026",
+    daysRemaining: 89,
+    prerequisites: ["Caste_Certificate", "Income_Certificate", "Domicile_Certificate"],
+    mandatoryDocuments: [
+      "Allotment letter showing admission to a MoTA-notified institute (IIT, NIT, AIIMS, etc.)",
+      "ST Caste Certificate issued by competent Revenue Authority",
+      "Income Certificate up to ₹6.00 Lakh/year",
+      "Hostel fee receipt and tuition fee voucher"
+    ],
+    offlineSubmission: {
+      centerName: "Dean of Student Affairs / Financial Aid Office at Premier Institute",
+      counterName: "Institute Nodal Verification Desk",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Official MoTA Direct Scheme. Zero intermediary charges.",
+      statutoryDaysLimit: 45,
+      rtsaClause: "MoTA Top Class Higher Education Manual Par. 4.1"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"TopClass_ST")
+when {
+    principal.category == "ST" &&
+    principal.annualFamilyIncome <= 600000 &&
+    principal.courseType == "Regular Full-Time" &&
+    (principal.educationLevel in ["UG", "PG"])
+};`,
+    officialGazetteRef: "MoTA Top Class Gazette S.O. 441(E)",
+    faqs: [
+      {
+        q: "What is the income limit for Top Class ST?",
+        a: "Unlike standard Post-Matric which is ₹2.5L, the Top Class scheme allows family income up to ₹6.00 Lakh per annum."
+      }
+    ]
+  },
+
+  // 8. Ishaan Uday Special Scholarship for North Eastern Region (NER - UGC)
+  {
+    id: "Ishaan_Uday_NER",
+    title: "Ishaan Uday Special Scholarship Scheme for North Eastern Region (UGC)",
+    shortCode: "UGC-ISHAAN-UDAY",
+    type: "scholarship",
+    ministry: "University Grants Commission (UGC), Ministry of Education",
+    sponsoringBody: "Central Sector Scheme for 8 North Eastern States",
+    level: "Central",
+    targetCategories: ["ST", "SC", "OBC", "EWS", "General"],
+    maxIncome: 450000,
+    educationStages: ["UG"],
+    courseTypesAllowed: ["Regular Full-Time"],
+    managementQuotaAllowed: false,
+    benefitAmount: "₹5,400 / month for General Degree; ₹7,800 / month for Technical / Medical",
+    benefitDescription: "10,000 fresh scholarships annually for students possessing domicile of the 8 North Eastern States (Assam, Arunachal Pradesh, Manipur, Meghalaya, Mizoram, Nagaland, Sikkim, Tripura) admitted to 1st year general, technical, or professional undergraduate degree programs.",
+    officialPortalUrl: "https://scholarships.gov.in",
+    portalName: "National Scholarship Portal",
+    portalSchemeCode: "UGC-ISHAAN-UDAY-2026",
+    deadline: "November 30, 2026",
+    daysRemaining: 74,
+    prerequisites: ["Domicile_Certificate", "Income_Certificate"],
+    mandatoryDocuments: [
+      "Permanent Resident Certificate (PRC) / Domicile of one of the 8 NE States",
+      "Annual Family Income Certificate (< ₹4.50 Lakh)",
+      "Class 12 Passing Marksheet and College Admission Proof",
+      "Aadhaar Card and Bank Account with NPCI active seeding"
+    ],
+    offlineSubmission: {
+      centerName: "Registrar / Principal Office at University or College",
+      counterName: "UGC Nodal Verification Counter",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Administered directly via NSP. No application fees.",
+      statutoryDaysLimit: 30,
+      rtsaClause: "UGC Ishaan Uday Operational Norms Section 3"
+    },
+    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"Ishaan_Uday_NER")
+when {
+    principal.annualFamilyIncome <= 450000 &&
+    principal.courseType == "Regular Full-Time" &&
+    principal.educationLevel == "UG"
+};`,
+    officialGazetteRef: "UGC Notification No. F. 23-2/2014(Policy/NER-IU)",
+    faqs: [
+      {
+        q: "Is domicile of North Eastern states compulsory?",
+        a: "Yes. Candidates must hold a valid Permanent Resident Certificate (PRC) from Assam, Arunachal, Manipur, Meghalaya, Mizoram, Nagaland, Sikkim, or Tripura."
+      }
+    ]
+  },
+
+  // 9. Begum Hazrat Mahal National Scholarship for Minority Girls
+  {
+    id: "BegumHazratMahal",
+    title: "Begum Hazrat Mahal National Scholarship for Meritorious Minority Girl Students",
+    shortCode: "MoMA-BHMN",
+    type: "scholarship",
+    ministry: "Ministry of Minority Affairs (MoMA)",
+    sponsoringBody: "Maulana Azad Education Foundation (MAEF) / Central Scheme",
+    level: "Central",
+    targetCategories: ["Minority"],
+    maxIncome: 200000,
+    educationStages: ["Class 9", "Class 10", "11th", "12th"],
+    courseTypesAllowed: ["Regular Full-Time"],
+    genderRestriction: "Female",
+    minorityOnly: true,
+    minimumMarksPercentage: 50,
+    managementQuotaAllowed: false,
+    benefitAmount: "₹5,000 / year (Class 9-10) and ₹6,000 / year (Class 11-12)",
+    benefitDescription: "Supports meritorious girl students belonging to notified national minority communities (Muslims, Christians, Sikhs, Buddhists, Jains, Parsis) who secured at least 50% marks in the qualifying examination.",
+    officialPortalUrl: "https://scholarships.gov.in",
+    portalName: "National Scholarship Portal",
+    portalSchemeCode: "MOMA-BHMN-2026",
+    deadline: "November 15, 2026",
+    daysRemaining: 59,
+    prerequisites: ["Income_Certificate"],
+    mandatoryDocuments: [
+      "Self-declaration of Minority Community on non-judicial stamp paper or verified format",
+      "Family Income Certificate issued by Revenue Authority (< ₹2.00 Lakh)",
+      "Marksheet of previous qualifying class with >= 50% aggregate marks",
+      "School verification certificate counter-signed by Principal"
+    ],
+    offlineSubmission: {
+      centerName: "School Principal Office & District Minority Welfare Officer Desk",
+      counterName: "Minority Welfare Section",
+      officialStatutoryFee: "₹0 (Free)",
+      maxAuthorizedFee: "₹0",
+      feeWarning: "Free government benefit. Any charging by schools is prohibited.",
       statutoryDaysLimit: 25,
       rtsaClause: "MoMA BHMNS Guidelines Clause 4.2"
     },
-    cedarPolicyId: "scholarships.cedar#BegumHazratMahal",
     cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"BegumHazratMahal")
 when {
     principal.gender == "Female" &&
     principal.isMinority == true &&
     principal.annualFamilyIncome <= 200000 &&
+    principal.marksPercentage >= 50 &&
     (principal.educationLevel in ["Class 9", "Class 10", "11th", "12th"])
 };`,
     officialGazetteRef: "MoMA Gazette Notification BHMNS-2023",
-    frequentlyAsked: [
+    faqs: [
       {
-        q: "Is there a minimum marks requirement?",
-        a: "Yes, candidates must secure at least 50% aggregate marks in the previous qualifying examination."
+        q: "What are the notified minority communities?",
+        a: "Muslims, Christians, Sikhs, Buddhists, Jains, and Parsis under Section 2(c) of the National Commission for Minorities Act, 1992."
       }
     ]
   },
-  {
-    id: "AICTE_Pragati",
-    title: "AICTE Pragati Scholarship for Female Students in Technical Degrees/Diplomas",
-    hindiTitle: "तकनीकी शिक्षा में छात्राओं के लिए एआईसीटीई प्रगति छात्रवृत्ति",
-    type: "scholarship",
-    ministry: "All India Council for Technical Education (AICTE), Ministry of Education",
-    level: "Central",
-    targetCategories: ["ST", "SC", "OBC", "EWS", "General"],
-    maxIncome: 800000,
-    educationStages: ["UG", "Diploma"],
-    benefitAmount: "₹50,000 / year (Fixed)",
-    benefitDescription: "₹50,000 lump sum per annum towards college tuition, purchase of laptop, stationery and books.",
-    officialPortalUrl: "https://scholarships.gov.in",
-    portalName: "National Scholarship Portal AICTE Module",
-    deadline: "Dec 31, 2026",
-    daysRemaining: 105,
-    prerequisites: ["Income_Certificate", "Domicile_Certificate"],
-    requiredDocuments: [
-      "AICTE approved institute admission receipt",
-      "Family Income Certificate (up to ₹8 Lakh)",
-      "Aadhaar Number",
-      "Class 12 or 10th marksheet showing merit"
-    ],
-    offlineSubmission: {
-      centerName: "College Academic Cell / AICTE Nodal Desk",
-      counterName: "AICTE Portal Verification Counter",
-      officialStatutoryFee: "₹0 (Free)",
-      feeWarning: "Free government benefit. Up to 2 girls per family allowed.",
-      statutoryDaysLimit: 30,
-      rtsaClause: "AICTE Pragati Scheme Regulations Gazette"
-    },
-    cedarPolicyId: "scholarships.cedar#AICTE_Pragati",
-    cedarPolicyCode: `permit(principal, action == Action::"ApplyScheme", resource == Scheme::"AICTE_Pragati")
-when {
-    principal.gender == "Female" &&
-    principal.annualFamilyIncome <= 800000 &&
-    (principal.educationLevel in ["UG", "Diploma"]) &&
-    principal.isTechnicalCourse == true
-};`,
-    officialGazetteRef: "AICTE F.No. 1-104/AICTE/P&AP/Pragati-Saksham/2021",
-    frequentlyAsked: [
-      {
-        q: "How many daughters in one family can receive this?",
-        a: "A maximum of two girl children per family are eligible."
-      }
-    ]
-  },
-  // Essential Citizen Certificates (Prerequisite Enablers)
+
+  // 10. Essential Certificate: Caste / Tribe Certificate
   {
     id: "Caste_Certificate",
-    title: "Caste / Tribe Certificate (ST / SC / OBC)",
-    hindiTitle: "जाति / जनजाति प्रमाण पत्र (एसटी / एससी / ओबीसी)",
+    title: "Caste / Tribe Certificate (SC / ST / OBC)",
+    shortCode: "REV-CERT-CASTE",
     type: "certificate",
-    ministry: "State Revenue & District Administration Dept",
+    ministry: "State Revenue Department & District Magistrate Office",
+    sponsoringBody: "Statutory Certificate under State Public Services Delivery Act",
     level: "State",
     targetCategories: ["ST", "SC", "OBC"],
     maxIncome: 99999999,
     educationStages: ["All"],
-    benefitAmount: "Statutory Identity Document",
-    benefitDescription: "Mandatory prerequisite required to claim educational reservations, fee waivers, and government welfare benefits.",
-    officialPortalUrl: "https://edistrict.gov.in",
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    benefitAmount: "Statutory Prerequisite for all Quotas, Fee Waivers & Scholarships",
+    benefitDescription: "Official statutory legal certificate establishing social category membership. Mandatory for claiming constitutional reservations and educational scholarships.",
+    officialPortalUrl: "https://services.india.gov.in",
     portalName: "State e-District / MeeSeva / RTPS Portal",
-    deadline: "Ongoing (Apply 45 days before scholarship closing)",
+    portalSchemeCode: "STATE-REV-CASTE-01",
+    deadline: "Permanent Validity (Apply 30-45 days before scholarship closing)",
     daysRemaining: 365,
     prerequisites: [],
-    requiredDocuments: [
-      "Father or Paternal Blood Relative Caste Certificate / Land Record (ROR)",
-      "Applicant Aadhaar Card",
-      "School Leaving Certificate (indicating caste/tribe)",
-      "Affidavit / Self-declaration"
+    mandatoryDocuments: [
+      "Paternal Blood Relative Caste Certificate (Father, Paternal Grandfather, or Uncle)",
+      "Land Record / Record of Rights (RoR / Khatian) establishing ancestral residence",
+      "Applicant Aadhaar Card and School Leaving Certificate (SLC) citing community",
+      "Self-Declaration Affidavit stamped by Notary / Magistrate"
     ],
     offlineSubmission: {
-      centerName: "Tahsildar / Sub-Divisional Magistrate (SDM) / Taluk Office or CSC Center",
-      counterName: "Revenue / RTPS Citizen Service Counter",
-      officialStatutoryFee: "₹25 – ₹30 (Depending on State RTPS Act)",
-      feeWarning: "Beware: Authorized fee is ₹25-30. If CSC charges ₹200+, ask for an official computerized receipt.",
+      centerName: "Tehsildar / Sub-Divisional Magistrate (SDM) Office or Local CSC Center",
+      counterName: "RTPS / Revenue Citizen Counter",
+      officialStatutoryFee: "₹15 – ₹30 (Depending on State Treasury Code)",
+      maxAuthorizedFee: "₹30 total (including CSC scanning)",
+      feeWarning: "Official fee is ₹25-30. If any cyber cafe charges ₹200-500, demand an official computerized receipt.",
       statutoryDaysLimit: 21,
-      rtsaClause: "State Right to Public Services Act (RTSA) SLA Schedule"
+      rtsaClause: "State Right to Public Services Act (RTSA) SLA Schedule 1"
     },
-    cedarPolicyId: "certificates.cedar#Caste_Certificate",
     cedarPolicyCode: `permit(principal, action == Action::"IssueCertificate", resource == Certificate::"Caste_Certificate")
 when {
     (principal.category in ["ST", "SC", "OBC"]) &&
     principal.hasPaternalCasteRecord == true
 };`,
-    officialGazetteRef: "Ministry of Home Affairs Guidelines on Scheduled Castes & Scheduled Tribes Certificates",
-    frequentlyAsked: [
+    officialGazetteRef: "Ministry of Home Affairs Guidelines on SC/ST Certificates (Rev. 2017)",
+    faqs: [
       {
-        q: "Can I get a caste certificate based on maternal relatives?",
-        a: "Under Indian law, caste status is inherited patrilineally from the father. Exceptional cases require special judicial affidavit."
+        q: "Can a caste certificate be issued based on maternal records?",
+        a: "Under Indian civil jurisprudence, social category status is inherited patrilineally from the biological father."
       }
     ]
   },
+
+  // 11. Essential Certificate: Income & Asset Certificate
   {
     id: "Income_Certificate",
     title: "Annual Family Income & Asset Certificate",
-    hindiTitle: "आय प्रमाण पत्र (तहसील / राजस्व विभाग)",
+    shortCode: "REV-CERT-INCOME",
     type: "certificate",
-    ministry: "Revenue Department (State Governments)",
+    ministry: "State Revenue Department & Taluk Administration",
+    sponsoringBody: "Statutory Certificate under State Revenue Code",
     level: "State",
     targetCategories: ["ST", "SC", "OBC", "EWS", "General"],
     maxIncome: 99999999,
     educationStages: ["All"],
-    benefitAmount: "Prerequisite for 95% of all Government Scholarships",
-    benefitDescription: "Official determination of household income, valid for 1 Financial Year. Crucial for EWS, OBC, and SC/ST fee waiver thresholds.",
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    benefitAmount: "Prerequisite for 95% of all Government Scholarships and Fee Waivers",
+    benefitDescription: "Official determination of total gross annual income of the family from all sources (agriculture, salary, business). Valid for 1 Financial Year.",
     officialPortalUrl: "https://services.india.gov.in",
-    portalName: "State Revenue / e-District Citizen Portal",
-    deadline: "Renew annually in April - July",
+    portalName: "State e-District / Taluk Revenue Portal",
+    portalSchemeCode: "STATE-REV-INCOME-02",
+    deadline: "Valid for Current Fiscal Year (Must be issued after April 1, 2026)",
     daysRemaining: 180,
     prerequisites: [],
-    requiredDocuments: [
-      "Ration Card / Family Member ID",
-      "Salary Slip / Form 16 / ITR or Self-Employed Gram Panchayat Income Panchanama",
-      "Electricity Bill or Address Proof",
-      "Affidavit stamped by Notary / Tehsildar verification"
+    mandatoryDocuments: [
+      "Family Ration Card / Food Security Card",
+      "Salary Slip / Form 16 / ITR or Gram Panchayat / Revenue Inspector Panchanama",
+      "Electricity Bill or House Tax Receipt as proof of residence",
+      "Notarized Self-Declaration Affidavit"
     ],
     offlineSubmission: {
-      centerName: "Tehsildar Office / Taluk Revenue Inspector / CSC Digital Seva Kendra",
-      counterName: "Income Certificate Desk",
-      officialStatutoryFee: "₹20 – ₹35 (State Gazette regulated)",
-      feeWarning: "Do not pay bribes or unofficial commissions. Always demand receipt with Application No.",
+      centerName: "Tehsildar Office / Revenue Inspector Desk or CSC Digital Seva Kendra",
+      counterName: "Income Certificate Verification Desk",
+      officialStatutoryFee: "₹15 – ₹35 (State Gazette Regulated)",
+      maxAuthorizedFee: "₹35 total",
+      feeWarning: "Valid for 1 financial year. Never pay bribes or unauthorized operator surcharges.",
       statutoryDaysLimit: 14,
-      rtsaClause: "Right to Public Service Delivery Timeline 14-21 Days"
+      rtsaClause: "Right to Public Service Delivery Timeline: 14 to 21 Working Days"
     },
-    cedarPolicyId: "certificates.cedar#Income_Certificate",
     cedarPolicyCode: `permit(principal, action == Action::"IssueCertificate", resource == Certificate::"Income_Certificate")
 when {
     principal.hasValidAddressProof == true
 };`,
-    officialGazetteRef: "State Revenue Code & Citizen Charter Manual",
-    frequentlyAsked: [
+    officialGazetteRef: "State Revenue Code & Citizen Charter Manual 2024",
+    faqs: [
       {
-        q: "What is the validity of an Income Certificate?",
-        a: "Typically 1 Financial Year (April 1 to March 31). Scholarships for 2026-27 require certificates issued on or after April 1, 2026."
+        q: "How long is an income certificate valid for scholarships?",
+        a: "Income certificates for scholarship academic year 2026-27 must be issued on or after April 1, 2026. Certificates from the previous financial year are expired."
       }
     ]
   },
+
+  // 12. Essential Certificate: Economically Weaker Section (EWS) Certificate
   {
     id: "EWS_Certificate",
-    title: "Economically Weaker Section (EWS) Certificate",
-    hindiTitle: "आर्थिक रूप से कमजोर वर्ग (EWS) प्रमाण पत्र",
+    title: "Economically Weaker Section (EWS) Income & Asset Certificate",
+    shortCode: "REV-CERT-EWS",
     type: "certificate",
-    ministry: "Ministry of Personnel, Public Grievances & Pensions / State Revenue",
+    ministry: "Department of Personnel & Training (DoPT) / State Revenue Dept",
+    sponsoringBody: "Constitutional 103rd Amendment Statutory Entitlement",
     level: "Central",
     targetCategories: ["General"],
     maxIncome: 800000,
     educationStages: ["All"],
-    benefitAmount: "10% Reservation in Admissions & Jobs + Fee Concessions",
-    benefitDescription: "Available to General Category citizens whose family income is below ₹8 Lakhs and do not fall under SC/ST/OBC quotas.",
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    benefitAmount: "10% Reservation in Higher Educational Admissions & Govt Jobs",
+    benefitDescription: "Provides 10% statutory reservation in Central and State university admissions and fee concessions for General category citizens whose family income is below ₹8.00 Lakhs and who do not own disqualified property.",
     officialPortalUrl: "https://services.india.gov.in",
     portalName: "State e-District / Taluk Office",
-    deadline: "Valid for 1 Financial Year",
+    portalSchemeCode: "CENTRAL-EWS-01",
+    deadline: "Valid for 1 Financial Year (Renew annually)",
     daysRemaining: 180,
     prerequisites: ["Income_Certificate", "Domicile_Certificate"],
-    requiredDocuments: [
-      "Aadhaar Card of Applicant & Family",
-      "Family Income & Asset Verification Documents (ITR / Bank Statements)",
-      "Land Record / Property tax receipt (proving < 5 acres land & < 1000 sq ft flat)",
-      "Self-Declaration of not availing SC/ST/OBC quotas"
+    mandatoryDocuments: [
+      "Aadhaar Card of Applicant and all family members",
+      "Income tax returns / Form 16 or Revenue Inspector Panchanama (< ₹8.00 Lakh)",
+      "Land Record / Property tax receipt proving agricultural land < 5 acres and residential flat < 1,000 sq ft",
+      "Self-Declaration confirming candidate does not belong to SC, ST, or OBC lists"
     ],
     offlineSubmission: {
-      centerName: "SDO / Tehsildar / District Magistrate Revenue Branch",
-      counterName: "EWS Verification Counter",
+      centerName: "Sub-Divisional Officer (SDO) / Tehsildar / District Magistrate Office",
+      counterName: "EWS Verification Branch",
       officialStatutoryFee: "₹30 – ₹50",
-      feeWarning: "Official administrative fee only. Verification is conducted by Revenue Inspector (RI).",
+      maxAuthorizedFee: "₹50 total",
+      feeWarning: "Administrative fee only. Field verification is conducted by Revenue Inspector.",
       statutoryDaysLimit: 21,
       rtsaClause: "Central EWS Notification No. 20013/01/2018-BC-II"
     },
-    cedarPolicyId: "certificates.cedar#EWS_Certificate",
     cedarPolicyCode: `permit(principal, action == Action::"IssueCertificate", resource == Certificate::"EWS_Certificate")
 when {
     principal.category == "General" &&
     principal.annualFamilyIncome <= 800000 &&
-    principal.agriculturalLandAcres <= 5.0
+    principal.agriculturalLandAcres <= 5.0 &&
+    principal.residentialFlatSqFt <= 1000
 };`,
     officialGazetteRef: "DoPT OM No. 36039/1/2019-Estt (Res) dated 31st January 2019",
-    frequentlyAsked: [
+    faqs: [
       {
-        q: "Who qualifies as family under EWS criteria?",
-        a: "Person seeking reservation, parents, siblings below 18 years, spouse, and children below 18 years."
-      }
-    ]
-  },
-  {
-    id: "Domicile_Certificate",
-    title: "Domicile / Permanent Resident Certificate (PRC)",
-    hindiTitle: "मूल निवास / अधिवास प्रमाण पत्र (Domicile)",
-    type: "certificate",
-    ministry: "State Home & Revenue Administration",
-    level: "State",
-    targetCategories: ["ST", "SC", "OBC", "EWS", "General"],
-    maxIncome: 99999999,
-    educationStages: ["All"],
-    benefitAmount: "Proof of State Residence for 85% State Quotas & State Scholarships",
-    benefitDescription: "Establishes long-term residence in the home state (usually 5 to 15 years), enabling state quota counseling and state DBT schemes.",
-    officialPortalUrl: "https://edistrict.gov.in",
-    portalName: "State e-District Portal",
-    deadline: "Valid for Lifetime in most states",
-    daysRemaining: 999,
-    prerequisites: [],
-    requiredDocuments: [
-      "Proof of continuous residence for required years (School records, Electricity bill, Voter ID)",
-      "Land registration documents / House deed or Father's PRC",
-      "Birth Certificate or 10th School Leaving Certificate",
-      "Passport-sized photographs"
-    ],
-    offlineSubmission: {
-      centerName: "Tehsildar / Taluk Office / District Administrative Complex",
-      counterName: "Citizenship & Resident Records Counter",
-      officialStatutoryFee: "₹25 – ₹40",
-      feeWarning: "Lifetime validity document. Do not pay agents.",
-      statutoryDaysLimit: 15,
-      rtsaClause: "State Citizen Charter Service Delivery Code"
-    },
-    cedarPolicyId: "certificates.cedar#Domicile_Certificate",
-    cedarPolicyCode: `permit(principal, action == Action::"IssueCertificate", resource == Certificate::"Domicile_Certificate")
-when {
-    principal.residenceYearsInState >= 5
-};`,
-    officialGazetteRef: "State Domicile Rules & Judicial Precedents",
-    frequentlyAsked: [
-      {
-        q: "Does a Domicile Certificate expire?",
-        a: "In most Indian states, once issued, a Domicile Certificate has lifetime validity unless proven fraudulent."
+        q: "What asset exclusions apply for EWS?",
+        a: "Persons whose families own 5+ acres of agricultural land, or residential flat of 1000+ sq ft, or residential plot of 100+ sq yards in notified municipalities are excluded."
       }
     ]
   }
