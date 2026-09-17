@@ -12,7 +12,7 @@ export interface SchemeOrService {
   id: string;
   title: string;
   shortCode: string;
-  type: "scholarship" | "certificate";
+  type: "scholarship" | "certificate" | "healthcare";
   ministry: string;
   sponsoringBody: string;
   level: "Central" | "State";
@@ -702,6 +702,66 @@ when {
       {
         q: "What asset exclusions apply for EWS?",
         a: "Persons whose families own 5+ acres of agricultural land, or residential flat of 1000+ sq ft, or residential plot of 100+ sq yards in notified municipalities are excluded."
+      }
+    ]
+  },
+
+  // 13. Ayushman Bharat PM-JAY & Rashtriya Arogya Nidhi (RAN) Medical Expense Assistance
+  {
+    id: "Ayushman_PMJAY",
+    title: "Ayushman Bharat PM-JAY & Rashtriya Arogya Nidhi (RAN) Medical Expense Assistance",
+    shortCode: "AB-PMJAY-RAN",
+    type: "healthcare",
+    ministry: "National Health Authority (NHA) & Ministry of Health and Family Welfare (MoHFW)",
+    sponsoringBody: "Centrally Sponsored Health Assurance Scheme (60:40 Central:State)",
+    level: "Central",
+    targetCategories: ["All", "ST", "SC", "OBC", "EWS", "General"],
+    maxIncome: 250000,
+    educationStages: ["All"],
+    courseTypesAllowed: ["Regular Full-Time", "Diploma", "Distance", "Vocational"],
+    managementQuotaAllowed: true,
+    benefitAmount: "₹5,00,000 / Family / Year Cashless Hospitalization + Up to ₹15 Lakh for Critical Care under RAN",
+    benefitDescription: "Cashless secondary and tertiary hospitalization across 27,000+ empaneled hospitals. Covers ICU, major surgeries, prosthetics, medical oncology, and 15 days post-discharge diagnostics and medicines.",
+    officialPortalUrl: "https://beneficiary.nha.gov.in",
+    portalName: "NHA BIS / TMS Beneficiary Portal",
+    portalSchemeCode: "NHA-PMJAY-RAN-2026",
+    deadline: "Open Year-Round (Continuous Enrollment & Emergency Admission)",
+    daysRemaining: 365,
+    prerequisites: ["Income_Certificate"],
+    mandatoryDocuments: [
+      "Aadhaar Card (Patient & Family Head)",
+      "Ration Card (NFSA / BPL / Antyodaya)",
+      "Government Hospital Referral / Treatment Cost Estimate Proforma",
+      "Income Certificate (Current FY - for RAN / Discretionary Relief)",
+      "Hospital Admission Slip or Doctor Prescription"
+    ],
+    offlineSubmission: {
+      centerName: "District Government Hospital / AIIMS / Medical College",
+      counterName: "Ayushman Mitra Helpdesk (Registration & Emergency Authorization)",
+      officialStatutoryFee: "₹0 (Statutorily Free Card Generation & 100% Cashless Treatment)",
+      maxAuthorizedFee: "₹0.00",
+      feeWarning: "Ayushman card generation and empaneled hospital treatment are 100% FREE. Never pay any fee or tout at hospital counters.",
+      statutoryDaysLimit: 0,
+      rtsaClause: "Section 4, National Health Protection Mission Guidelines 2026"
+    },
+    cedarPolicyCode: `permit(
+    principal,
+    action == Action::"ApplyScheme",
+    resource == Scheme::"Ayushman_PMJAY"
+)
+when {
+    principal.annualFamilyIncome <= 250000 &&
+    principal.heldDocuments.contains("Income_Certificate")
+};`,
+    officialGazetteRef: "MoHFW Notification S.O. 1134(E), National Health Protection Mission",
+    faqs: [
+      {
+        q: "What medical expenses are covered under AB-PMJAY?",
+        a: "It covers over 1,949 treatment procedures including cardiology, oncology, neurosurgery, orthopedics, ICU charges, room rent, and pre- and post-hospitalization expenses for 15 days."
+      },
+      {
+        q: "How do I get treatment if I don't have the physical Ayushman card yet?",
+        a: "Carry your Aadhaar card and Ration Card directly to the Ayushman Mitra desk at any empaneled government or private hospital. They will generate your e-card instantly on spot via e-KYC."
       }
     ]
   }

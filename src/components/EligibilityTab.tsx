@@ -29,6 +29,7 @@ interface EligibilityTabProps {
   evaluationResults: CedarEvaluationResult[];
   onProfileChange: (newProfile: UserProfile) => void;
   onNavigateToDocuments: () => void;
+  onNavigateToRoadmap?: (schemeId: string) => void;
 }
 
 export const EligibilityTab: React.FC<EligibilityTabProps> = ({
@@ -36,10 +37,11 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
   evaluationResults,
   onProfileChange,
   onNavigateToDocuments,
+  onNavigateToRoadmap,
 }) => {
   const [activeSection, setActiveSection] = useState<"ALL" | "ACADEMIC" | "FINANCIAL">("ALL");
   const [expandedCedarPolicy, setExpandedCedarPolicy] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<"ALL" | "ELIGIBLE" | "SCHOLARSHIP" | "CERTIFICATE">("ALL");
+  const [filterType, setFilterType] = useState<"ALL" | "ELIGIBLE" | "SCHOLARSHIP" | "HEALTHCARE" | "CERTIFICATE">("ALL");
 
   const eligibleResults = evaluationResults.filter((r) => r.decision === "ALLOW");
   const eligibleCount = eligibleResults.length;
@@ -47,6 +49,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
   const filteredResults = evaluationResults.filter((r) => {
     if (filterType === "ELIGIBLE") return r.decision === "ALLOW";
     if (filterType === "SCHOLARSHIP") return r.scheme.type === "scholarship";
+    if (filterType === "HEALTHCARE") return r.scheme.type === "healthcare";
     if (filterType === "CERTIFICATE") return r.scheme.type === "certificate";
     return true;
   });
@@ -486,6 +489,14 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
               Scholarships
             </button>
             <button
+              onClick={() => setFilterType("HEALTHCARE")}
+              className={`rounded px-3 py-1 font-medium transition-all ${
+                filterType === "HEALTHCARE" ? "bg-white text-slate-900 shadow-xs" : "text-slate-300 hover:text-white"
+              }`}
+            >
+              Medical Relief
+            </button>
+            <button
               onClick={() => setFilterType("CERTIFICATE")}
               className={`rounded px-3 py-1 font-medium transition-all ${
                 filterType === "CERTIFICATE" ? "bg-white text-slate-900 shadow-xs" : "text-slate-300 hover:text-white"
@@ -632,11 +643,20 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                       {isExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
                     </button>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {onNavigateToRoadmap && (
+                        <button
+                          onClick={() => onNavigateToRoadmap(result.scheme.id)}
+                          className="flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100 transition-colors cursor-pointer"
+                        >
+                          <Layers className="size-3.5 text-indigo-600" />
+                          <span>View Specific Roadmap</span>
+                        </button>
+                      )}
                       {isAllowed && hasMissingPrereqs && (
                         <button
                           onClick={onNavigateToDocuments}
-                          className="flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-100 transition-colors"
+                          className="flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer"
                         >
                           <FileCheck className="size-3.5" />
                           Resolve Prerequisites

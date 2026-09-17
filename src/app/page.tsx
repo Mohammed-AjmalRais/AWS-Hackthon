@@ -31,6 +31,7 @@ export default function Home() {
   // Initial Profile: Default to Rajesh Kumar Munda (ST Student)
   const [profile, setProfile] = useState<UserProfile>(DEMO_PERSONAS[0].profile);
   const [auditInput, setAuditInput] = useState<DocumentAuditInput>(DEMO_PERSONAS[0].auditInput);
+  const [targetRoadmapSchemeId, setTargetRoadmapSchemeId] = useState<string>("PostMatric_ST");
 
   // Live Cedar policy evaluation
   const evaluationResults = useMemo(() => {
@@ -43,6 +44,11 @@ export default function Home() {
   }, [auditInput]);
 
   const eligibleCount = evaluationResults.filter((r) => r.decision === "ALLOW").length;
+
+  const handleNavigateToRoadmap = (schemeId: string) => {
+    setTargetRoadmapSchemeId(schemeId);
+    setActiveTab("roadmap");
+  };
 
   const handleSelectPersona = (persona: DemoPersona) => {
     setProfile(persona.profile);
@@ -161,6 +167,7 @@ export default function Home() {
               evaluationResults={evaluationResults}
               onProfileChange={setProfile}
               onNavigateToDocuments={() => setActiveTab("audit")}
+              onNavigateToRoadmap={handleNavigateToRoadmap}
             />
           )}
 
@@ -171,7 +178,11 @@ export default function Home() {
           )}
 
           {activeTab === "roadmap" && (
-            <PrerequisiteRoadmapTab />
+            <PrerequisiteRoadmapTab
+              initialSchemeId={targetRoadmapSchemeId}
+              userHeldDocuments={profile.heldDocuments || []}
+              onSelectScheme={(id) => setTargetRoadmapSchemeId(id)}
+            />
           )}
 
           {activeTab === "offline" && (
