@@ -37,32 +37,54 @@ import {
 interface PrerequisiteRoadmapTabProps {
   initialSchemeId?: string;
   userHeldDocuments?: string[];
+  userState?: string;
   onSelectScheme?: (schemeId: string) => void;
 }
 
 export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
   initialSchemeId = "Ayushman_PMJAY",
   userHeldDocuments = [],
+  userState,
+  onSelectScheme,
 }) => {
   // Navigation & View Mode
   const [viewMode, setViewMode] = useState<"SINGLE" | "MERGED">("SINGLE");
 
+  // Determine initial scheme
+  const defaultScheme = useMemo(() => {
+    if (userState === "Andhra Pradesh" && (!initialSchemeId || initialSchemeId.startsWith("TN_"))) {
+      return "AP_Jagananna_Vidya_Deevena";
+    }
+    if (userState === "Tamil Nadu" && (!initialSchemeId || initialSchemeId.startsWith("AP_"))) {
+      return "TN_Pudhumai_Penn";
+    }
+    return initialSchemeId || "Ayushman_PMJAY";
+  }, [initialSchemeId, userState]);
+
   // Single Scheme State
-  const [selectedSchemeId, setSelectedSchemeId] = useState<string>(initialSchemeId);
-  const [categoryFilter, setCategoryFilter] = useState<"ALL" | "SCHOLARSHIP" | "HEALTHCARE" | "CERTIFICATE">("ALL");
+  const [selectedSchemeId, setSelectedSchemeId] = useState<string>(defaultScheme);
+  const [categoryFilter, setCategoryFilter] = useState<"ALL" | "MY_STATE" | "CENTRAL" | "SCHOLARSHIP" | "HEALTHCARE" | "CERTIFICATE">("ALL");
 
   React.useEffect(() => {
-    if (initialSchemeId) {
+    if (userState === "Andhra Pradesh" && initialSchemeId.startsWith("TN_")) {
+      setSelectedSchemeId("AP_Jagananna_Vidya_Deevena");
+    } else if (userState === "Tamil Nadu" && initialSchemeId.startsWith("AP_")) {
+      setSelectedSchemeId("TN_Pudhumai_Penn");
+    } else if (initialSchemeId) {
       setSelectedSchemeId(initialSchemeId);
     }
-  }, [initialSchemeId]);
+  }, [initialSchemeId, userState]);
 
-  // Merged Multi-Scheme State
-  const [mergedSelection, setMergedSelection] = useState<string[]>([
-    "PostMatric_ST",
-    "Ayushman_PMJAY",
-    "Income_Certificate",
-  ]);
+  // Merged Multi-Scheme State (Initialized smartly according to state)
+  const [mergedSelection, setMergedSelection] = useState<string[]>(() => {
+    if (userState === "Andhra Pradesh") {
+      return ["AP_Jagananna_Vidya_Deevena", "AP_YSR_Aarogyasri", "AP_Integrated_Community_Cert"];
+    }
+    if (userState === "Tamil Nadu") {
+      return ["TN_Pudhumai_Penn", "TN_CMCHIS_Medical", "Income_Certificate"];
+    }
+    return ["PostMatric_ST", "Ayushman_PMJAY", "Income_Certificate"];
+  });
 
   // Interactive Checklist State (for Single Scheme)
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>(() => {
@@ -83,15 +105,28 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
     return getMergedRoadmap(mergedSelection);
   }, [mergedSelection]);
 
-  // Filter schemes for the single selector
+  // Filter schemes for the single selector with state prioritization
   const availableSchemes = useMemo(() => {
     return SCHEMES_DATABASE.filter((s) => {
+      if (categoryFilter === "MY_STATE" && userState) {
+        return s.level === "State" && s.applicableStates?.includes(userState);
+      }
+      if (categoryFilter === "CENTRAL") {
+        return s.level === "Central";
+      }
       if (categoryFilter === "SCHOLARSHIP") return s.type === "scholarship";
       if (categoryFilter === "HEALTHCARE") return s.type === "healthcare";
       if (categoryFilter === "CERTIFICATE") return s.type === "certificate";
       return true;
+    }).sort((a, b) => {
+      // Prioritize user's home state schemes to prevent cross-state confusion
+      const aMatches = a.applicableStates?.includes(userState || "");
+      const bMatches = b.applicableStates?.includes(userState || "");
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+      return 0;
     });
-  }, [categoryFilter]);
+  }, [categoryFilter, userState]);
 
   const toggleCheckItem = (id: string) => {
     setCheckedItems((prev) => ({
@@ -198,6 +233,30 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                 >
                   All ({SCHEMES_DATABASE.length})
                 </button>
+                {userState && (
+                  <button
+                    onClick={() => setCategoryFilter("MY_STATE")}
+                    className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer transition-colors ${
+                      categoryFilter === "MY_STATE"
+                        ? "bg-purple-700 text-white shadow-xs"
+                        : "bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-200"
+                    }`}
+                  >
+                    <MapPin className="size-3" />
+                    My State ({userState})
+                  </button>
+                )}
+                <button
+                  onClick={() => setCategoryFilter("CENTRAL")}
+                  className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-colors ${
+                    categoryFilter === "CENTRAL"
+                      ? "bg-blue-700 text-white"
+                      : "bg-blue-50 text-blue-800 hover:bg-blue-100"
+                  }`}
+                >
+                  <Building2 className="size-3" />
+                  Central Gov
+                </button>
                 <button
                   onClick={() => setCategoryFilter("HEALTHCARE")}
                   className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-colors ${
@@ -224,8 +283,8 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                   onClick={() => setCategoryFilter("CERTIFICATE")}
                   className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-colors ${
                     categoryFilter === "CERTIFICATE"
-                      ? "bg-blue-600 text-white"
-                      : "bg-blue-50 text-blue-800 hover:bg-blue-100"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-indigo-50 text-indigo-800 hover:bg-indigo-100"
                   }`}
                 >
                   <ShieldCheck className="size-3" />
@@ -244,7 +303,10 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                 return (
                   <button
                     key={s.id}
-                    onClick={() => setSelectedSchemeId(s.id)}
+                    onClick={() => {
+                      setSelectedSchemeId(s.id);
+                      if (onSelectScheme) onSelectScheme(s.id);
+                    }}
                     className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
                       isSelected
                         ? "border-orange-500 bg-orange-50/50 shadow-xs ring-1 ring-orange-500"
@@ -628,13 +690,55 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
 
               {/* Quick Preset Buttons */}
               <div className="flex flex-wrap items-center gap-2">
+                {userState === "Andhra Pradesh" && (
+                  <>
+                    <button
+                      onClick={() =>
+                        setMergedSelection(["AP_Jagananna_Vidya_Deevena", "AP_YSR_Aarogyasri", "AP_Integrated_Community_Cert"])
+                      }
+                      className="rounded-lg bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-800 hover:bg-orange-100 cursor-pointer border border-orange-200"
+                    >
+                      Combo: AP Vidya Deevena + YSR Aarogyasri
+                    </button>
+                    <button
+                      onClick={() =>
+                        setMergedSelection(["AP_Amma_Vodi", "AP_YSR_Aarogyasri", "Income_Certificate"])
+                      }
+                      className="rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-800 hover:bg-teal-100 cursor-pointer border border-teal-200"
+                    >
+                      Combo: Amma Vodi + Aarogyasri
+                    </button>
+                  </>
+                )}
+
+                {userState === "Tamil Nadu" && (
+                  <>
+                    <button
+                      onClick={() =>
+                        setMergedSelection(["TN_Pudhumai_Penn", "TN_CMCHIS_Medical", "TN_First_Graduate"])
+                      }
+                      className="rounded-lg bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-800 hover:bg-orange-100 cursor-pointer border border-orange-200"
+                    >
+                      Combo: TN Pudhumai Penn + CMCHIS Health
+                    </button>
+                    <button
+                      onClick={() =>
+                        setMergedSelection(["TN_7_5_Govt_School_Quota", "TN_CMCHIS_Medical", "Income_Certificate"])
+                      }
+                      className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 hover:bg-emerald-100 cursor-pointer border border-emerald-200"
+                    >
+                      Combo: TN 7.5% Quota + CMCHIS
+                    </button>
+                  </>
+                )}
+
                 <button
                   onClick={() =>
                     setMergedSelection(["PostMatric_ST", "Ayushman_PMJAY", "Income_Certificate"])
                   }
                   className="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 cursor-pointer border border-indigo-200"
                 >
-                  Combo: ST Scholarship + Medical Relief
+                  Combo: ST Scholarship + PM-JAY Relief
                 </button>
                 <button
                   onClick={() =>

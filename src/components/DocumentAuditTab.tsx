@@ -74,20 +74,30 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
   // Default active scheme
   const defaultSchemeId = useMemo(() => {
+    if (profile?.state === "Andhra Pradesh" && (!selectedSchemeId || selectedSchemeId.startsWith("TN_"))) {
+      return "AP_Jagananna_Vidya_Deevena";
+    }
+    if (profile?.state === "Tamil Nadu" && (!selectedSchemeId || selectedSchemeId.startsWith("AP_"))) {
+      return "TN_Pudhumai_Penn";
+    }
     if (selectedSchemeId) return selectedSchemeId;
-    if (profile?.state === "Andhra Pradesh") return "AP_Jagananna_Vidya_Deevena";
-    if (profile?.state === "Tamil Nadu") return "TN_Pudhumai_Penn";
     return "PostMatric_ST";
   }, [selectedSchemeId, profile?.state]);
 
   const [activeSchemeId, setActiveSchemeId] = useState<string>(defaultSchemeId);
 
-  // Sync if prop changes
+  // Sync if prop or state changes
   React.useEffect(() => {
     if (selectedSchemeId) {
-      setActiveSchemeId(selectedSchemeId);
+      if (profile?.state === "Andhra Pradesh" && selectedSchemeId.startsWith("TN_")) {
+        setActiveSchemeId("AP_Jagananna_Vidya_Deevena");
+      } else if (profile?.state === "Tamil Nadu" && selectedSchemeId.startsWith("AP_")) {
+        setActiveSchemeId("TN_Pudhumai_Penn");
+      } else {
+        setActiveSchemeId(selectedSchemeId);
+      }
     }
-  }, [selectedSchemeId]);
+  }, [selectedSchemeId, profile?.state]);
 
   const currentScheme: SchemeOrService = useMemo(() => {
     return (
@@ -256,27 +266,55 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
               onChange={(e) => handleSchemeChange(e.target.value)}
               className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-xs font-bold text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
             >
-              <optgroup label="Andhra Pradesh Flagship Schemes">
-                {SCHEMES_DATABASE.filter((s) => s.id.startsWith("AP_")).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    AP: {s.title.substring(0, 45)}...
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="Tamil Nadu Flagship Schemes">
-                {SCHEMES_DATABASE.filter((s) => s.id.startsWith("TN_")).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    TN: {s.title.substring(0, 45)}...
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="Centrally Sponsored Schemes">
-                {SCHEMES_DATABASE.filter((s) => !s.id.startsWith("AP_") && !s.id.startsWith("TN_")).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    Central: {s.title.substring(0, 45)}...
-                  </option>
-                ))}
-              </optgroup>
+              {profile?.state === "Tamil Nadu" ? (
+                <>
+                  <optgroup label="Tamil Nadu Flagship Schemes">
+                    {SCHEMES_DATABASE.filter((s) => s.id.startsWith("TN_")).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        TN: {s.title.substring(0, 45)}...
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Centrally Sponsored Schemes">
+                    {SCHEMES_DATABASE.filter((s) => !s.id.startsWith("AP_") && !s.id.startsWith("TN_")).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        Central: {s.title.substring(0, 45)}...
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Andhra Pradesh Flagship Schemes">
+                    {SCHEMES_DATABASE.filter((s) => s.id.startsWith("AP_")).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        AP: {s.title.substring(0, 45)}...
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
+              ) : (
+                <>
+                  <optgroup label="Andhra Pradesh Flagship Schemes">
+                    {SCHEMES_DATABASE.filter((s) => s.id.startsWith("AP_")).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        AP: {s.title.substring(0, 45)}...
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Centrally Sponsored Schemes">
+                    {SCHEMES_DATABASE.filter((s) => !s.id.startsWith("AP_") && !s.id.startsWith("TN_")).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        Central: {s.title.substring(0, 45)}...
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Tamil Nadu Flagship Schemes">
+                    {SCHEMES_DATABASE.filter((s) => s.id.startsWith("TN_")).map((s) => (
+                      <option key={s.id} value={s.id}>
+                        TN: {s.title.substring(0, 45)}...
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
+              )}
             </select>
           </div>
         </div>
@@ -800,6 +838,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
           certificateId={selectedCertGuideId}
           onClose={() => setSelectedCertGuideId(null)}
           onMarkAsObtained={handleMarkCertAsHeld}
+          userState={profile?.state}
         />
       )}
     </div>

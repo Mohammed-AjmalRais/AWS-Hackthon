@@ -299,6 +299,7 @@ export default function Home() {
             <PrerequisiteRoadmapTab
               initialSchemeId={targetSchemeId}
               userHeldDocuments={profile.heldDocuments || []}
+              userState={profile.state}
               onSelectScheme={(id) => setTargetSchemeId(id)}
             />
           )}

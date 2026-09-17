@@ -517,6 +517,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
           certificateId={selectedCertGuideId}
           onClose={() => setSelectedCertGuideId(null)}
           onMarkAsObtained={handleMarkCertAsHeld}
+          userState={profile.state}
         />
       )}
     </div>

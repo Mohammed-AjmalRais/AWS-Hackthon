@@ -25,14 +25,16 @@ interface CertificateResolutionModalProps {
   certificateId: string | null;
   onClose: () => void;
   onMarkAsObtained?: (certificateId: string) => void;
+  userState?: string;
 }
 
 export const CertificateResolutionModal: React.FC<CertificateResolutionModalProps> = ({
   certificateId,
   onClose,
   onMarkAsObtained,
+  userState,
 }) => {
-  const guide = certificateId ? getCertificateGuide(certificateId) : undefined;
+  const guide = certificateId ? getCertificateGuide(certificateId, userState) : undefined;
 
   // Local storage checklist persistence
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>({});

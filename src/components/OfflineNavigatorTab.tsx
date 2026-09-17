@@ -28,17 +28,33 @@ interface OfflineNavigatorTabProps {
 }
 
 export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
-  userState = "Odisha",
+  userState = "Andhra Pradesh",
 }) => {
-  const [selectedState, setSelectedState] = useState<string>(userState || "Odisha");
+  const [selectedState, setSelectedState] = useState<string>(userState || "Andhra Pradesh");
   const [selectedDistrict, setSelectedDistrict] = useState<string>("All");
   const [selectedType, setSelectedType] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Fee Calculator selected service
-  const [selectedServiceId, setSelectedServiceId] = useState<string>(
-    REAL_SERVICE_FEE_SCHEDULE[0].serviceId
-  );
+  const initialService = useMemo(() => {
+    if (userState === "Andhra Pradesh") return "AP_MeeSeva_REV01";
+    if (userState === "Tamil Nadu") return "TN_eSevai_REV104";
+    return REAL_SERVICE_FEE_SCHEDULE[0].serviceId;
+  }, [userState]);
+
+  const [selectedServiceId, setSelectedServiceId] = useState<string>(initialService);
+
+  // Sync state when prop changes
+  React.useEffect(() => {
+    if (userState) {
+      setSelectedState(userState);
+      if (userState === "Andhra Pradesh") {
+        setSelectedServiceId("AP_MeeSeva_REV01");
+      } else if (userState === "Tamil Nadu") {
+        setSelectedServiceId("TN_eSevai_REV104");
+      }
+    }
+  }, [userState]);
 
   const selectedFeeDetail = useMemo(() => {
     return (
