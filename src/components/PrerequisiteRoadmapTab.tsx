@@ -182,7 +182,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
               onClick={() => setViewMode("SINGLE")}
               className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${
                 viewMode === "SINGLE"
-                  ? "bg-orange-600 text-white shadow-sm"
+                  ? "bg-indigo-600 text-white shadow-sm"
                   : "text-indigo-300 hover:text-white"
               }`}
             >
@@ -272,8 +272,8 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                   onClick={() => setCategoryFilter("SCHOLARSHIP")}
                   className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-colors ${
                     categoryFilter === "SCHOLARSHIP"
-                      ? "bg-orange-600 text-white"
-                      : "bg-orange-50 text-orange-800 hover:bg-orange-100"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-indigo-50 text-indigo-800 hover:bg-indigo-100"
                   }`}
                 >
                   <GraduationCap className="size-3" />
@@ -309,7 +309,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                     }}
                     className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
                       isSelected
-                        ? "border-orange-500 bg-orange-50/50 shadow-xs ring-1 ring-orange-500"
+                        ? "border-indigo-500 bg-indigo-50/50 shadow-xs ring-1 ring-indigo-500"
                         : "border-slate-200 bg-slate-50/50 hover:bg-slate-100/80 hover:border-slate-300"
                     }`}
                   >
@@ -327,7 +327,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                           {s.shortCode}
                         </span>
                         {isSelected && (
-                          <span className="flex items-center gap-1 text-[11px] font-bold text-orange-600">
+                          <span className="flex items-center gap-1 text-[11px] font-bold text-indigo-600">
                             <Check className="size-3" /> Active
                           </span>
                         )}
@@ -372,9 +372,9 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
 
               {/* Benefit & Fee Chips */}
               <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-xl bg-orange-50 border border-orange-200 px-3.5 py-2 text-xs">
-                  <span className="text-[10px] text-orange-700 font-bold uppercase block">Official Benefit</span>
-                  <span className="font-bold text-orange-950">{currentRoadmap.benefitHeadline}</span>
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-3.5 py-2 text-xs">
+                  <span className="text-[10px] text-emerald-700 font-bold uppercase block">Official Benefit</span>
+                  <span className="font-bold text-emerald-950">{currentRoadmap.benefitHeadline}</span>
                 </div>
                 <div className="rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2 text-xs">
                   <span className="text-[10px] text-slate-500 font-bold uppercase block">Official Fee</span>
@@ -391,7 +391,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
             <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
               <div className="flex items-center justify-between text-xs mb-2">
                 <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                  <Activity className="size-4 text-orange-600" />
+                  <Activity className="size-4 text-indigo-600" />
                   Applicant Readiness for this Scheme: {readyCount} of {allSingleDocs.length} items verified
                 </span>
                 <span className="font-mono font-bold text-slate-900">{readinessPercent}% Ready</span>
@@ -403,7 +403,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                       ? "bg-emerald-500"
                       : readinessPercent >= 50
                       ? "bg-amber-500"
-                      : "bg-orange-500"
+                      : "bg-indigo-500"
                   }`}
                   style={{ width: `${readinessPercent}%` }}
                 />
@@ -441,7 +441,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                           onClick={() => toggleCheckItem(doc.name)}
                           className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer group"
                         >
-                          <span className="mt-0.5 shrink-0 text-slate-400 group-hover:text-orange-600">
+                          <span className="mt-0.5 shrink-0 text-slate-400 group-hover:text-indigo-600">
                             {checkedItems[doc.name] ? (
                               <CheckSquare className="size-4 text-emerald-600" />
                             ) : (
@@ -596,7 +596,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="flex size-6 items-center justify-center rounded-full bg-orange-600 text-xs font-bold text-white">
+                        <span className="flex size-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
                           {stage.stageNumber}
                         </span>
                         <span className="font-mono text-[10px] font-bold text-slate-500">
@@ -606,7 +606,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                       <h5 className="text-xs font-bold text-slate-900 leading-snug">
                         {stage.stageName}
                       </h5>
-                      <span className="text-[10px] font-semibold text-orange-700 block mt-0.5">
+                      <span className="text-[10px] font-semibold text-indigo-700 block mt-0.5">
                         Actor: {stage.actor}
                       </span>
                       <p className="mt-2 text-[11px] text-slate-600 leading-relaxed">
@@ -631,7 +631,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl bg-slate-50 p-4 border border-slate-200">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-xs text-slate-700">
-                  <MapPin className="size-4 text-orange-600 shrink-0" />
+                  <MapPin className="size-4 text-indigo-600 shrink-0" />
                   <span><strong>Physical Counter:</strong> {currentRoadmap.offlineCounter}</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
@@ -644,7 +644,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                   href={currentRoadmap.portalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-700 transition-colors shadow-xs"
+                  className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700 transition-colors shadow-xs"
                 >
                   <span>Open Official Portal</span>
                   <ExternalLink className="size-3.5" />
@@ -696,7 +696,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                       onClick={() =>
                         setMergedSelection(["AP_Jagananna_Vidya_Deevena", "AP_YSR_Aarogyasri", "AP_Integrated_Community_Cert"])
                       }
-                      className="rounded-lg bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-800 hover:bg-orange-100 cursor-pointer border border-orange-200"
+                      className="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-800 hover:bg-indigo-100 cursor-pointer border border-indigo-200"
                     >
                       Combo: AP Vidya Deevena + YSR Aarogyasri
                     </button>
@@ -717,7 +717,7 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
                       onClick={() =>
                         setMergedSelection(["TN_Pudhumai_Penn", "TN_CMCHIS_Medical", "TN_First_Graduate"])
                       }
-                      className="rounded-lg bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-800 hover:bg-orange-100 cursor-pointer border border-orange-200"
+                      className="rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-800 hover:bg-indigo-100 cursor-pointer border border-indigo-200"
                     >
                       Combo: TN Pudhumai Penn + CMCHIS Health
                     </button>

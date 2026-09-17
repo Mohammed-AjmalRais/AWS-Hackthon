@@ -54,7 +54,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
 
         <button
           onClick={handlePrint}
-          className="flex items-center gap-2 rounded-xl bg-orange-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-orange-700 transition-all cursor-pointer"
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md hover:bg-indigo-700 transition-all cursor-pointer"
         >
           <Printer className="size-4" />
           <span>Print / Export Dossier</span>
@@ -253,7 +253,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
               value={appTrackerId}
               onChange={(e) => setAppTrackerId(e.target.value)}
               placeholder="Enter Application ID (e.g. NSP2026ST89201)"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 py-2 text-xs font-mono text-slate-800 focus:border-orange-500 focus:outline-hidden"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 py-2 text-xs font-mono text-slate-800 focus:border-indigo-500 focus:outline-hidden"
             />
           </div>
           <button
@@ -281,7 +281,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
                   step.status === "COMPLETED"
                     ? "border-emerald-200 bg-emerald-50/60 text-emerald-900"
                     : step.status === "IN_PROGRESS"
-                    ? "border-orange-300 bg-orange-50 text-orange-950 font-semibold shadow-xs"
+                    ? "border-amber-300 bg-amber-50 text-amber-950 font-semibold shadow-xs"
                     : "border-slate-200 bg-slate-50 text-slate-400"
                 }`}
               >
@@ -290,7 +290,7 @@ export const ApplicationDossierTab: React.FC<ApplicationDossierTabProps> = ({
                   {step.status === "COMPLETED" ? (
                     <CheckCircle2 className="size-3.5 text-emerald-600" />
                   ) : step.status === "IN_PROGRESS" ? (
-                    <Clock className="size-3.5 text-orange-600 animate-pulse" />
+                    <Clock className="size-3.5 text-amber-600 animate-pulse" />
                   ) : (
                     <div className="size-2 rounded-full bg-slate-300" />
                   )}

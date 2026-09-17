@@ -141,12 +141,12 @@ export default function Home() {
               onClick={() => setActiveTab("profile")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "profile"
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <User className="size-4" />
-              <span>1. Citizen Official Profile</span>
+              <span>1. Citizen Profile</span>
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   activeTab === "profile"
@@ -163,60 +163,60 @@ export default function Home() {
               onClick={() => setActiveTab("schemes")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "schemes"
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <ShieldCheck className="size-4" />
-              <span>2. Scheme Discovery & Eligibility</span>
+              <span>2. Schemes & Eligibility</span>
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   activeTab === "schemes"
                     ? "bg-white/25 text-white"
-                    : "bg-orange-100 text-orange-800"
+                    : "bg-indigo-100 text-indigo-800"
                 }`}
               >
                 {eligibleCount} Eligible
               </span>
             </button>
 
-            {/* Tab 3: Scheme Document Pre-Flight */}
+            {/* Tab 3: Document Upload & Name Matcher */}
             <button
               onClick={() => setActiveTab("audit")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "audit"
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <FileCheck2 className="size-4" />
-              <span>3. Scheme Document Pre-Flight</span>
+              <span>3. Document Upload & Matcher</span>
               {auditResult.npciStatus !== "SEEDED" && (
-                <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800">
-                  Risk
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                  Attention
                 </span>
               )}
             </button>
 
-            {/* Tab 4: Scheme Action Roadmap */}
+            {/* Tab 4: Application Roadmap */}
             <button
               onClick={() => setActiveTab("roadmap")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "roadmap"
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <GitFork className="size-4" />
-              <span>4. Scheme Action Roadmap</span>
+              <span>4. Application Roadmap</span>
             </button>
 
-            {/* Tab 5: Offline Seva Centers & Fees */}
+            {/* Tab 5: Seva Centers & Fees */}
             <button
               onClick={() => setActiveTab("offline")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "offline"
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
@@ -229,13 +229,13 @@ export default function Home() {
               onClick={() => setActiveTab("copilot")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "copilot"
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <Bot className="size-4" />
-              <span>6. Bedrock AI Copilot</span>
-              <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">
+              <span>6. AI Civic Assistant</span>
+              <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-200">
                 <Sparkles className="size-2.5" /> Voice
               </span>
             </button>
@@ -245,12 +245,12 @@ export default function Home() {
               onClick={() => setActiveTab("dossier")}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "dossier"
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <FileBadge className="size-4" />
-              <span>7. Application Dossier</span>
+              <span>7. Download Dossier</span>
             </button>
           </div>
         </div>
@@ -339,7 +339,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-4">
             <button
               onClick={() => setIsArchitectureOpen(true)}
-              className="text-orange-600 hover:underline cursor-pointer font-medium"
+              className="text-indigo-600 hover:underline cursor-pointer font-medium"
             >
               Inspect AWS Stack
             </button>

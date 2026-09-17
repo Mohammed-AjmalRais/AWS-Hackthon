@@ -91,7 +91,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 bg-gradient-to-r from-orange-50 via-amber-50 to-white p-6">
+        <div className="flex items-start justify-between border-b border-slate-100 bg-gradient-to-r from-indigo-50/70 via-slate-50 to-white p-6">
           <div className="space-y-1.5 pr-4">
             <div className="flex flex-wrap items-center gap-2">
               <span
@@ -185,7 +185,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
                 href={scheme.officialPortalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-orange-600 hover:underline"
+                className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:underline"
               >
                 <span>{scheme.portalSchemeCode || "Visit Portal"}</span>
                 <ExternalLink className="size-3" />
@@ -197,7 +197,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
           <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileCheck2 className="size-4.5 text-orange-600" />
+                <FileCheck2 className="size-4.5 text-indigo-600" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                   Required Certificates & Documents Audit
                 </h3>
@@ -268,7 +268,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
           {/* Section 2: Why I Satisfied the Criteria (or Why Ineligible) */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
             <div className="flex items-center gap-2">
-              <Sparkles className="size-4.5 text-orange-600" />
+              <Sparkles className="size-4.5 text-indigo-600" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                 {decision === "ALLOW" ? "Why You Satisfied the Eligibility Criteria" : "Why You Are Disqualified (Failed Clauses)"}
               </h3>
@@ -346,7 +346,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <div className="flex items-center gap-2">
-                  <ListTodo className="size-4.5 text-orange-600" />
+                  <ListTodo className="size-4.5 text-indigo-600" />
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                     Where I Am Present: Self-Audit Checklist
                   </h3>
@@ -362,7 +362,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
                 </span>
                 <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-200">
                   <div
-                    className="h-full bg-orange-600 transition-all duration-300"
+                    className="h-full bg-indigo-600 transition-all duration-300"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -386,7 +386,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
                         type="checkbox"
                         checked={isDone}
                         onChange={() => toggleMilestone(m.id)}
-                        className="size-4.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 mt-0.5 cursor-pointer"
+                        className="size-4.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mt-0.5 cursor-pointer"
                       />
                       <div className="text-xs">
                         <p className={`font-bold ${isDone ? "text-emerald-950 line-through" : "text-slate-900"}`}>
@@ -413,7 +413,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
                             onClose();
                             onNavigateToDocumentsTab();
                           }}
-                          className="flex items-center gap-1 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-2xs hover:bg-orange-700 cursor-pointer"
+                          className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white shadow-2xs hover:bg-indigo-700 cursor-pointer"
                         >
                           <span>Upload & Audit Docs ➔</span>
                         </button>
@@ -448,7 +448,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
                   onClose();
                   onNavigateToDocumentsTab();
                 }}
-                className="text-orange-600 font-bold hover:underline cursor-pointer"
+                className="text-indigo-600 font-bold hover:underline cursor-pointer"
               >
                 Audit Aadhaar & NPCI Bank Seeding ➔
               </button>
@@ -467,7 +467,7 @@ export const SchemeCockpitModal: React.FC<SchemeCockpitModalProps> = ({
               href={scheme.officialPortalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl bg-orange-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-orange-700 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-indigo-700 transition-colors cursor-pointer"
             >
               <span>Apply on {scheme.portalName}</span>
               <ExternalLink className="size-3.5" />

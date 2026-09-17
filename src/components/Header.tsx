@@ -20,20 +20,23 @@ export const Header: React.FC<HeaderProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs">
-      {/* Top Hackathon Banner */}
-      <div className="bg-slate-950 px-4 py-1.5 text-xs text-white">
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-xs">
+      {/* Tricolor Subtle Top Bar */}
+      <div className="h-1 w-full bg-linear-to-r from-amber-500 via-white to-emerald-600" />
+
+      {/* Top Hackathon & Cloud Stack Bar */}
+      <div className="bg-slate-900 px-4 py-1.5 text-xs text-slate-200">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex items-center gap-2 font-medium">
-            <span className="inline-flex items-center gap-1 rounded bg-orange-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider">
-              <Award className="size-3 text-white" /> WeMakeDevs × AWS
+          <div className="flex items-center gap-2 font-medium text-[11px]">
+            <span className="inline-flex items-center gap-1 rounded bg-amber-500/20 text-amber-300 px-2 py-0.5 font-bold uppercase tracking-wider border border-amber-500/30">
+              <Award className="size-3 text-amber-400" /> AWS × WeMakeDevs
             </span>
-            <span className="text-slate-300 hidden sm:inline">Bharat Builds Tour • First Commit Hackathon 2026</span>
+            <span className="text-slate-400 hidden sm:inline">Bharat Builds Tour • "First Commit" Hackathon 2026</span>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <button
               onClick={onOpenArchitecture}
-              className="flex items-center gap-1.5 font-mono text-amber-300 hover:text-white underline-offset-4 hover:underline transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 font-mono text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer text-[11px]"
             >
               <Cpu className="size-3.5" />
               <span>Inspect AWS Stack (Bedrock + Cedar + SAM)</span>
@@ -43,18 +46,18 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Main Navbar */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6">
         {/* Logo & Identity */}
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-orange-600 text-white font-black text-lg shadow-sm">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-indigo-700 to-slate-900 text-white font-black text-lg shadow-sm ring-2 ring-indigo-600/20">
             JS
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
-                JanSetu <span className="text-orange-600">AI</span>
+                JanSetu <span className="text-indigo-600">AI</span>
               </h1>
-              <span className="rounded-md border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700 uppercase">
+              <span className="rounded-md border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[10px] font-extrabold text-indigo-700 uppercase tracking-wide">
                 National Citizen Engine
               </span>
             </div>
@@ -70,9 +73,9 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-all cursor-pointer shadow-xs"
+              className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer shadow-xs"
             >
-              <div className="flex size-5 items-center justify-center rounded-md bg-orange-600 text-[10px] font-bold text-white">
+              <div className="flex size-6 items-center justify-center rounded-lg bg-indigo-700 text-[11px] font-black text-white shadow-2xs">
                 {activeProfileName ? activeProfileName.charAt(0) : "U"}
               </div>
               <div className="text-left hidden sm:block">
@@ -85,12 +88,12 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-50 space-y-1">
+              <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-slate-200 bg-white p-2.5 shadow-xl z-50 space-y-1.5 animate-in fade-in zoom-in-95 duration-100">
                 <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Switch Citizen Persona (9 Verified Profiles):
+                  Select Citizen Profile (9 Real-World Cases):
                 </div>
 
-                <div className="max-h-60 overflow-y-auto space-y-0.5">
+                <div className="max-h-64 overflow-y-auto space-y-1 pr-1">
                   {DEMO_PERSONAS.map((p) => {
                     const isSelected = activeProfileName === p.profile.name;
                     return (
@@ -100,33 +103,38 @@ export const Header: React.FC<HeaderProps> = ({
                           onSelectPersona(p);
                           setDropdownOpen(false);
                         }}
-                        className={`w-full flex items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-medium transition-colors cursor-pointer ${
+                        className={`w-full flex items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-medium transition-all cursor-pointer ${
                           isSelected
-                            ? "bg-orange-50 text-orange-950 font-bold"
-                            : "text-slate-700 hover:bg-slate-50"
+                            ? "bg-indigo-50 text-indigo-950 font-bold border border-indigo-200"
+                            : "text-slate-700 hover:bg-slate-50 border border-transparent"
                         }`}
                       >
                         <div className="truncate pr-2">
                           <p className="font-bold text-slate-900 truncate">{p.name}</p>
-                          <p className="text-[10px] text-slate-500">{p.state} • {p.categoryTag}</p>
+                          <p className="text-[10px] text-slate-500">
+                            <span className={`font-semibold ${p.state === "Andhra Pradesh" ? "text-teal-700" : p.state === "Tamil Nadu" ? "text-purple-700" : "text-blue-700"}`}>
+                              {p.state}
+                            </span>
+                            {" "}• {p.categoryTag}
+                          </p>
                         </div>
-                        {isSelected && <Check className="size-3.5 text-orange-600 shrink-0" />}
+                        {isSelected && <Check className="size-4 text-indigo-600 shrink-0" />}
                       </button>
                     );
                   })}
                 </div>
 
                 {onResetToBlank && (
-                  <div className="border-t border-slate-100 pt-1">
+                  <div className="border-t border-slate-100 pt-1.5">
                     <button
                       onClick={() => {
                         onResetToBlank();
                         setDropdownOpen(false);
                       }}
-                      className="w-full flex items-center gap-2 rounded-xl px-2.5 py-2 text-left text-xs font-bold text-orange-700 hover:bg-orange-50 transition-colors cursor-pointer"
+                      className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold text-indigo-700 hover:bg-indigo-50 transition-colors cursor-pointer"
                     >
                       <PlusCircle className="size-4" />
-                      <span>+ Register New Blank Citizen</span>
+                      <span>+ Register New / Blank Citizen</span>
                     </button>
                   </div>
                 )}

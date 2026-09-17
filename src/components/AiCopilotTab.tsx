@@ -170,7 +170,7 @@ export const AiCopilotTab: React.FC = () => {
       {/* Header Info */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 p-6 text-white shadow-xs">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-400">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
             <Sparkles className="size-4" />
             Amazon Bedrock Conversational Copilot
           </div>
@@ -199,7 +199,7 @@ export const AiCopilotTab: React.FC = () => {
               }`}
             >
               {m.role === "assistant" && (
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white shadow-xs">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white shadow-xs">
                   <Bot className="size-4" />
                 </div>
               )}
@@ -207,7 +207,7 @@ export const AiCopilotTab: React.FC = () => {
               <div
                 className={`rounded-2xl p-4 max-w-[85%] text-xs sm:text-sm leading-relaxed ${
                   m.role === "user"
-                    ? "bg-orange-600 text-white"
+                    ? "bg-indigo-600 text-white"
                     : "bg-slate-50 text-slate-800 border border-slate-200/80"
                 }`}
               >
@@ -218,7 +218,7 @@ export const AiCopilotTab: React.FC = () => {
                     <span className="font-mono text-[10px]">JanSetu AWS Copilot</span>
                     <button
                       onClick={() => handleSpeak(m.content)}
-                      className="flex items-center gap-1 text-orange-600 hover:text-orange-800 font-medium transition-colors cursor-pointer"
+                      className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium transition-colors cursor-pointer"
                       title="Read aloud"
                     >
                       {isSpeaking ? (
@@ -247,11 +247,11 @@ export const AiCopilotTab: React.FC = () => {
 
           {isLoading && (
             <div className="flex gap-3 justify-start items-center text-xs text-slate-500">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white animate-pulse">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white animate-pulse">
                 <Bot className="size-4" />
               </div>
               <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80 flex items-center gap-2">
-                <RefreshCw className="size-3.5 animate-spin text-orange-600" />
+                <RefreshCw className="size-3.5 animate-spin text-indigo-600" />
                 <span>Consulting official gazette database & Cedar policies...</span>
               </div>
             </div>
@@ -268,7 +268,7 @@ export const AiCopilotTab: React.FC = () => {
               <button
                 key={i}
                 onClick={() => handleSendMessage(prompt)}
-                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800 transition-all text-left cursor-pointer"
+                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] text-slate-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-800 transition-all text-left cursor-pointer"
               >
                 {prompt}
               </button>
@@ -283,7 +283,7 @@ export const AiCopilotTab: React.FC = () => {
               className={`rounded-xl p-2.5 transition-all cursor-pointer ${
                 isListening
                   ? "bg-rose-600 text-white animate-pulse shadow-md shadow-rose-500/30"
-                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-orange-600"
+                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-indigo-600"
               }`}
               title={isListening ? "Listening... click to stop" : "Click to speak your question"}
             >
@@ -300,14 +300,14 @@ export const AiCopilotTab: React.FC = () => {
                   ? "Listening to your voice..."
                   : "Ask about scholarships, documents, or NPCI bank seeding..."
               }
-              className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-orange-500 focus:outline-hidden"
+              className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:border-indigo-500 focus:outline-hidden"
             />
 
             <button
               type="button"
               onClick={() => handleSendMessage()}
               disabled={isLoading || !inputQuery.trim()}
-              className="flex items-center gap-1.5 rounded-xl bg-orange-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs hover:bg-orange-700 disabled:opacity-50 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs hover:bg-indigo-700 disabled:opacity-50 transition-all cursor-pointer"
             >
               <span>Ask</span>
               <Send className="size-3.5" />

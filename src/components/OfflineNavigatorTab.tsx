@@ -108,11 +108,11 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
   return (
     <div className="space-y-8">
       {/* SECTION 1: INTERACTIVE STATUTORY FEE CALCULATOR & ANTI-FRAUD GUARD */}
-      <div className="rounded-2xl border border-amber-300 bg-gradient-to-br from-amber-50/90 via-orange-50/50 to-white p-6 shadow-xs">
+      <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50/50 via-slate-50 to-white p-6 shadow-xs">
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-amber-200/80 pb-5">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="rounded-md bg-amber-200 px-2.5 py-0.5 font-mono text-[11px] font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1">
+              <span className="rounded-md bg-amber-100 px-2.5 py-0.5 font-mono text-[11px] font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1 border border-amber-200">
                 <Scale className="size-3 text-amber-900" />
                 Statutory Fee Transparency Guard
               </span>
@@ -136,7 +136,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
             <select
               value={selectedServiceId}
               onChange={(e) => setSelectedServiceId(e.target.value)}
-              className="w-full sm:w-80 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs focus:border-orange-500 focus:outline-hidden cursor-pointer"
+              className="w-full sm:w-80 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs focus:border-indigo-500 focus:outline-hidden cursor-pointer"
             >
               {REAL_SERVICE_FEE_SCHEDULE.map((s) => (
                 <option key={s.serviceId} value={s.serviceId}>
@@ -239,7 +239,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Building className="size-4 text-orange-600" />
+                <Building className="size-4 text-indigo-600" />
                 Verified Offline Service Centers Directory
               </h4>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -262,7 +262,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
                   setSelectedState(e.target.value);
                   setSelectedDistrict("All");
                 }}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:outline-hidden"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-hidden"
               >
                 {availableStates.map((s) => (
                   <option key={s} value={s}>
@@ -278,7 +278,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
               <select
                 value={selectedDistrict}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:outline-hidden"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-hidden"
               >
                 {availableDistricts.map((d) => (
                   <option key={d} value={d}>
@@ -294,7 +294,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:outline-hidden"
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:outline-hidden"
               >
                 <option value="ALL">All Types</option>
                 <option value="CSC">Common Service Center (CSC / Seva Kendra)</option>
@@ -312,7 +312,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search address, VLE, center..."
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 py-2 text-xs text-slate-900 focus:border-orange-500 focus:outline-hidden"
+                  className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-3 py-2 text-xs text-slate-900 focus:border-indigo-500 focus:outline-hidden"
                 />
               </div>
             </div>
@@ -324,7 +324,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
           {filteredCenters.map((center) => (
             <div
               key={center.id}
-              className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs transition-all hover:border-orange-300 hover:shadow-md flex flex-col justify-between"
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs transition-all hover:border-indigo-300 hover:shadow-md flex flex-col justify-between"
             >
               <div>
                 {/* Header: Center Type & ID */}
@@ -351,7 +351,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
                 {/* Location & Contact Details */}
                 <div className="mt-3.5 space-y-2 text-xs text-slate-600">
                   <p className="flex items-start gap-2">
-                    <MapPin className="size-4 text-orange-600 shrink-0 mt-0.5" />
+                    <MapPin className="size-4 text-indigo-600 shrink-0 mt-0.5" />
                     <span>
                       {center.address}, {center.district}, {center.state} – <strong>{center.pincode}</strong>
                       {center.distanceEstimate && (
@@ -375,7 +375,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
                       Contact: <strong>{center.contactPerson}</strong> •{" "}
                       <a
                         href={`tel:${center.contactNumber}`}
-                        className="text-orange-600 hover:underline font-mono"
+                        className="text-indigo-600 hover:underline font-mono"
                       >
                         {center.contactNumber}
                       </a>
@@ -417,7 +417,7 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
                   )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 rounded-lg bg-orange-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-orange-700 transition-colors"
+                  className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 transition-colors"
                 >
                   <Navigation className="size-3.5" />
                   <span>Get Directions</span>

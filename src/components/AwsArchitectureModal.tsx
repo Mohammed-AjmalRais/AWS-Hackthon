@@ -24,7 +24,7 @@ export const AwsArchitectureModal: React.FC<AwsArchitectureModalProps> = ({ isOp
 
         {/* Title & Badge */}
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-orange-100 px-3 py-1 font-mono text-xs font-semibold text-orange-700">
+          <span className="rounded-full bg-indigo-100 px-3 py-1 font-mono text-xs font-semibold text-indigo-800">
             WeMakeDevs × AWS First Commit Architecture
           </span>
           <span className="rounded-full bg-emerald-100 px-3 py-1 font-mono text-xs font-semibold text-emerald-800 flex items-center gap-1">
@@ -56,15 +56,15 @@ export const AwsArchitectureModal: React.FC<AwsArchitectureModalProps> = ({ isOp
           </div>
 
           {/* Amazon Bedrock */}
-          <div className="rounded-xl border border-orange-200 bg-orange-50/50 p-4">
-            <div className="flex items-center gap-2 text-orange-700 font-semibold text-sm">
+          <div className="rounded-xl border border-purple-200 bg-purple-50/50 p-4">
+            <div className="flex items-center gap-2 text-purple-700 font-semibold text-sm">
               <Bot className="size-5" />
               Amazon Bedrock (Claude 3.5)
             </div>
             <p className="mt-2 text-xs text-slate-600">
               Powers the vernacular voice/text assistant. Synthesizes dense government gazettes into empathetic, plain-language explanations in English and Hindi.
             </p>
-            <div className="mt-3 rounded bg-orange-950 p-2 font-mono text-[10px] text-orange-200">
+            <div className="mt-3 rounded bg-purple-950 p-2 font-mono text-[10px] text-purple-200">
               BedrockRuntimeClient.invokeModel()
             </div>
           </div>
@@ -114,7 +114,7 @@ export const AwsArchitectureModal: React.FC<AwsArchitectureModalProps> = ({ isOp
           {/* AWS Amplify */}
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-center gap-2 text-slate-800 font-semibold text-sm">
-              <Cloud className="size-5 text-orange-600" />
+              <Cloud className="size-5 text-indigo-600" />
               AWS Amplify Hosting
             </div>
             <p className="mt-2 text-xs text-slate-600">

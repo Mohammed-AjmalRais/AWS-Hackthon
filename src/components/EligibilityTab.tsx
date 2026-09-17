@@ -135,7 +135,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-orange-600 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+              <span className="rounded-md bg-indigo-600 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
                 {profile.state} Citizen Profile
               </span>
               <span className="rounded-md bg-white/15 text-slate-200 px-2 py-0.5 text-[10px] font-bold">
@@ -242,7 +242,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search 35 schemes..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
             />
           </div>
         </div>
@@ -263,7 +263,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
               onClick={() => setCategoryFilter(filter.id as any)}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all cursor-pointer ${
                 categoryFilter === filter.id
-                  ? "bg-orange-600 text-white shadow-xs"
+                  ? "bg-indigo-600 text-white shadow-xs"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
               }`}
             >
@@ -334,11 +334,11 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                 </p>
 
                 {/* Benefit Amount Highlight */}
-                <div className="rounded-2xl border border-orange-100 bg-linear-to-r from-orange-50/70 to-amber-50/40 p-3.5">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-orange-900">
+                <div className="rounded-2xl border border-indigo-100 bg-linear-to-r from-indigo-50/60 to-slate-50/60 p-3.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-950">
                     Statutory Benefit Amount:
                   </div>
-                  <div className="text-base font-black text-orange-800">
+                  <div className="text-base font-black text-indigo-900">
                     {scheme.benefitAmount}
                   </div>
                   <div className="text-[11px] text-slate-600 mt-0.5 line-clamp-2">
@@ -415,7 +415,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                           className="inline-flex items-center gap-1 rounded-md border border-amber-300 bg-white px-2 py-0.5 text-[11px] font-semibold text-amber-900 hover:bg-amber-100 cursor-pointer"
                         >
                           <span>{preq.title ? preq.title.substring(0, 35) : preq.id}</span>
-                          <span className="text-[10px] text-orange-600 font-bold">Resolve Guide ➔</span>
+                          <span className="text-[10px] text-indigo-700 font-bold">Resolve Guide ➔</span>
                         </button>
                       ))}
                     </div>
@@ -431,7 +431,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                       onClick={() => onNavigateToDocuments(scheme.id)}
                       className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-xs"
                     >
-                      <FileCheck2 className="size-3.5 text-orange-600" />
+                      <FileCheck2 className="size-3.5 text-indigo-600" />
                       <span>Audit Docs for Scheme</span>
                     </button>
                   )}
@@ -450,7 +450,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
                 <div className="flex items-center justify-between pt-1">
                   <button
                     onClick={() => setSelectedCockpitResult(result)}
-                    className="flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline cursor-pointer"
+                    className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
                   >
                     <span>Open Scheme Cockpit & Action Tracker</span>
                     <ArrowRight className="size-3.5" />
@@ -489,7 +489,7 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
               setSearchQuery("");
               setCategoryFilter("ALL");
             }}
-            className="rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-700 cursor-pointer"
+            className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700 cursor-pointer shadow-xs"
           >
             Clear Filters
           </button>

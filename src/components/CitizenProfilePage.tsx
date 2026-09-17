@@ -89,12 +89,12 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
   return (
     <div className="space-y-6">
       {/* Official Gov Identity Card Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-linear-to-br from-white via-slate-50 to-orange-50/40 p-6 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-linear-to-br from-white via-slate-50 to-indigo-50/30 p-6 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           {/* Left: Citizen Card */}
           <div className="flex items-start gap-4">
             <div className="relative">
-              <div className="flex size-16 items-center justify-center rounded-2xl bg-linear-to-tr from-orange-600 to-amber-500 text-white font-black text-2xl shadow-md ring-4 ring-white">
+              <div className="flex size-16 items-center justify-center rounded-2xl bg-linear-to-tr from-indigo-700 via-indigo-800 to-slate-900 text-white font-black text-2xl shadow-md ring-4 ring-white">
                 {profile.name ? profile.name.charAt(0) : "U"}
               </div>
               <span className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white ring-2 ring-white">
@@ -113,7 +113,9 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
               </div>
 
               <p className="text-xs text-slate-600 flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-orange-700">{profile.state} Domicile</span>
+                <span className={`font-semibold ${profile.state === "Andhra Pradesh" ? "text-teal-700" : profile.state === "Tamil Nadu" ? "text-purple-700" : "text-blue-700"}`}>
+                  {profile.state} Domicile
+                </span>
                 <span>•</span>
                 <span>Category: <strong className="text-slate-800">{profile.category} {isTamilNadu && profile.tnCommunity !== "None" ? `(${profile.tnCommunity})` : isAndhraPradesh && profile.apCommunity !== "None" ? `(${profile.apCommunity})` : ""}</strong></span>
                 <span>•</span>
@@ -124,14 +126,14 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
 
               {/* Status Verification Badges */}
               <div className="pt-1.5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
-                  <ShieldCheck className="size-3.5" /> Aadhaar e-KYC: Verified
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200 shadow-2xs">
+                  <ShieldCheck className="size-3.5 text-emerald-600" /> Aadhaar e-KYC: Verified
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700 border border-sky-200">
-                  <MapPin className="size-3.5" /> Domicile Verified
+                <span className="inline-flex items-center gap-1 rounded-md bg-sky-50 px-2.5 py-0.5 text-[11px] font-semibold text-sky-700 border border-sky-200 shadow-2xs">
+                  <MapPin className="size-3.5 text-sky-600" /> Domicile Verified
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800 border border-amber-200">
-                  <FileText className="size-3.5" /> DigiLocker: {profile.heldDocuments?.length || 0} Docs Synced
+                <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-700 border border-indigo-200 shadow-2xs">
+                  <FileText className="size-3.5 text-indigo-600" /> DigiLocker: {profile.heldDocuments?.length || 0} Docs Synced
                 </span>
               </div>
             </div>
@@ -141,11 +143,11 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
           <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-2.5">
             <button
               onClick={onNavigateToSchemes}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-orange-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-orange-700 transition-all cursor-pointer hover:shadow-orange-200"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-indigo-700 transition-all cursor-pointer hover:shadow-indigo-200"
             >
-              <span>Evaluate 35 Government Schemes</span>
-              <span className="rounded-full bg-white/25 px-2 py-0.5 text-xs font-black text-white">
-                {eligibleCount} Eligible
+              <span>Explore Schemes For You</span>
+              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-black text-white">
+                {eligibleCount} Qualified
               </span>
               <ArrowRight className="size-4" />
             </button>
@@ -153,7 +155,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleSaveProfile}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
               >
                 <Check className="size-3.5 text-emerald-600" />
                 <span>Save Profile</span>
@@ -161,7 +163,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
 
               <button
                 onClick={handleResetToBlank}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-100 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-100 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer shadow-2xs"
               >
                 <RotateCcw className="size-3.5 text-slate-500" />
                 <span>Register New / Blank</span>
@@ -182,13 +184,13 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            <Sparkles className="size-4 text-amber-500" />
+            <Sparkles className="size-4 text-indigo-600" />
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
               Quick Client Roster (9 Real-World Personas Across States):
             </h3>
           </div>
           <span className="text-[11px] text-slate-500 hidden sm:inline">
-            Click any client to populate verified particulars & evaluate eligibility
+            Click any citizen to auto-populate and test real-time eligibility
           </span>
         </div>
 
@@ -201,7 +203,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                 onClick={() => handleSelectPersona(p)}
                 className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                   isSelected
-                    ? "bg-orange-600 text-white shadow-xs ring-2 ring-orange-400"
+                    ? "bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-400"
                     : "border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 }`}
                 title={p.story}
@@ -227,7 +229,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
         {/* SECTION A: Demographics & Legal Identity */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-orange-100 text-orange-700">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
               <User className="size-4" />
             </div>
             <div>
@@ -246,7 +248,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                 value={profile.name}
                 onChange={(e) => onProfileChange({ ...profile, name: e.target.value })}
                 placeholder="e.g. Sravani Reddy"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               />
             </div>
 
@@ -257,7 +259,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                 onChange={(e) =>
                   onProfileChange({ ...profile, gender: e.target.value as "Female" | "Male" | "Other" })
                 }
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               >
                 <option value="Female">Female (Eligible for Women Grants)</option>
                 <option value="Male">Male</option>
@@ -277,7 +279,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                       disabilityPercentage: e.target.checked ? 40 : 0
                     })
                   }
-                  className="size-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                  className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span>Person with Disability (Divyangjan)</span>
               </label>
@@ -296,7 +298,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                   }
                   min={40}
                   max={100}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
                 />
               </div>
             )}
@@ -309,7 +311,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                   onChange={(e) =>
                     onProfileChange({ ...profile, isOrphanOrSingleParent: e.target.checked })
                   }
-                  className="size-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                  className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span>Orphan / Single Parent Dependent (Priority Quota)</span>
               </label>
@@ -345,7 +347,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                     apCommunity: newState === "Andhra Pradesh" ? "BC-A" : "None"
                   });
                 }}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-bold text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-bold text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               >
                 <option value="Tamil Nadu">Tamil Nadu (Flagship Schemes Active)</option>
                 <option value="Andhra Pradesh">Andhra Pradesh (Flagship Schemes Active)</option>
@@ -369,7 +371,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                 value={profile.district}
                 onChange={(e) => onProfileChange({ ...profile, district: e.target.value })}
                 placeholder="e.g. NTR / Krishna, Chennai, Madurai"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               />
             </div>
 
@@ -385,7 +387,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                     category: e.target.value as "SC" | "ST" | "OBC" | "General" | "EWS"
                   })
                 }
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               >
                 <option value="OBC">OBC (Other Backward Classes)</option>
                 <option value="SC">SC (Scheduled Caste)</option>
@@ -398,7 +400,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
             {/* State-Specific Community Quota */}
             {isTamilNadu && (
               <div>
-                <label className="block text-xs font-semibold text-orange-700 mb-1">
+                <label className="block text-xs font-semibold text-indigo-700 mb-1">
                   TN State Community Quota
                 </label>
                 <select
@@ -409,7 +411,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                       tnCommunity: e.target.value as any
                     })
                   }
-                  className="w-full rounded-xl border border-orange-200 bg-orange-50/40 px-3 py-2 text-xs font-bold text-orange-950 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                  className="w-full rounded-xl border border-indigo-200 bg-indigo-50/40 px-3 py-2 text-xs font-bold text-indigo-950 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
                 >
                   <option value="MBC">MBC (Most Backward Class - 20%)</option>
                   <option value="DNC">DNC (De-notified Communities)</option>
@@ -458,7 +460,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                   type="checkbox"
                   checked={profile.isMinority}
                   onChange={(e) => onProfileChange({ ...profile, isMinority: e.target.checked })}
-                  className="size-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                  className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span>Religious Minority (Muslim, Christian, Sikh, Buddhist, Jain, Parsi)</span>
               </label>
@@ -486,7 +488,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
               <select
                 value={profile.educationLevel}
                 onChange={(e) => onProfileChange({ ...profile, educationLevel: e.target.value as any })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               >
                 <option value="Class 10">Class 10 (Secondary School)</option>
                 <option value="12th">Class 12 (Higher Secondary)</option>
@@ -505,7 +507,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
               <select
                 value={profile.admissionQuota}
                 onChange={(e) => onProfileChange({ ...profile, admissionQuota: e.target.value as any })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               >
                 <option value="Merit/Govt Counseling">Merit / Govt Counseling (Eligible)</option>
                 <option value="Management Quota">Management Quota (Disqualified from Fee Reimbursement)</option>
@@ -522,7 +524,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                 onChange={(e) => onProfileChange({ ...profile, marksPercentage: Number(e.target.value) })}
                 min={35}
                 max={100}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               />
             </div>
 
@@ -533,7 +535,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
               <select
                 value={profile.institutionType}
                 onChange={(e) => onProfileChange({ ...profile, institutionType: e.target.value as any })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
               >
                 <option value="Government">Government Institution</option>
                 <option value="Govt-Aided">Government-Aided Institution</option>
@@ -550,9 +552,9 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                   onChange={(e) =>
                     onProfileChange({ ...profile, studiedInGovtSchool6To12: e.target.checked })
                   }
-                  className="size-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                  className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <span className="text-orange-900 font-bold">Continuous Govt Schooling Class 6 to 12 (Mandatory for Pudhumai Penn & 7.5% Quota)</span>
+                <span className="text-indigo-950 font-bold">Continuous Govt Schooling Class 6 to 12 (Mandatory for Pudhumai Penn & 7.5% Quota)</span>
               </label>
             </div>
 
@@ -564,7 +566,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                   onChange={(e) =>
                     onProfileChange({ ...profile, isFirstGraduateInFamily: e.target.checked })
                   }
-                  className="size-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                  className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span>First Graduate in Immediate Family (REV-104 Fee Concession)</span>
               </label>
@@ -588,7 +590,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
             <div>
               <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
                 <span>Annual Family Income</span>
-                <span className="text-sm font-black text-orange-700">
+                <span className="text-sm font-black text-indigo-700">
                   ₹{profile.annualFamilyIncome.toLocaleString("en-IN")} / year
                 </span>
               </div>
@@ -601,7 +603,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                 onChange={(e) =>
                   onProfileChange({ ...profile, annualFamilyIncome: Number(e.target.value) })
                 }
-                className="w-full accent-orange-600 cursor-pointer"
+                className="w-full accent-indigo-600 cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-600 font-semibold">
                 <span>₹30K (BPL)</span>
@@ -621,7 +623,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                   onChange={(e) =>
                     onProfileChange({ ...profile, electricityUnitsPerYear: Number(e.target.value) })
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
                 />
                 <span className="text-[10px] text-slate-600 mt-1 block font-medium">
                   {profile.electricityUnitsPerYear && profile.electricityUnitsPerYear > 3600 ? (
@@ -643,7 +645,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
                     onProfileChange({ ...profile, agriculturalLandAcres: Number(e.target.value) })
                   }
                   step={0.5}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-orange-500 focus:bg-white focus:outline-hidden"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs font-medium text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-hidden"
                 />
               </div>
             </div>
@@ -666,7 +668,7 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
             {onNavigateToAudit && (
               <button
                 onClick={onNavigateToAudit}
-                className="flex items-center gap-1 text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline cursor-pointer"
+                className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
               >
                 <span>Audit NPCI Status & Documents</span>
                 <ChevronRight className="size-3.5" />
@@ -745,10 +747,10 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
       </div>
 
       {/* Bottom Sticky Action Bar */}
-      <div className="sticky bottom-4 z-30 rounded-2xl border border-slate-200 bg-slate-900/95 backdrop-blur-md p-4 text-white shadow-xl">
+      <div className="sticky bottom-4 z-30 rounded-2xl border border-slate-700 bg-slate-900/95 backdrop-blur-md p-4 text-white shadow-xl ring-1 ring-white/10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-orange-600 font-bold text-sm">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-600 font-bold text-sm shadow-sm">
               JS
             </div>
             <div>
@@ -771,11 +773,11 @@ export const CitizenProfilePage: React.FC<CitizenProfilePageProps> = ({
 
             <button
               onClick={onNavigateToSchemes}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-6 py-2 text-xs font-bold text-white shadow-md hover:bg-orange-500 transition-all cursor-pointer"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-xs font-bold text-white shadow-md hover:bg-indigo-500 transition-all cursor-pointer"
             >
-              <span>View Eligible Schemes</span>
-              <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-black">
-                {eligibleCount}
+              <span>Explore Schemes For You</span>
+              <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-black">
+                {eligibleCount} Qualified
               </span>
               <ArrowRight className="size-3.5" />
             </button>

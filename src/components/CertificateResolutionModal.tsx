@@ -76,10 +76,10 @@ export const CertificateResolutionModal: React.FC<CertificateResolutionModalProp
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
         {/* Modal Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 bg-gradient-to-r from-orange-50 via-amber-50 to-white p-6">
+        <div className="flex items-start justify-between border-b border-slate-100 bg-gradient-to-r from-indigo-50/70 via-slate-50 to-white p-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2.5 py-0.5 text-[11px] font-bold text-orange-800">
+              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-bold text-indigo-800">
                 <FileCheck2 className="size-3.5" />
                 {guide.officialCode}
               </span>
@@ -155,7 +155,7 @@ export const CertificateResolutionModal: React.FC<CertificateResolutionModalProp
           {/* Precursor Documents Required (What to Carry) */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-              <FileText className="size-4 text-orange-600" />
+              <FileText className="size-4 text-indigo-600" />
               <span>Precursor Documents to Carry ({guide.precursorDocuments.length})</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -181,16 +181,16 @@ export const CertificateResolutionModal: React.FC<CertificateResolutionModalProp
           {/* Step-by-Step Procedure */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-              <Sparkles className="size-4 text-orange-600" />
+              <Sparkles className="size-4 text-indigo-600" />
               <span>Step-by-Step Resolution Architecture</span>
             </h4>
             <div className="space-y-2.5">
               {guide.stepsToObtain.map((step) => (
                 <div
                   key={step.stepNumber}
-                  className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 text-xs transition-all hover:border-orange-300"
+                  className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 text-xs transition-all hover:border-indigo-300"
                 >
-                  <div className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-orange-600 font-black text-white text-xs">
+                  <div className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-indigo-600 font-black text-white text-xs">
                     {step.stepNumber}
                   </div>
                   <div className="flex-1">
@@ -216,7 +216,7 @@ export const CertificateResolutionModal: React.FC<CertificateResolutionModalProp
                   {completedSteps} of {totalSteps} milestones reached ({progressPercent}%)
                 </p>
               </div>
-              <span className="rounded-full bg-orange-100 px-2.5 py-1 text-xs font-black text-orange-700">
+              <span className="rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-black text-indigo-700">
                 {progressPercent}%
               </span>
             </div>
@@ -224,7 +224,7 @@ export const CertificateResolutionModal: React.FC<CertificateResolutionModalProp
             {/* Progress bar */}
             <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
               <div
-                className="h-full bg-orange-600 transition-all duration-300"
+                className="h-full bg-indigo-600 transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -246,7 +246,7 @@ export const CertificateResolutionModal: React.FC<CertificateResolutionModalProp
                       type="checkbox"
                       checked={isDone}
                       onChange={() => toggleStep(item.id)}
-                      className="size-4.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 mt-0.5 cursor-pointer"
+                      className="size-4.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mt-0.5 cursor-pointer"
                     />
                     <div className="flex-1 text-xs">
                       <p className={`font-bold ${isDone ? "text-emerald-950 line-through" : "text-slate-800"}`}>
@@ -286,7 +286,7 @@ export const CertificateResolutionModal: React.FC<CertificateResolutionModalProp
               href={guide.portalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl bg-orange-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-orange-700 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-indigo-700 transition-colors cursor-pointer"
             >
               <span>Open Official Portal</span>
               <ExternalLink className="size-3.5" />
