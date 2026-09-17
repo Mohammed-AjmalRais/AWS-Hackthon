@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # JanSetu AI (जनसेतु) 🇮🇳
 ### Unified AI-Assisted Government Service & Scholarship Copilot for Bharat
 **Built for the WeMakeDevs × AWS "First Commit" Hackathon (Bharat Builds Tour 2026)**
@@ -141,3 +142,6 @@ node scripts/test-standalone.mjs
 ## 📜 License
 Built with ❤️ for Bharat during the WeMakeDevs × AWS Bharat Builds Tour 2026.
 Licensed under the Apache 2.0 License.
+=======
+# AWS-Hackthon
+>>>>>>> ba47f05ce9909aa2a9af6085feba36a94a88186f
