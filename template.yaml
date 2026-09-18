@@ -1,0 +1,138 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  JanSetu AI - Serverless Architecture for Bharat Builds Tour (WeMakeDevs x AWS)
+  Compatible with AWS SAM CLI, LocalStack, and AWS Cloud.
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        SCHEMES_TABLE: !Ref SchemesTable
+        DOSSIERS_TABLE: !Ref DossiersTable
+        BEDROCK_REGION: us-east-1
+        BEDROCK_MODEL_ID: anthropic.claude-3-5-sonnet-20241022-v2:0
+
+Resources:
+  # ============================================================================
+  # API GATEWAY
+  # ============================================================================
+  JanSetuApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+        AllowOrigin: "'*'"
+
+  # ============================================================================
+  # SERVERLESS FUNCTIONS (LAMBDA)
+  # ============================================================================
+  CedarPolicyEngineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: api/evaluate.handler
+      Description: Deterministic AWS Cedar-based policy evaluator for Indian citizen schemes
+      Events:
+        EvaluateApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JanSetuApi
+            Path: /evaluate
+            Method: post
+
+  BedrockAssistantFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: api/chat.handler
+      Description: Amazon Bedrock multilingual conversational copilot with RAG
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: "*"
+      Events:
+        ChatApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JanSetuApi
+            Path: /chat
+            Method: post
+
+  DocumentAuditFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: api/audit.handler
+      Description: Pre-flight document discrepancy and NPCI bank seeding verifier
+      Events:
+        AuditApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref JanSetuApi
+            Path: /audit-documents
+            Method: post
+
+  # ============================================================================
+  # DYNAMODB TABLES (SCALES TO ZERO)
+  # ============================================================================
+  SchemesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: JanSetuSchemes
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: category
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: CategoryIndex
+          KeySchema:
+            - AttributeName: category
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  DossiersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: JanSetuDossiers
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: dossierId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: dossierId
+          KeyType: HASH
+
+  # ============================================================================
+  # S3 STORAGE (DOCUMENT TEMPLATES & FORMS)
+  # ============================================================================
+  DocumentTemplatesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub jansetu-templates-${AWS::AccountId}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL for JanSetu AI
+    Value: !Sub "https://${JanSetuApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+  SchemesTableName:
+    Description: DynamoDB Table Name for Schemes
+    Value: !Ref SchemesTable

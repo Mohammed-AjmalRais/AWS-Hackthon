@@ -1,0 +1,64 @@
+{
+  "": {
+    "entityTypes": {
+      "User": {
+        "memberOfTypes": [],
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "category": { "type": "String", "required": true },
+            "annualFamilyIncome": { "type": "Long", "required": true },
+            "educationLevel": { "type": "String", "required": true },
+            "state": { "type": "String", "required": true },
+            "gender": { "type": "String", "required": true },
+            "isMinority": { "type": "Boolean", "required": false },
+            "isTechnicalCourse": { "type": "Boolean", "required": false },
+            "marksPercentage": { "type": "Long", "required": false },
+            "hasPaternalCasteRecord": { "type": "Boolean", "required": false },
+            "hasValidAddressProof": { "type": "Boolean", "required": false },
+            "agriculturalLandAcres": { "type": "Long", "required": false },
+            "residentialFlatSqFt": { "type": "Long", "required": false },
+            "residenceYearsInState": { "type": "Long", "required": false },
+            "isPersonWithDisability": { "type": "Boolean", "required": false },
+            "disabilityPercentage": { "type": "Long", "required": false }
+          }
+        }
+      },
+      "Scheme": {
+        "memberOfTypes": [],
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "name": { "type": "String", "required": true },
+            "ministry": { "type": "String", "required": true },
+            "portal": { "type": "String", "required": true }
+          }
+        }
+      },
+      "Certificate": {
+        "memberOfTypes": [],
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "name": { "type": "String", "required": true },
+            "issuingAuthority": { "type": "String", "required": true }
+          }
+        }
+      }
+    },
+    "actions": {
+      "ApplyScheme": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Scheme"]
+        }
+      },
+      "IssueCertificate": {
+        "appliesTo": {
+          "principalTypes": ["User"],
+          "resourceTypes": ["Certificate"]
+        }
+      }
+    }
+  }
+}
