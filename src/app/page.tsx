@@ -313,7 +313,13 @@ export default function Home() {
 
           {/* View 6: Bedrock AI Copilot */}
           {activeTab === "copilot" && (
-            <AiCopilotTab />
+            <AiCopilotTab
+              profile={profile}
+              evaluationResults={evaluationResults}
+              targetSchemeId={targetSchemeId}
+              auditResult={auditResult}
+              auditInput={auditInput}
+            />
           )}
 
           {/* View 7: Application Dossier */}
