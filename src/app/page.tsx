@@ -289,6 +289,7 @@ export default function Home() {
               profile={profile}
               onSelectScheme={(id) => setTargetSchemeId(id)}
               onProfileChange={handleProfileChange}
+              onAuditInputChange={(newAudit) => setAuditInput(newAudit)}
               onNavigateToEligibility={() => setActiveTab("schemes")}
               onNavigateToRoadmap={handleNavigateToRoadmap}
             />

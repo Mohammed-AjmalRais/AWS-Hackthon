@@ -24,7 +24,8 @@ import {
   MapPin,
   Check,
   HelpCircle,
-  Activity
+  Activity,
+  Printer
 } from "lucide-react";
 import { SCHEMES_DATABASE, SchemeOrService } from "@/data/schemes";
 import {
@@ -176,29 +177,39 @@ export const PrerequisiteRoadmapTab: React.FC<PrerequisiteRoadmapTabProps> = ({
             </p>
           </div>
 
-          {/* Mode Selector Toggle */}
-          <div className="shrink-0 flex items-center gap-1.5 rounded-xl bg-[#071233]/90 p-1.5 border border-[#DFB738]/30 shadow-inner">
+          {/* Mode Selector Toggle & Print */}
+          <div className="shrink-0 flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 rounded-xl bg-[#071233]/90 p-1.5 border border-[#DFB738]/30 shadow-inner">
+              <button
+                onClick={() => setViewMode("SINGLE")}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "SINGLE"
+                    ? "bg-[#152864] text-[#F5E29F] ring-1 ring-[#DFB738]/50 shadow-sm"
+                    : "text-slate-300 hover:text-white"
+                }`}
+              >
+                <FileText className="size-4" />
+                <span>Specific Scheme Roadmap</span>
+              </button>
+              <button
+                onClick={() => setViewMode("MERGED")}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "MERGED"
+                    ? "bg-[#152864] text-[#F5E29F] ring-1 ring-[#DFB738]/50 shadow-sm"
+                    : "text-slate-300 hover:text-white"
+                }`}
+              >
+                <Layers className="size-4" />
+                <span>Merge Multiple Schemes</span>
+              </button>
+            </div>
+
             <button
-              onClick={() => setViewMode("SINGLE")}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "SINGLE"
-                  ? "bg-[#152864] text-[#F5E29F] ring-1 ring-[#DFB738]/50 shadow-sm"
-                  : "text-slate-300 hover:text-white"
-              }`}
+              onClick={() => window.print()}
+              className="flex items-center gap-1.5 rounded-xl bg-[#F5E29F] hover:bg-[#FAF0C8] text-[#0B1B4F] px-4 py-2.5 text-xs font-bold transition-all cursor-pointer border border-[#DFB738] shadow-sm"
             >
-              <FileText className="size-4" />
-              <span>Specific Scheme Roadmap</span>
-            </button>
-            <button
-              onClick={() => setViewMode("MERGED")}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "MERGED"
-                  ? "bg-[#152864] text-[#F5E29F] ring-1 ring-[#DFB738]/50 shadow-sm"
-                  : "text-slate-300 hover:text-white"
-              }`}
-            >
-              <Layers className="size-4" />
-              <span>Merge Multiple Schemes</span>
+              <Printer className="size-4 text-[#0B1B4F]" />
+              <span>Print Roadmap</span>
             </button>
           </div>
         </div>

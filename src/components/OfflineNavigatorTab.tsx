@@ -30,7 +30,8 @@ interface OfflineNavigatorTabProps {
 export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
   userState = "Andhra Pradesh",
 }) => {
-  const [selectedState, setSelectedState] = useState<string>(userState || "Andhra Pradesh");
+  const isKnownState = REAL_OFFLINE_CENTERS.some((c) => c.state === userState);
+  const [selectedState, setSelectedState] = useState<string>(isKnownState ? userState : "All States");
   const [selectedDistrict, setSelectedDistrict] = useState<string>("All");
   const [selectedType, setSelectedType] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -47,7 +48,8 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
   // Sync state when prop changes
   React.useEffect(() => {
     if (userState) {
-      setSelectedState(userState);
+      const isKnown = REAL_OFFLINE_CENTERS.some((c) => c.state === userState);
+      setSelectedState(isKnown ? userState : "All States");
       if (userState === "Andhra Pradesh") {
         setSelectedServiceId("AP_MeeSeva_REV01");
       } else if (userState === "Tamil Nadu") {
@@ -430,12 +432,22 @@ export const OfflineNavigatorTab: React.FC<OfflineNavigatorTabProps> = ({
 
         {/* Empty state */}
         {filteredCenters.length === 0 && (
-          <div className="mt-8 text-center py-12 rounded-xl border border-dashed border-[#DFC8A5] bg-[#FAF7F2]/50">
+          <div className="mt-8 text-center py-12 rounded-xl border border-dashed border-[#DFC8A5] bg-[#FAF7F2]/50 space-y-3">
             <Building className="size-10 text-[#DFC8A5] mx-auto" />
-            <h5 className="mt-2 text-sm font-bold text-[#0B1B4F] font-serif">No Service Centers Found</h5>
-            <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-              No centers match your state & district filter. Select &ldquo;All States&rdquo; or change your search terms.
+            <h5 className="text-sm font-bold text-[#0B1B4F] font-serif">No Service Centers Found</h5>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              No centers match your current state & district filter. Click below to explore all centers across India.
             </p>
+            <button
+              onClick={() => {
+                setSelectedState("All States");
+                setSelectedDistrict("All");
+                setSearchQuery("");
+              }}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#0B1B4F] px-4 py-2 text-xs font-bold text-[#F5E29F] hover:bg-[#152864] cursor-pointer shadow-sm border border-[#DFB738]/40"
+            >
+              <span>View All Centers Across India</span>
+            </button>
           </div>
         )}
       </div>

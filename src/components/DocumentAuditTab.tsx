@@ -45,6 +45,7 @@ interface DocumentAuditTabProps {
   profile?: UserProfile;
   onSelectScheme?: (schemeId: string) => void;
   onProfileChange?: (newProfile: UserProfile) => void;
+  onAuditInputChange?: (newAudit: DocumentAuditInput) => void;
   onNavigateToEligibility?: () => void;
   onNavigateToRoadmap?: (schemeId: string) => void;
 }
@@ -64,6 +65,7 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
   profile,
   onSelectScheme,
   onProfileChange,
+  onAuditInputChange,
   onNavigateToEligibility,
   onNavigateToRoadmap,
 }) => {
@@ -170,17 +172,33 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
   // Direct handlers for updating document names
   const handleUpdateAadhaarName = (newName: string) => {
-    setAuditInput((prev) => ({ ...prev, nameOnAadhaar: newName }));
+    const updated = { ...auditInput, nameOnAadhaar: newName };
+    setAuditInput(updated);
     setAadhaarFile((prev) => (prev ? { ...prev, extractedName: newName } : null));
+    if (onAuditInputChange) onAuditInputChange(updated);
   };
 
   const handleUpdateMarksheetName = (newName: string) => {
-    setAuditInput((prev) => ({ ...prev, nameOnMarksheet: newName }));
+    const updated = { ...auditInput, nameOnMarksheet: newName };
+    setAuditInput(updated);
     setMarksheetFile((prev) => (prev ? { ...prev, extractedName: newName } : null));
+    if (onAuditInputChange) onAuditInputChange(updated);
   };
 
   const handleUpdateBankName = (newName: string) => {
     setBankFile((prev) => (prev ? { ...prev, extractedName: newName } : null));
+  };
+
+  const handleToggleBankLinked = (linked: boolean) => {
+    const updated = { ...auditInput, isAadhaarLinkedToBank: linked };
+    setAuditInput(updated);
+    if (onAuditInputChange) onAuditInputChange(updated);
+  };
+
+  const handleToggleNpciSeeded = (seeded: boolean) => {
+    const updated = { ...auditInput, isNpciSeeded: seeded };
+    setAuditInput(updated);
+    if (onAuditInputChange) onAuditInputChange(updated);
   };
 
   // Upload handler for native file input
@@ -227,18 +245,20 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
 
   // Quick Preset Test Scenarios
   const handleApplyPreset = (preset: "sravani_ap" | "kavitha_tn" | "exact_match" | "typo_mismatch" | "clear") => {
+    let updated: DocumentAuditInput = { ...auditInput };
+
     if (preset === "sravani_ap") {
-      setAuditInput((prev) => ({
-        ...prev,
+      updated = {
+        ...auditInput,
         nameOnAadhaar: "Madhira Sravani",
         nameOnMarksheet: "M. Sravani",
         dobOnAadhaar: "2005-08-14",
         dobOnMarksheet: "2005-08-14",
         bankName: "Andhra Pragathi Grameena Bank",
-        isAadhaarLinkedToMobile: true,
         isAadhaarLinkedToBank: true,
-        isNpciDirectBenefitTransferEnabled: true,
-      }));
+        isNpciSeeded: true,
+      };
+      setAuditInput(updated);
       setAadhaarFile({
         name: "AP_Aadhaar_Card_Sravani.pdf",
         size: "380 KB",
@@ -263,17 +283,17 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
         extractedId: "91028301928",
       });
     } else if (preset === "kavitha_tn") {
-      setAuditInput((prev) => ({
-        ...prev,
+      updated = {
+        ...auditInput,
         nameOnAadhaar: "Kavitha Selvam",
         nameOnMarksheet: "Kavitha S",
         dobOnAadhaar: "2006-05-12",
         dobOnMarksheet: "2006-05-12",
         bankName: "State Bank of India",
-        isAadhaarLinkedToMobile: true,
         isAadhaarLinkedToBank: true,
-        isNpciDirectBenefitTransferEnabled: false,
-      }));
+        isNpciSeeded: false,
+      };
+      setAuditInput(updated);
       setAadhaarFile({
         name: "TN_Aadhaar_Card_Kavitha.pdf",
         size: "420 KB",
@@ -299,22 +319,26 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
       });
     } else if (preset === "exact_match") {
       const matchName = auditInput.nameOnAadhaar || profile?.name || "Kavitha Selvam";
-      setAuditInput((prev) => ({
-        ...prev,
+      updated = {
+        ...auditInput,
         nameOnAadhaar: matchName,
         nameOnMarksheet: matchName,
-      }));
+        isAadhaarLinkedToBank: true,
+        isNpciSeeded: true,
+      };
+      setAuditInput(updated);
       if (aadhaarFile) setAadhaarFile({ ...aadhaarFile, extractedName: matchName });
       if (marksheetFile) setMarksheetFile({ ...marksheetFile, extractedName: matchName });
       if (bankFile) setBankFile({ ...bankFile, extractedName: matchName });
     } else if (preset === "typo_mismatch") {
       const aadhaarName = "Kavitha Selvam";
       const typoMarksheet = "Kavita Chelvam";
-      setAuditInput((prev) => ({
-        ...prev,
+      updated = {
+        ...auditInput,
         nameOnAadhaar: aadhaarName,
         nameOnMarksheet: typoMarksheet,
-      }));
+      };
+      setAuditInput(updated);
       if (aadhaarFile) setAadhaarFile({ ...aadhaarFile, extractedName: aadhaarName });
       if (marksheetFile) setMarksheetFile({ ...marksheetFile, extractedName: typoMarksheet });
       if (bankFile) setBankFile({ ...bankFile, extractedName: aadhaarName });
@@ -322,11 +346,16 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
       setAadhaarFile(null);
       setMarksheetFile(null);
       setBankFile(null);
-      setAuditInput((prev) => ({
-        ...prev,
+      updated = {
+        ...auditInput,
         nameOnAadhaar: "",
         nameOnMarksheet: "",
-      }));
+      };
+      setAuditInput(updated);
+    }
+
+    if (onAuditInputChange) {
+      onAuditInputChange(updated);
     }
   };
 
@@ -901,6 +930,29 @@ export const DocumentAuditTab: React.FC<DocumentAuditTabProps> = ({
                   <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
                     <span>A/C: <strong>38920192819</strong></span>
                     <span>NPCI: <strong className={auditResult.npciStatus === "SEEDED" ? "text-emerald-700" : "text-amber-700"}>{auditResult.npciStatus}</strong></span>
+                  </div>
+
+                  {/* Interactive Bank KYC & NPCI Seeding Controls */}
+                  <div className="pt-2 border-t border-[#EDE6DD] space-y-1.5">
+                    <label className="flex items-center gap-2 text-[11px] text-slate-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={auditInput.isAadhaarLinkedToBank}
+                        onChange={(e) => handleToggleBankLinked(e.target.checked)}
+                        className="rounded border-[#DFC8A5] text-[#0B1B4F] focus:ring-[#DFB738]"
+                      />
+                      <span>Aadhaar linked to bank (KYC)</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 text-[11px] text-slate-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={auditInput.isNpciSeeded}
+                        onChange={(e) => handleToggleNpciSeeded(e.target.checked)}
+                        className="rounded border-[#DFC8A5] text-[#0B1B4F] focus:ring-[#DFB738]"
+                      />
+                      <span className="font-semibold text-[#0B1B4F]">NPCI DBT Mapper Active (Seeded)</span>
+                    </label>
                   </div>
                 </div>
               )}
