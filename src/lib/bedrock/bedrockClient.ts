@@ -3,6 +3,7 @@ import { SCHEMES_DATABASE, SchemeOrService } from "@/data/schemes";
 import { evaluateCedarPolicies, UserProfile, CedarEvaluationResult } from "@/lib/cedar/evaluator";
 import { DEMO_PERSONAS } from "@/data/demoPersonas";
 import { DocumentAuditResult, DocumentAuditInput } from "@/lib/audit/documentAuditor";
+import { globalSchemeRegistry } from "@/lib/schemes/schemeRegistry";
 
 export interface ChatMessage {
   role: "user" | "assistant" | "system";
@@ -53,13 +54,15 @@ export async function askJanSetuCopilot(
   const effectiveEvalResults: CedarEvaluationResult[] =
     context?.evaluationResults && context.evaluationResults.length > 0
       ? context.evaluationResults
-      : evaluateCedarPolicies(effectiveProfile);
+      : evaluateCedarPolicies(effectiveProfile, globalSchemeRegistry.getAllSchemes());
 
   const eligibleResults = effectiveEvalResults.filter((r) => r.decision === "ALLOW");
   const deniedResults = effectiveEvalResults.filter((r) => r.decision === "DENY");
   const currentTargetId = context?.targetSchemeId || "TN_Pudhumai_Penn";
   const currentTargetScheme =
-    SCHEMES_DATABASE.find((s) => s.id === currentTargetId) || SCHEMES_DATABASE[0];
+    globalSchemeRegistry.getSchemeById(currentTargetId) ||
+    SCHEMES_DATABASE.find((s) => s.id === currentTargetId) ||
+    SCHEMES_DATABASE[0];
 
   // Check if real AWS Bedrock credentials exist and are configured
   if (

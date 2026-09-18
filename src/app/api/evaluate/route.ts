@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { evaluateCedarPolicies, UserProfile } from "@/lib/cedar/evaluator";
+import { globalSchemeRegistry } from "@/lib/schemes/schemeRegistry";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const profile: UserProfile = body.profile;
+    const schemes = body.schemes && Array.isArray(body.schemes) && body.schemes.length > 0
+      ? body.schemes
+      : globalSchemeRegistry.getAllSchemes();
 
     if (!profile) {
       return NextResponse.json({ error: "Missing profile in request body" }, { status: 400 });
     }
 
-    const results = evaluateCedarPolicies(profile);
+    const results = evaluateCedarPolicies(profile, schemes);
     const eligibleCount = results.filter(r => r.decision === "ALLOW").length;
 
     return NextResponse.json({

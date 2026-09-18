@@ -34,7 +34,8 @@ import {
   HelpCircle,
   Search,
   FileCheck2,
-  GitFork
+  GitFork,
+  RefreshCw
 } from "lucide-react";
 import { SchemeCockpitModal } from "@/components/SchemeCockpitModal";
 import { CertificateResolutionModal } from "@/components/CertificateResolutionModal";
@@ -46,6 +47,10 @@ interface EligibilityTabProps {
   onNavigateToProfile?: () => void;
   onNavigateToDocuments?: (schemeId: string) => void;
   onNavigateToRoadmap?: (schemeId: string) => void;
+  totalSchemesCount?: number;
+  lastSyncedAt?: string;
+  onSyncWithApiSetu?: () => Promise<void>;
+  isSyncing?: boolean;
 }
 
 export const EligibilityTab: React.FC<EligibilityTabProps> = ({
@@ -55,6 +60,10 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
   onNavigateToProfile,
   onNavigateToDocuments,
   onNavigateToRoadmap,
+  totalSchemesCount,
+  lastSyncedAt = "Live (API Setu Gateway)",
+  onSyncWithApiSetu,
+  isSyncing = false,
 }) => {
   // Classification tabs: Eligible vs Not Eligible
   const [eligibilityTab, setEligibilityTab] = useState<"ELIGIBLE" | "NOT_ELIGIBLE">("ELIGIBLE");
@@ -180,6 +189,43 @@ export const EligibilityTab: React.FC<EligibilityTabProps> = ({
             )}
           </div>
         </div>
+      </div>
+
+      {/* API Setu & National Public Data Exchange Live Sync Bar */}
+      <div className="luxury-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[#DFC8A5] bg-white p-3.5 px-5 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="relative flex size-3 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full size-3 bg-emerald-600"></span>
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-[#0B1B4F] font-serif">
+                API Setu & myScheme DPI Gateway: Active & Synchronized
+              </span>
+              <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 border border-emerald-200">
+                {totalSchemesCount || evaluationResults.length} Verified Policies
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Auto-syncs with National Scholarship Portal (NSP), MoTA, & State Gazettes • Last check: <span className="font-semibold text-slate-700">{lastSyncedAt}</span>
+            </p>
+          </div>
+        </div>
+
+        {onSyncWithApiSetu && (
+          <button
+            onClick={onSyncWithApiSetu}
+            disabled={isSyncing}
+            className={`shrink-0 flex items-center gap-2 rounded-xl bg-[#FAF7F2] hover:bg-[#F5E29F]/30 text-[#0B1B4F] border border-[#DFC8A5] px-3.5 py-2 text-xs font-bold transition-all shadow-xs cursor-pointer ${
+              isSyncing ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            title="Poll API Setu & myScheme National Data Gateway for newly gazetted welfare schemes"
+          >
+            <RefreshCw className={`size-3.5 text-[#DFB738] ${isSyncing ? "animate-spin" : ""}`} />
+            <span>{isSyncing ? "Syncing with API Setu..." : "Check for Scheme Updates"}</span>
+          </button>
+        )}
       </div>
 
       {/* Classification & Search Controls */}

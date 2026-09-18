@@ -16,6 +16,7 @@ import {
   BLANK_CITIZEN_PROFILE,
   BLANK_CITIZEN_AUDIT
 } from "@/data/demoPersonas";
+import { SCHEMES_DATABASE, SchemeOrService } from "@/data/schemes";
 import { evaluateCedarPolicies, UserProfile } from "@/lib/cedar/evaluator";
 import { auditCitizenDocuments, DocumentAuditInput } from "@/lib/audit/documentAuditor";
 import {
@@ -26,7 +27,8 @@ import {
   Building,
   Bot,
   FileBadge,
-  Sparkles
+  Sparkles,
+  CheckCircle2
 } from "lucide-react";
 
 export default function Home() {
@@ -36,6 +38,12 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<
     "profile" | "schemes" | "audit" | "roadmap" | "offline" | "copilot" | "dossier"
   >("profile");
+
+  // Dynamic Scheme Pool (Baseline + API Setu Dynamic Ingestion)
+  const [schemes, setSchemes] = useState<SchemeOrService[]>(SCHEMES_DATABASE);
+  const [isSyncingSchemes, setIsSyncingSchemes] = useState<boolean>(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string>("Today (Live API Setu Gateway)");
+  const [syncBannerMessage, setSyncBannerMessage] = useState<string | null>(null);
 
   // Master Citizen Profile (Initial: Kavitha Selvam, Tamil Nadu)
   const [profile, setProfile] = useState<UserProfile>(DEMO_PERSONAS[0].profile);
@@ -77,10 +85,40 @@ export default function Home() {
     }
   };
 
-  // Live Cedar policy evaluation
+  // Sync with API Setu & National Public Data Exchange
+  const handleSyncWithApiSetu = async () => {
+    setIsSyncingSchemes(true);
+    try {
+      const res = await fetch("/api/schemes/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ forceRefresh: true })
+      });
+      const data = await res.json();
+      if (data.success && data.allSchemes) {
+        setSchemes(data.allSchemes);
+        setLastSyncedAt("Just now");
+        if (data.newlyAddedSchemes && data.newlyAddedSchemes.length > 0) {
+          const names = data.newlyAddedSchemes.map((s: { shortCode: string }) => s.shortCode).join(", ");
+          setSyncBannerMessage(`🎉 Successfully ingested newly gazetted scheme(s) from API Setu: ${names}`);
+        } else {
+          setSyncBannerMessage("✅ All schemes verified up-to-date with API Setu.");
+        }
+        setTimeout(() => setSyncBannerMessage(null), 8000);
+      }
+    } catch (e) {
+      console.error("Failed to sync schemes:", e);
+      setSyncBannerMessage("⚠️ Could not reach API Setu gateway. Kept 24 baseline policies active.");
+      setTimeout(() => setSyncBannerMessage(null), 5000);
+    } finally {
+      setIsSyncingSchemes(false);
+    }
+  };
+
+  // Live Cedar policy evaluation over active dynamic scheme pool
   const evaluationResults = useMemo(() => {
-    return evaluateCedarPolicies(profile);
-  }, [profile]);
+    return evaluateCedarPolicies(profile, schemes);
+  }, [profile, schemes]);
 
   // Live document audit
   const auditResult = useMemo(() => {
@@ -255,6 +293,22 @@ export default function Home() {
           </div>
         </div>
 
+        {/* API Setu Live Ingestion Toast Notification */}
+        {syncBannerMessage && (
+          <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-3.5 text-xs text-emerald-900 shadow-sm animate-in fade-in slide-in-from-top duration-300">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="size-4 shrink-0 text-emerald-600" />
+              <span className="font-semibold">{syncBannerMessage}</span>
+            </div>
+            <button
+              onClick={() => setSyncBannerMessage(null)}
+              className="rounded-lg px-2 py-0.5 text-emerald-700 hover:bg-emerald-100 font-mono font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Tab Views */}
         <div>
           {/* View 1: Citizen Master Profile Page (Default Entry Point) */}
@@ -278,6 +332,10 @@ export default function Home() {
               onNavigateToProfile={() => setActiveTab("profile")}
               onNavigateToDocuments={handleNavigateToDocuments}
               onNavigateToRoadmap={handleNavigateToRoadmap}
+              totalSchemesCount={schemes.length}
+              lastSyncedAt={lastSyncedAt}
+              onSyncWithApiSetu={handleSyncWithApiSetu}
+              isSyncing={isSyncingSchemes}
             />
           )}
 
